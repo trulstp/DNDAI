@@ -3,15 +3,18 @@ const express = require("express");
 
 const {
     register,
-    getMonsters,
     getAllMonsters,
+    openai,
+    getMonstersByLocationAndCR,
 } = require("../controller/dndController");
 
 const router = express.Router();
 
 router.post("/register", register);
 
-router.get("/encounter", getMonsters);
+router.post("/completions", openai);
+
+router.get("/encounter", getMonstersByLocationAndCR);
 
 router.get("/all", getAllMonsters);
 

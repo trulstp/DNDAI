@@ -2,12 +2,8 @@ const mongoose = require("mongoose");
 
 
 const monsterSchema = new mongoose.Schema({
-    monster: {
+    monsterName: {
         type: String,
-        required: true,
-    },
-    number: {
-        type: Number,
         required: true,
     },
     challengeRating: {
@@ -22,6 +18,10 @@ const monsterSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    groupTag: {
+        type: String,
+        required: true,
+    }
 });
 
 module.exports = mongoose.model("monsters", monsterSchema);
