@@ -94,9 +94,16 @@ main();
 
 // gets a monster based on location, challenge rating, and setting
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 const getMonstersByLocationAndCR = async (req, res) => {
     try {
-        const { location, challengeRating } = req.query;  // I'm assuming you're passing these as query parameters
+        const { location, challengeRating } = req.query;
 
         // Fetch all monsters of the given location
         const potentialMonsters = await monsterSchema.find({ location: { $regex: location, $options: 'i' } });
@@ -104,17 +111,26 @@ const getMonstersByLocationAndCR = async (req, res) => {
         let selectedMonsters = [];
         let remainingCR = parseInt(challengeRating, 10);
 
-
-        // Sorting monsters by CR in descending order
-        potentialMonsters.sort((a, b) => b.challengeRating - a.challengeRating);
-
+        // Create a pool of monsters based on their CR and the total available CR
+        let monsterPool = [];
         for (const monster of potentialMonsters) {
+            const maxAppearances = Math.floor(remainingCR / monster.challengeRating);
+            for (let i = 0; i < maxAppearances; i++) {
+                monsterPool.push(monster);
+            }
+        }
+
+        // Shuffle multiple times for increased randomness
+        shuffleArray(monsterPool);
+        shuffleArray(monsterPool);
+        shuffleArray(monsterPool);
+
+        for (const monster of monsterPool) {
             if (monster.challengeRating <= remainingCR) {
                 selectedMonsters.push(monster);
                 remainingCR -= monster.challengeRating;
             }
 
-            // Optional: If you've found enough monsters or hit some other condition, you can break early
             if (remainingCR <= 0) break;
         }
 
@@ -126,6 +142,29 @@ const getMonstersByLocationAndCR = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+const getMonstersByLocation = async (req, res) => {
+    try {
+        const { location } = req.query;
+
+        // Fetch all monsters of the given location
+        const monsters = await monsterSchema.find({ location: { $regex: location, $options: 'i' } });
+
+        // Filter the results to only include monsterName, challengeRating, and groupTag
+        const filteredMonsters = monsters.map(monster => ({
+            monsterName: monster.monsterName,
+            challengeRating: monster.challengeRating,
+            groupTag: monster.groupTag
+        }));
+
+        res.json(filteredMonsters);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
 
 
 
@@ -145,5 +184,5 @@ module.exports = {
     getMonstersByLocationAndCR,
     getAllMonsters,
     openai,
-
+    getMonstersByLocation
 };
