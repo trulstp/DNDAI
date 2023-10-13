@@ -6,6 +6,7 @@ const {
     getAllMonsters,
     openai,
     getMonstersByLocationAndCR,
+    getMonstersByLocation,
 } = require("../controller/dndController");
 
 const router = express.Router();
@@ -17,5 +18,7 @@ router.post("/completions", openai);
 router.get("/encounter", getMonstersByLocationAndCR);
 
 router.get("/all", getAllMonsters);
+
+router.get("/location", getMonstersByLocation);
 
 module.exports = router;

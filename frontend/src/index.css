@@ -16,14 +16,7 @@ body {
   display: flex;
 }
 
-.side-bar {
-  background-color: #202123;
-  height: 100vh;
-  width: 244px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+
 
 button {
   border: solid 0.5px rgba(255, 255, 255, 0.5);
@@ -100,17 +93,7 @@ input:focus {
   cursor: pointer;
 }
 
-.history {
-  padding: 10px;
-  margin: 10px;
-  height: 100%;
-}
 
-.history li {
-  list-style-type: none;
-  padding: 15px;
-  cursor: pointer;
-}
 
 
 
