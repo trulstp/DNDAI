@@ -1,95 +1,35 @@
-import Sidebar from "./Components/UI/Sidebar/Sidebar";
-import Login from "./Components/Login/Login";
-import Register from "./Components/Register/Register";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ProfilePage from "./pages/ProfilePage";
+import EditProfilePage from "./pages/EditProfilePage";
+import RandomItemPage from "./pages/RandomItemPage";
+import MapsPage from "./pages/MapsPage";
+import CharacterCreatorPage from "./pages/CharacterCreatorPage";
+import RandomEncounterPage from "./pages/RandomEncounterPage";
 import "./index.css";
-import { useState, useEffect } from "react";
-import RandomEncounter from "./Components/RandomEncounter/RandomEncounter";
+
+const router = createBrowserRouter([
+  { path: "/", element: <HomePage /> },
+  { path: "/encounter", element: <RandomEncounterPage /> },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> },
+  { path: "/forgotpassword", element: <ForgotPasswordPage /> },
+  { path: "/resetpassword", element: <ResetPasswordPage /> },
+  { path: "/profile", element: <ProfilePage /> },
+  { path: "/profile/edit", element: <EditProfilePage /> },
+  { path: "/treasure", element: <RandomItemPage /> },
+  { path: "/mapmaker", element: <MapsPage /> },
+  { path: "/creator", element: <CharacterCreatorPage /> },
+]);
 
 function App() {
-  const [value, setValue] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [previousChats, setPreviousChats] = useState([]);
-  const [currentTitle, setCurrentTitle] = useState(null);
-
-  const createNewEncounter = () => {
-    setMessage(null);
-    setValue("");
-    setCurrentTitle(null);
-  };
-
-  const handleClick = (uniqueTitle) => {
-    setCurrentTitle(uniqueTitle);
-    setMessage(null);
-    setValue("");
-  };
-
-  const getMessages = async () => {
-    const options = {
-      method: "POST",
-      body: JSON.stringify({
-        message: value,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    try {
-      const response = await fetch(
-        "http://localhost:4000/app/completions",
-        options
-      );
-      const data = await response.json();
-      setMessage(data.choices[0].message);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    console.log(currentTitle, value, message);
-    if (!currentTitle && value && message) {
-      setCurrentTitle(value);
-    }
-    if (currentTitle && value && message) {
-      setPreviousChats((prevChats) => [
-        ...prevChats,
-        {
-          title: currentTitle,
-          role: "user",
-          content: value,
-        },
-        {
-          title: currentTitle,
-          role: message.role,
-          content: message.content,
-        },
-      ]);
-    }
-  }, [message, currentTitle]);
-
-  console.log(previousChats);
-
-  const currentEncounter = previousChats.filter(
-    (previousChat) => previousChat.title === currentTitle
-  );
-  const uniqueTitles = Array.from(
-    new Set(previousChats.map((previousChat) => previousChat.title).reverse())
-  );
-  console.log(uniqueTitles);
-
   return (
     <div className='App'>
-      <Sidebar
-        createNewEncounter={createNewEncounter}
-        handleClick={handleClick}
-        uniqueTitles={uniqueTitles}
-      />
-      <RandomEncounter
-        currentEncounter={currentEncounter}
-        value={value}
-        setValue={setValue}
-        getMessages={getMessages}
-      />
+      <RouterProvider router={router} />
     </div>
   );
 }
