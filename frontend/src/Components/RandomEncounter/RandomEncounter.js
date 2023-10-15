@@ -1,3 +1,5 @@
+import React from "react";
+
 const RandomEncounter = (props) => {
   return (
     <section className='main'>

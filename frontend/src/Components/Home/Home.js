@@ -1,27 +1,38 @@
 import classes from "./Home.module.css";
 import React from "react";
+import { Link } from "react-router-dom";
+import dragon from "../../Images/dragon.png";
+import elf from "../../Images/elf.png";
+import map from "../../Images/old-map.png";
+import treasure from "../../Images/treasure-chest.png";
 
 const Home = () => {
   return (
-    <div>
-      <h1>DND AI</h1>
-      <div className={classes.container}>
-        <div className={classes.square}>
-          <img src='image1.jpg' alt='Image 1' />
-          <p>Text 1</p>
-        </div>
-        <div className={classes.square}>
-          <img src='image2.jpg' alt='Image 2' />
-          <p>Text 2</p>
-        </div>
-        <div className={classes.square}>
-          <img src='image3.jpg' alt='Image 3' />
-          <p>Text 3</p>
-        </div>
-        <div className={classes.square}>
-          <img src='image4.jpg' alt='Image 4' />
-          <p>Text 4</p>
-        </div>
+    <div className={classes.container}>
+      <div className={classes.square}>
+        <Link to='/encounter'>
+          <img src={dragon} alt='monsters' />
+          <p>Random Encounter</p>
+        </Link>
+      </div>
+
+      <div className={classes.square}>
+        <Link to='/creator'>
+          <img src={elf} alt='Characters' />
+          <p>Character</p>
+        </Link>
+      </div>
+      <div className={classes.square}>
+        <Link to='/mapmaker'>
+          <img src={map} alt='a map' />
+          <p>Maps</p>
+        </Link>
+      </div>
+      <div className={classes.square}>
+        <Link to='/treasure'>
+          <img src={treasure} alt='a treasure chest' />
+          <p>Treasure</p>
+        </Link>
       </div>
     </div>
   );
