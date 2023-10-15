@@ -1,6 +1,9 @@
 import Sidebar from "./Components/UI/Sidebar/Sidebar";
+import Login from "./Components/Login/Login";
+import Register from "./Components/Register/Register";
 import "./index.css";
 import { useState, useEffect } from "react";
+import RandomEncounter from "./Components/RandomEncounter/RandomEncounter";
 
 function App() {
   const [value, setValue] = useState(null);
@@ -70,7 +73,7 @@ function App() {
     (previousChat) => previousChat.title === currentTitle
   );
   const uniqueTitles = Array.from(
-    new Set(previousChats.map((previousChat) => previousChat.title))
+    new Set(previousChats.map((previousChat) => previousChat.title).reverse())
   );
   console.log(uniqueTitles);
 
@@ -81,31 +84,12 @@ function App() {
         handleClick={handleClick}
         uniqueTitles={uniqueTitles}
       />
-      <section className='main'>
-        {!currentTitle && <h1>DNDAI</h1>}
-        <div className='picture-section'></div>
-        <div className='feed'>
-          <ul>
-            {currentEncounter?.map((chatMessage, index) => (
-              <li key={index}>
-                <p className='role'>{chatMessage.role}</p>
-                <p>{chatMessage.content}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className='bottom-section'>
-          <div className='input-container'>
-            <input value={value} onChange={(e) => setValue(e.target.value)} />
-            <div id='submit' onClick={getMessages}>
-              ➢
-            </div>
-          </div>
-          <p className='info'>
-            DNDAI is a studentproject made by Truls, Dani, and Timothè
-          </p>
-        </div>
-      </section>
+      <RandomEncounter
+        currentEncounter={currentEncounter}
+        value={value}
+        setValue={setValue}
+        getMessages={getMessages}
+      />
     </div>
   );
 }

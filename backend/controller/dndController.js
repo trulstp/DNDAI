@@ -6,51 +6,43 @@ dotenv.config();
 // registers a monster based on schema, all needs to be included
 
 const register = async (req, res) => {
-  // Check if the request contains an array of monsters
-  if (Array.isArray(req.body)) {
-    let registeredMonsters = [];
+  try {
+    // Check if the request contains an array of monsters
+    if (Array.isArray(req.body)) {
+      let registeredMonsters = [];
 
-    // Loop through each monster in the array
-    for (const monster of req.body) {
-      const newMonster = new monsterSchema({
-        monsterName: monster.monsterName,
-        challengeRating: monster.challengeRating,
-        setting: monster.setting,
-        location: monster.location,
-        groupTag: monster.groupTag,
-      });
-
-      // Save the monster
-      await newMonster
-        .save()
-        .then((data) => {
-          registeredMonsters.push(data);
-        })
-        .catch((err) => {
-          return res.status(400).json(err);
+      // Loop through each monster in the array
+      for (const monster of req.body) {
+        const newMonster = new monsterSchema({
+          monsterName: monster.monsterName,
+          challengeRating: monster.challengeRating,
+          setting: monster.setting,
+          location: monster.location,
+          groupTag: monster.groupTag,
         });
-    }
 
-    // Return the array of registered monsters
-    return res.json(registeredMonsters);
-  } else {
-    // Handle single monster registration
-    let registeredMonster = new monsterSchema({
-      monsterName: req.body.monsterName,
-      challengeRating: req.body.challengeRating,
-      setting: req.body.setting,
-      location: req.body.location,
-      groupTag: req.body.groupTag,
-    });
+        // Save the monster
+        const data = await newMonster.save();
+        registeredMonsters.push(data);
+      }
 
-    registeredMonster = await registeredMonster
-      .save()
-      .then((data) => {
-        res.json(data);
-      })
-      .catch((err) => {
-        res.status(400).json(err);
+      // Return the array of registered monsters
+      return res.json(registeredMonsters);
+    } else {
+      // Handle single monster registration
+      let registeredMonster = new monsterSchema({
+        monsterName: req.body.monsterName,
+        challengeRating: req.body.challengeRating,
+        setting: req.body.setting,
+        location: req.body.location,
+        groupTag: req.body.groupTag,
       });
+
+      const data = await registeredMonster.save();
+      res.json(data);
+    }
+  } catch (err) {
+    res.status(400).json(err);
   }
 };
 
