@@ -14,16 +14,22 @@ import "./index.css";
 
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
+
+  // Game related pages
   { path: "/encounter", element: <RandomEncounterPage /> },
+  { path: "/treasure", element: <RandomItemPage /> },
+  { path: "/mapmaker", element: <MapsPage /> },
+  { path: "/creator", element: <CharacterCreatorPage /> },
+
+  // User authentication and account management
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   { path: "/forgotpassword", element: <ForgotPasswordPage /> },
   { path: "/resetpassword", element: <ResetPasswordPage /> },
+
+  // User profile related
   { path: "/profile", element: <ProfilePage /> },
   { path: "/profile/edit", element: <EditProfilePage /> },
-  { path: "/treasure", element: <RandomItemPage /> },
-  { path: "/mapmaker", element: <MapsPage /> },
-  { path: "/creator", element: <CharacterCreatorPage /> },
 ]);
 
 function App() {
