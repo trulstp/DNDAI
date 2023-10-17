@@ -8,7 +8,7 @@ const RandomEncounterPage = () => {
   const [previousChats, setPreviousChats] = useState([]);
   const [currentTitle, setCurrentTitle] = useState(null);
 
-  const createNewEncounter = () => {
+  const createNew = () => {
     setMessage(null);
     setValue("");
     setCurrentTitle(null);
@@ -77,9 +77,10 @@ const RandomEncounterPage = () => {
   return (
     <React.Fragment>
       <Sidebar
-        createNewEncounter={createNewEncounter}
+        createNewEncounter={createNew}
         handleClick={handleClick}
         uniqueTitles={uniqueTitles}
+        button={"+ New Encounter"}
       />
       <RandomEncounter
         currentEncounter={currentEncounter}
