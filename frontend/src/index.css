@@ -9,6 +9,14 @@
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #fafafc;
+    color: #777;
+    font-family: sans-serif;
 }
 
 .App {

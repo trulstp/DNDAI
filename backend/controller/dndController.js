@@ -1,6 +1,8 @@
 const monsterSchema = require("../models/DnDSchema");
 const axios = require("axios");
 const dotenv = require("dotenv");
+const OpenAI = require("openai");
+
 dotenv.config();
 
 // registers a monster based on schema, all needs to be included
@@ -46,8 +48,10 @@ const register = async (req, res) => {
   }
 };
 
+// My API key for OpenAI
 const API_KEY = process.env.OPENAI_API_KEY;
 
+// gets a response from openai based on a message
 const openai = async (req, res) => {
   const options = {
     method: "POST",
@@ -71,21 +75,26 @@ const openai = async (req, res) => {
   }
 };
 
-const openaiImage = async (req, res) => {
-  const openai = new OpenAI();
+const openaiImages = async (req, res) => {
+  // Initialize the OpenAI client with the API key
+  const openai = new OpenAI(API_KEY);
 
-  async function main() {
+  try {
     const image = await openai.images.generate({
-      prompt: "A cute baby sea otter",
+      prompt: req.body.message,
+      n: 2,
+      size: "1024x1024",
     });
 
     console.log(image.data);
+    res.send(image.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
   }
-  main();
 };
 
 // gets a monster based on location, challenge rating, and setting
-
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -174,5 +183,6 @@ module.exports = {
   getMonstersByLocationAndCR,
   getAllMonsters,
   openai,
+  openaiImages,
   getMonstersByLocation,
 };
