@@ -2,11 +2,12 @@ const { response } = require("express");
 const express = require("express");
 
 const {
-    register,
-    getAllMonsters,
-    openai,
-    getMonstersByLocationAndCR,
-    getMonstersByLocation,
+  register,
+  getAllMonsters,
+  openai,
+  openaiImages,
+  getMonstersByLocationAndCR,
+  getMonstersByLocation,
 } = require("../controller/dndController");
 
 const router = express.Router();
@@ -14,6 +15,8 @@ const router = express.Router();
 router.post("/register", register);
 
 router.post("/completions", openai);
+
+router.post("/images", openaiImages);
 
 router.get("/encounter", getMonstersByLocationAndCR);
 
