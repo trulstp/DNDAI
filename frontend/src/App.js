@@ -12,24 +12,32 @@ import CharacterCreatorPage from "./pages/CharacterCreatorPage";
 import RandomEncounterPage from "./pages/RandomEncounterPage";
 import "./index.css";
 
+import Root from "./pages/Root";
+
 const router = createBrowserRouter([
-  { path: "/", element: <HomePage /> },
+  {
+    path: "/",
+    element: <Root />,
+    children: [
+      { path: "/", element: <HomePage /> },
 
-  // Game related pages
-  { path: "/encounter", element: <RandomEncounterPage /> },
-  { path: "/treasure", element: <RandomItemPage /> },
-  { path: "/mapmaker", element: <MapsPage /> },
-  { path: "/creator", element: <CharacterCreatorPage /> },
+      // Game related pages
+      { path: "/encounter", element: <RandomEncounterPage /> },
+      { path: "/treasure", element: <RandomItemPage /> },
+      { path: "/mapmaker", element: <MapsPage /> },
+      { path: "/creator", element: <CharacterCreatorPage /> },
 
-  // User authentication and account management
-  { path: "/login", element: <LoginPage /> },
-  { path: "/register", element: <RegisterPage /> },
-  { path: "/forgotpassword", element: <ForgotPasswordPage /> },
-  { path: "/resetpassword", element: <ResetPasswordPage /> },
+      // User authentication and account management
+      { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
+      { path: "/forgotpassword", element: <ForgotPasswordPage /> },
+      { path: "/resetpassword", element: <ResetPasswordPage /> },
 
-  // User profile related
-  { path: "/profile", element: <ProfilePage /> },
-  { path: "/profile/edit", element: <EditProfilePage /> },
+      // User profile related
+      { path: "/profile", element: <ProfilePage /> },
+      { path: "/profile/edit", element: <EditProfilePage /> },
+    ],
+  },
 ]);
 
 function App() {

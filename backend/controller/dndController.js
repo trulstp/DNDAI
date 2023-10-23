@@ -60,9 +60,9 @@ const openai = async (req, res) => {
       "Content-Type": "application/json",
     },
     data: {
-      model: "gpt-3.5-turbo",
+      model: "gpt-4",
       messages: [{ role: "user", content: req.body.message }],
-      max_tokens: 100,
+      max_tokens: 2000,
     },
     url: "https://api.openai.com/v1/chat/completions",
   };
@@ -70,6 +70,7 @@ const openai = async (req, res) => {
   try {
     const response = await axios(options);
     res.send(response.data);
+    console.log(response.data);
   } catch (error) {
     console.log(error);
   }
@@ -178,6 +179,39 @@ const getAllMonsters = async (req, res) => {
   }
 };
 
+const getLocations = async (req, res) => {
+  try {
+    const locations = await monsterSchema.find({}, "location");
+
+    // Use a Set to store unique locations after standardizing them
+    const uniqueLocationsSet = new Set();
+
+    // Iterate through the locations and standardize them before adding to the Set
+    locations.forEach((item) => {
+      // You can use a custom function to standardize the location as needed
+      const standardizedLocation = standardizeLocation(item.location);
+
+      // Add the standardized location to the Set
+      uniqueLocationsSet.add(standardizedLocation);
+    });
+
+    // Convert the Set back to an array
+    const uniqueLocations = Array.from(uniqueLocationsSet);
+
+    console.log("Distinct Locations:", uniqueLocations);
+    res.json(uniqueLocations);
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Custom function to standardize location
+function standardizeLocation(location) {
+  // You can implement your standardization logic here, e.g., removing spaces and making it lowercase
+  return location.toLowerCase().replace(/\s/g, "");
+}
+
 module.exports = {
   register,
   getMonstersByLocationAndCR,
@@ -185,4 +219,5 @@ module.exports = {
   openai,
   openaiImages,
   getMonstersByLocation,
+  getLocations,
 };

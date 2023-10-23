@@ -1,5 +1,6 @@
 import classes from "./Login.module.css";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -25,10 +26,10 @@ const Login = () => {
       <div>
         <div>
           {" "}
-          <a href='/forgotpassword'>Forgot password</a>
+          <Link to='/forgotpassword'>Forgot password</Link>
         </div>
         <div>
-          <a href='/register'>Don't have an account? Sign up here!</a>
+          <Link to='/register'>Don't have an account? Sign up here!</Link>
         </div>
       </div>
     </div>
