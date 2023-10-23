@@ -1,10 +1,11 @@
 import classes from "./Sidebar.module.css";
+import Button from "../Buttons/Button";
 import React from "react";
 
 const Sidebar = (props) => {
   return (
     <section className={classes["side-bar"]}>
-      <button onClick={props.createNew}>{props.button}</button>
+      <Button onClick={props.createNewEncounter}>{props.button}</Button>
       <ul className={classes.history}>
         {props.uniqueTitles?.map((uniqueTitle, index) => (
           <li key={index} onClick={() => props.handleClick(uniqueTitle)}>
@@ -12,9 +13,6 @@ const Sidebar = (props) => {
           </li>
         ))}
       </ul>
-      <nav>
-        <p>Made by Truls</p>
-      </nav>
     </section>
   );
 };

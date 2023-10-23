@@ -5,13 +5,6 @@ const ImageTester = () => {
   const [images, setImages] = useState(null);
   const [value, setValue] = useState("");
 
-  const surpriseOptions = [
-    "A painting of a sunflower in a purple vase",
-    "A painting of a sunflower in a blue vase",
-    "a man with a hat",
-    "a pineapple sunbathing on an island",
-  ];
-
   const getImages = async () => {
     try {
       const options = {

@@ -3,39 +3,52 @@ import React, { useState, useEffect } from "react";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 
 const RandomEncounterPage = () => {
-  const [value, setValue] = useState(null);
+  const [value1, setValue1] = useState("");
+  const [value2, setValue2] = useState("");
   const [message, setMessage] = useState(null);
   const [previousChats, setPreviousChats] = useState([]);
   const [currentTitle, setCurrentTitle] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [feedActive, setFeedActive] = useState(false);
 
   const createNew = () => {
     setMessage(null);
-    setValue("");
+    setValue1("");
+    setValue2("");
     setCurrentTitle(null);
   };
 
   const handleClick = (uniqueTitle) => {
     setCurrentTitle(uniqueTitle);
     setMessage(null);
-    setValue("");
+    setValue1("");
+    setValue2("");
   };
 
   const getMessages = async () => {
-    const options = {
-      method: "POST",
-      body: JSON.stringify({
-        message: value,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+    console.log(value1);
+
     try {
-      const response = await fetch(
+      const firstResponse = await fetch(
+        `http://localhost:4000/app/encounter?location=${value1}&challengeRating=${value2}`
+      );
+      const firstData = await firstResponse.json();
+      console.log(firstData);
+      const options = {
+        method: "POST",
+        body: JSON.stringify({
+          message: `Generate a detailed encounter description involving the following monsters: ${firstData}. Describe the setting, the actions of the monsters, and any potential challenges or interactions the player characters might face during this encounter.`,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      const secondResponse = await fetch(
         "http://localhost:4000/app/completions",
         options
       );
-      const data = await response.json();
+      const data = await secondResponse.json();
       setMessage(data.choices[0].message);
     } catch (error) {
       console.error(error);
@@ -43,17 +56,17 @@ const RandomEncounterPage = () => {
   };
 
   useEffect(() => {
-    console.log(currentTitle, value, message);
-    if (!currentTitle && value && message) {
-      setCurrentTitle(value);
+    console.log(currentTitle, value1, message);
+    if (!currentTitle && value1 && message) {
+      setCurrentTitle(value1);
     }
-    if (currentTitle && value && message) {
+    if (currentTitle && value1 && message) {
       setPreviousChats((prevChats) => [
         ...prevChats,
         {
           title: currentTitle,
           role: "user",
-          content: value,
+          content: value1,
         },
         {
           title: currentTitle,
@@ -62,7 +75,7 @@ const RandomEncounterPage = () => {
         },
       ]);
     }
-  }, [message, currentTitle, value]);
+  }, [message, currentTitle]);
 
   console.log(previousChats);
 
@@ -84,9 +97,15 @@ const RandomEncounterPage = () => {
       />
       <RandomEncounter
         currentEncounter={currentEncounter}
-        value={value}
-        setValue={setValue}
+        value1={value1}
+        value2={value2}
+        setValue1={setValue1}
+        setValue2={setValue2}
         getMessages={getMessages}
+        loading={loading}
+        setLoading={setLoading}
+        feedActive={feedActive}
+        setFeedActive={setFeedActive}
       />
     </React.Fragment>
   );
