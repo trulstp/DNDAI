@@ -1,34 +1,21 @@
 import React from "react";
+import classes from "./RandomEncounter.module.css";
+import Feed from "../UI/Feed/Feed";
+import InputSection from "../UI/InputSection/InputSection";
 
 const RandomEncounter = (props) => {
   return (
-    <section className='main'>
+    <section className={classes.main}>
       {!props.currentTitle && <h1>DNDAI</h1>}
-      <div className='picture-section'></div>
-      <div className='feed'>
-        <ul>
-          {props.currentEncounter?.map((chatMessage, index) => (
-            <li key={index}>
-              <p className='role'>{chatMessage.role}</p>
-              <p>{chatMessage.content}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className='bottom-section'>
-        <div className='input-container'>
-          <input
-            value={props.value}
-            onChange={(e) => props.setValue(e.target.value)}
-          />
-          <div id='submit' onClick={props.getMessages}>
-            ➢
-          </div>
-        </div>
-        <p className='info'>
-          DNDAI is a studentproject made by Truls, Dani, and Timothè
-        </p>
-      </div>
+      <div className={classes["picture-section"]}></div>
+      <Feed currentEncounter={props.currentEncounter} />
+      <InputSection
+        value1={props.value1}
+        value2={props.value2}
+        setValue1={props.setValue1}
+        setValue2={props.setValue2}
+        getMessages={props.getMessages}
+      />
     </section>
   );
 };
