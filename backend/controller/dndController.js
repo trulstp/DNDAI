@@ -60,9 +60,9 @@ const openai = async (req, res) => {
       "Content-Type": "application/json",
     },
     data: {
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: req.body.message }],
-      max_tokens: 2000,
+      max_tokens: 600,
     },
     url: "https://api.openai.com/v1/chat/completions",
   };

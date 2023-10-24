@@ -9,9 +9,12 @@ const RandomEncounterPage = () => {
   const [previousChats, setPreviousChats] = useState([]);
   const [currentTitle, setCurrentTitle] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [encounter, setEncounter] = useState("");
   const [feedActive, setFeedActive] = useState(false);
 
   const createNew = () => {
+    setFeedActive(false);
+    setLoading(false);
     setMessage(null);
     setValue1("");
     setValue2("");
@@ -19,10 +22,13 @@ const RandomEncounterPage = () => {
   };
 
   const handleClick = (uniqueTitle) => {
+    setFeedActive(true);
+    setLoading(false);
     setCurrentTitle(uniqueTitle);
     setMessage(null);
     setValue1("");
     setValue2("");
+    console.log(feedActive);
   };
 
   const getMessages = async () => {
@@ -33,11 +39,15 @@ const RandomEncounterPage = () => {
         `http://localhost:4000/app/encounter?location=${value1}&challengeRating=${value2}`
       );
       const firstData = await firstResponse.json();
+      setLoading(true);
+      setEncounter(firstData);
       console.log(firstData);
       const options = {
         method: "POST",
         body: JSON.stringify({
-          message: `Generate a detailed encounter description involving the following monsters: ${firstData}. Describe the setting, the actions of the monsters, and any potential challenges or interactions the player characters might face during this encounter.`,
+          message: `Generate a detailed encounter description involving the following monsters: ${firstData}. 
+          It takes place in ${value1}. Describe the setting, the actions of the monsters, 
+          and any potential challenges or interactions the player characters might face during this encounter. add paragraphs`,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -50,6 +60,9 @@ const RandomEncounterPage = () => {
       );
       const data = await secondResponse.json();
       setMessage(data.choices[0].message);
+      setLoading(false);
+      setEncounter("");
+      setFeedActive(true);
     } catch (error) {
       console.error(error);
     }
@@ -63,11 +76,7 @@ const RandomEncounterPage = () => {
     if (currentTitle && value1 && message) {
       setPreviousChats((prevChats) => [
         ...prevChats,
-        {
-          title: currentTitle,
-          role: "user",
-          content: value1,
-        },
+
         {
           title: currentTitle,
           role: message.role,
@@ -97,6 +106,7 @@ const RandomEncounterPage = () => {
       />
       <RandomEncounter
         currentEncounter={currentEncounter}
+        currentTitle={currentTitle}
         value1={value1}
         value2={value2}
         setValue1={setValue1}
@@ -106,6 +116,7 @@ const RandomEncounterPage = () => {
         setLoading={setLoading}
         feedActive={feedActive}
         setFeedActive={setFeedActive}
+        encounter={encounter}
       />
     </React.Fragment>
   );
