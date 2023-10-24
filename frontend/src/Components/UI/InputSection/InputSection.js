@@ -100,9 +100,6 @@ const InputSection = (props) => {
       <Button className={classes.submit} onClick={props.getMessages}>
         Roll an Encounter
       </Button>
-      <p className='info'>
-        DNDAI is a studentproject made by Truls, Dani, and Timothè
-      </p>
     </div>
   );
 };

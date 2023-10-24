@@ -1,4 +1,7 @@
 .Select {
     display: flex;
     flex-direction: row-reverse;
+    margin: 0 auto;
+    margin-bottom: 40px;
+    
 }
