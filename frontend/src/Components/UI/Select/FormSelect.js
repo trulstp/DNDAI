@@ -6,6 +6,8 @@ const FormSelect = (props) => {
   return (
     <Select
       isMulti={props.isMulti}
+      menuPlacement='auto'
+      menuPosition='fixed'
       name={props.name}
       placeholder={props.placeholder}
       options={props.options}
