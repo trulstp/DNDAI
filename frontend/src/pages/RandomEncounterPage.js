@@ -45,9 +45,10 @@ const RandomEncounterPage = () => {
       const options = {
         method: "POST",
         body: JSON.stringify({
-          message: `Generate a detailed encounter description involving the following monsters: ${firstData}. 
-          It takes place in ${value1}. Describe the setting, the actions of the monsters, 
-          and any potential challenges or interactions the player characters might face during this encounter. add paragraphs`,
+          message: {
+            monsters: firstData,
+            location: value1,
+          },
         }),
         headers: {
           "Content-Type": "application/json",
@@ -55,11 +56,15 @@ const RandomEncounterPage = () => {
       };
 
       const secondResponse = await fetch(
-        "http://localhost:4000/app/completions",
+        "http://localhost:4000/app/schematic",
         options
       );
+      if (!secondResponse.ok) {
+        throw new Error(`HTTP error! Status: ${secondResponse.status}`);
+      }
       const data = await secondResponse.json();
-      setMessage(data.choices[0].message);
+      console.log(data);
+      setMessage(data);
       setLoading(false);
       setEncounter("");
       setFeedActive(true);
@@ -71,7 +76,7 @@ const RandomEncounterPage = () => {
   useEffect(() => {
     console.log(currentTitle, value1, message);
     if (!currentTitle && value1 && message) {
-      setCurrentTitle(value1);
+      setCurrentTitle(message.title);
     }
     if (currentTitle && value1 && message) {
       setPreviousChats((prevChats) => [
@@ -80,7 +85,7 @@ const RandomEncounterPage = () => {
         {
           title: currentTitle,
           role: message.role,
-          content: message.content,
+          content: message,
         },
       ]);
     }
@@ -123,3 +128,7 @@ const RandomEncounterPage = () => {
 };
 
 export default RandomEncounterPage;
+
+// `Generate a detailed encounter description involving the following monsters: ${firstData}.
+//           It takes place in the environment ${value1}. Describe the setting, the actions of the monsters,
+//           and any potential challenges or interactions the player characters might face during this encounter.`,
