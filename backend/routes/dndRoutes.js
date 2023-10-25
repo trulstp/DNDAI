@@ -4,11 +4,12 @@ const express = require("express");
 const {
   register,
   getAllMonsters,
-  openai,
+  openaimessage,
   openaiImages,
   getMonstersByLocationAndCR,
   getMonstersByLocation,
   getLocations,
+  encounter,
 } = require("../controller/dndController");
 
 const router = express.Router();
@@ -16,7 +17,7 @@ const router = express.Router();
 // url Example: http://localhost:4000/user/register body: json format { "monsterName" : "Beholder", "challengeRating" : 13, "location" : "Underdark", "groupTag" : "Beholder" }
 router.post("/register", register);
 
-router.post("/completions", openai);
+router.post("/completions", openaimessage);
 
 router.post("/images", openaiImages);
 
@@ -30,5 +31,7 @@ router.get("/all", getAllMonsters);
 router.get("/location", getMonstersByLocation);
 
 router.get("/locations", getLocations);
+
+router.post("/schematic", encounter);
 
 module.exports = router;
