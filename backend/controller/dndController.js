@@ -2,8 +2,8 @@ const monsterSchema = require("../models/DnDSchema");
 const axios = require("axios");
 const dotenv = require("dotenv");
 const OpenAI = require("openai");
-
 dotenv.config();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // registers a monster based on schema, all needs to be included
 
@@ -52,7 +52,7 @@ const register = async (req, res) => {
 const API_KEY = process.env.OPENAI_API_KEY;
 
 // gets a response from openai based on a message
-const openai = async (req, res) => {
+const openaimessage = async (req, res) => {
   const options = {
     method: "POST",
     headers: {
@@ -61,7 +61,12 @@ const openai = async (req, res) => {
     },
     data: {
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: req.body.message }],
+      messages: [
+        {
+          role: "user",
+          content: req.body.message,
+        },
+      ],
       max_tokens: 600,
     },
     url: "https://api.openai.com/v1/chat/completions",
@@ -83,8 +88,8 @@ const openaiImages = async (req, res) => {
   try {
     const image = await openai.images.generate({
       prompt: req.body.message,
-      n: 2,
-      size: "1024x1024",
+      n: 1,
+      size: "512x512",
     });
 
     console.log(image.data);
@@ -212,12 +217,102 @@ function standardizeLocation(location) {
   return location.toLowerCase().replace(/\s/g, "");
 }
 
+const encounterSchema = {
+  type: "object",
+  properties: {
+    title: {
+      type: "string",
+      description: "Make a title for the encounter.",
+    },
+    location: {
+      type: "string",
+      description:
+        "describe the location and the environment of the encounter in great detail.",
+    },
+    monsters: {
+      type: "string",
+      description: "describe the monsters in the encounter in great detail.",
+    },
+    gear: {
+      type: "string",
+      description:
+        "describe the weapons and armor the monsters in the encounter are using if they are wearing weapons and armor.",
+    },
+    treasure: {
+      type: "string",
+      description:
+        "describe the treasure the monsters in the encounter are guarding if there is any around.",
+    },
+    magical_items: {
+      type: "string",
+      description:
+        "describe the magical items the monsters in the encounter are guarding or using if there is any around.",
+    },
+    poster_description: {
+      type: "string",
+      description:
+        "Make prompts describing the encounter as a poster, that can be used by an image generating ai like DALL-E.",
+    },
+  },
+  required: [
+    "encounter",
+    "location",
+    "monsters",
+    "gear",
+    "treasure",
+    "magical_items",
+    "poster_description",
+  ],
+};
+
+const encounter = async (req, res) => {
+  const options = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a dungeon master helper and you are creating an detailed encounter based on monsters and location for your players.",
+        },
+        {
+          role: "user",
+          content: `Create an detailed encounter based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location}`,
+        },
+      ],
+      functions: [{ name: "create_encounter", parameters: encounterSchema }],
+      function_call: { name: "create_encounter" },
+      temperature: 1,
+      max_tokens: 1000,
+    },
+    url: "https://api.openai.com/v1/chat/completions",
+  };
+
+  try {
+    const response = await axios(options);
+    const encounterData = JSON.parse(
+      response.data.choices[0].message.function_call.arguments
+    );
+    res.json(encounterData); // Send the encounter data as JSON
+    console.log(encounterData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   register,
   getMonstersByLocationAndCR,
   getAllMonsters,
-  openai,
+  openaimessage,
   openaiImages,
   getMonstersByLocation,
   getLocations,
+  encounter,
 };
