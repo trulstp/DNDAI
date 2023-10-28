@@ -85,7 +85,7 @@ const InputSection = (props) => {
         <FormSelect
           options={options}
           placeholder={"Locations"}
-          isMulti={true}
+          isMulti={false}
           name={"Locations"}
           onChange={handleChange}
         />

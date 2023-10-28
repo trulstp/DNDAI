@@ -1,53 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import Button from "../Buttons/Button";
 import classes from "./Feed.module.css";
 
 const Feed = (props) => {
   const feedContainerRef = useRef(null);
-
-  const [images, setImages] = useState(null);
-
-  // Scroll to the bottom whenever messages change
-  useEffect(() => {
-    scrollToBottom();
-  }, [props.currentEncounter]);
-
-  const scrollToBottom = () => {
-    if (feedContainerRef.current) {
-      feedContainerRef.current.scrollTop =
-        feedContainerRef.current.scrollHeight;
-    }
-  };
-
-  const imageGenerator = async () => {
-    try {
-      const currentDescription =
-        props.currentEncounter[0]?.content?.poster_description;
-      if (!currentDescription) {
-        console.error("Poster description not found");
-        return;
-      }
-
-      const options = {
-        method: "POST",
-        body: JSON.stringify({ message: currentDescription }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const response = await fetch("http://localhost:4000/app/images", options);
-      const data = await response.json();
-      console.log(data);
-      if (Array.isArray(data) && data.length > 0) {
-        setImages(data);
-      } else {
-        console.error("Invalid image data received");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+  console.log("testing again" + props.currentEncounter);
   return (
     <div className={classes.feed} ref={feedContainerRef}>
       {props.currentEncounter?.map((chatMessage, index) => (
@@ -56,12 +13,15 @@ const Feed = (props) => {
             <p className={classes.role}>{chatMessage.role}</p>
             <h1>{chatMessage.content.title}</h1>
           </section>
-          {!images && (
-            <Button onClick={() => imageGenerator()}>Generate Image?</Button>
+          {!props.images && (
+            <Button onClick={() => props.imageGenerator()}>
+              Generate Image?
+            </Button>
           )}
-          {images &&
-            images.map((image, index) => (
+          {props.images &&
+            props.images.map((image, index) => (
               <img
+                loading='lazy'
                 key={index}
                 src={image.url}
                 alt={chatMessage.content.title}
@@ -76,6 +36,11 @@ const Feed = (props) => {
           <section className={classes.section}>
             <h2 className={classes.heading}>Monsters</h2>
             <p className={classes.paragraph}>{chatMessage.content.monsters}</p>
+          </section>
+
+          <section className={classes.section}>
+            <h2 className={classes.heading}>Scene</h2>
+            <p className={classes.paragraph}>{chatMessage.content.scene}</p>
           </section>
 
           <section className={classes.section}>

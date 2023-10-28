@@ -11,6 +11,7 @@ const RandomEncounterPage = () => {
   const [loading, setLoading] = useState(false);
   const [encounter, setEncounter] = useState("");
   const [feedActive, setFeedActive] = useState(false);
+  const [images, setImages] = useState(null);
 
   const createNew = () => {
     setFeedActive(false);
@@ -19,6 +20,7 @@ const RandomEncounterPage = () => {
     setValue1("");
     setValue2("");
     setCurrentTitle(null);
+    setImages(null);
   };
 
   const handleClick = (uniqueTitle) => {
@@ -28,7 +30,37 @@ const RandomEncounterPage = () => {
     setMessage(null);
     setValue1("");
     setValue2("");
+    setImages(null);
     console.log(feedActive);
+  };
+
+  const imageGenerator = async () => {
+    try {
+      const currentDescription =
+        currentEncounter[0]?.content?.poster_description;
+      if (!currentDescription) {
+        console.error("Poster description not found");
+        return;
+      }
+
+      const options = {
+        method: "POST",
+        body: JSON.stringify({ message: currentDescription }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const response = await fetch("http://localhost:4000/app/images", options);
+      const data = await response.json();
+      console.log(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setImages(data);
+      } else {
+        console.error("Invalid image data received");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getMessages = async () => {
@@ -63,6 +95,7 @@ const RandomEncounterPage = () => {
         throw new Error(`HTTP error! Status: ${secondResponse.status}`);
       }
       const data = await secondResponse.json();
+      console.log("testing", data);
       console.log(data);
       setMessage(data);
       setLoading(false);
@@ -122,6 +155,9 @@ const RandomEncounterPage = () => {
         feedActive={feedActive}
         setFeedActive={setFeedActive}
         encounter={encounter}
+        images={images}
+        imageGenerator={imageGenerator}
+        setImages={setImages}
       />
     </React.Fragment>
   );
