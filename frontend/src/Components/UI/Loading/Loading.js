@@ -36,9 +36,16 @@ const Loading = (props) => {
         size='xl'
         style={{ color: "#ff0000" }}
       />
-      <h2 className={classes["loading-text"]}>
-        An encounter of {formattedEncounter} is being generated
-      </h2>
+      {formattedEncounter.length > 0 && (
+        <h2 className={classes["loading-text"]}>
+          An encounter of {formattedEncounter} is being generated
+        </h2>
+      )}
+      {!formattedEncounter.length > 0 && (
+        <h2 className={classes["loading-text"]}>
+          An encounter{formattedEncounter} is being generated
+        </h2>
+      )}
     </div>
   );
 };
