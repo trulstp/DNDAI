@@ -233,6 +233,11 @@ const encounterSchema = {
       type: "string",
       description: "describe the monsters in the encounter in great detail.",
     },
+    scene: {
+      type: "string",
+      description:
+        "Describe the setting, the actions of the monsters, how they view each other, and any potential challenges or interactions the player characters might face during this encounter.",
+    },
     gear: {
       type: "string",
       description:
@@ -251,13 +256,14 @@ const encounterSchema = {
     poster_description: {
       type: "string",
       description:
-        "Make prompts describing the encounter as a poster, that can be used by an image generating ai like DALL-E.",
+        "Describe the encounter in intricate detail, include specific descriptions, shapes, colors, textures, patterns, and artistic styles.",
     },
   },
   required: [
     "encounter",
     "location",
     "monsters",
+    "scene",
     "gear",
     "treasure",
     "magical_items",
@@ -273,7 +279,7 @@ const encounter = async (req, res) => {
       "Content-Type": "application/json",
     },
     data: {
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -282,13 +288,14 @@ const encounter = async (req, res) => {
         },
         {
           role: "user",
-          content: `Create an detailed encounter based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location}`,
+          content: `Create an detailed encounter based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location} make the encounter at least 800 words long`,
         },
       ],
       functions: [{ name: "create_encounter", parameters: encounterSchema }],
       function_call: { name: "create_encounter" },
       temperature: 1,
-      max_tokens: 1000,
+
+      max_tokens: 1500,
     },
     url: "https://api.openai.com/v1/chat/completions",
   };
@@ -299,6 +306,7 @@ const encounter = async (req, res) => {
       response.data.choices[0].message.function_call.arguments
     );
     res.json(encounterData); // Send the encounter data as JSON
+    console.log(response.data);
     console.log(encounterData);
   } catch (error) {
     console.error(error);

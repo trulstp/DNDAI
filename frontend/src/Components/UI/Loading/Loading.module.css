@@ -11,3 +11,7 @@
 .loading-text {
     color: var(--text-secondary);
 }
+
+.loading h2 {
+    text-align: center;
+}

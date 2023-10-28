@@ -12,7 +12,12 @@ const RandomEncounter = (props) => {
       ) : (
         <>
           {props.feedActive && (
-            <Feed currentEncounter={props.currentEncounter} />
+            <Feed
+              currentEncounter={props.currentEncounter}
+              images={props.images}
+              setImages={props.setImages}
+              imageGenerator={props.imageGenerator}
+            />
           )}
           {!props.feedActive && (
             <InputSection
