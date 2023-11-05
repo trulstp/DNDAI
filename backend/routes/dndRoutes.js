@@ -10,6 +10,7 @@ const {
   getMonstersByLocation,
   getLocations,
   encounter,
+  getCharacter,
 } = require("../controller/dndController");
 
 const router = express.Router();
@@ -33,5 +34,7 @@ router.get("/location", getMonstersByLocation);
 router.get("/locations", getLocations);
 
 router.post("/schematic", encounter);
+
+router.post("/create-character", getCharacter);
 
 module.exports = router;
