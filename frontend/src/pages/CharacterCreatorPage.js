@@ -1,9 +1,5 @@
-import ImageTester from "../Components/ImageTester/ImageTester";
+const CharacterCreatorPage = () => {};
 
-const Character = () => {
-  return <ImageTester />;
-};
-
-export default Character;
+export default CharacterCreatorPage;
 
 //Some testing,

@@ -4,16 +4,19 @@
 :root {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  --text-primary: #343541;
+  --text-primary: steelblue;
   --text-secondary: #ffffff;
-  --color-primary: #6649b8;
-  --color-secondary: #1e1e24;
+  --color-primary: #343541;
+  --color-secondary: #202123;
+  --color-tertiary: #444654;
+  --transition-speed: 600ms;
 }
 
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  
 }
 
 body::-webkit-scrollbar {
@@ -29,13 +32,13 @@ body::-webkit-scrollbar-thumb {
 }
 
 
+
+
 .App {
   background-color: #343541;
   display: flex;
- 
   width: 100vw;
   height: 100vh;
-  
 }
 
 
