@@ -89,7 +89,7 @@ const openaiImages = async (req, res) => {
     const image = await openai.images.generate({
       prompt: req.body.message,
       n: 1,
-      size: "512x512",
+      size: "1024x1024",
     });
 
     console.log(image.data);
@@ -227,11 +227,11 @@ const encounterSchema = {
     location: {
       type: "string",
       description:
-        "describe the location and the environment of the encounter in great detail.",
+        "describe in great detail the location and the environment of the encounter.",
     },
     monsters: {
       type: "string",
-      description: "describe the monsters in the encounter in great detail.",
+      description: "describe in great detail the monsters in the encounter",
     },
     scene: {
       type: "string",
@@ -314,6 +314,63 @@ const encounter = async (req, res) => {
   }
 };
 
+const { spawn } = require("child_process");
+
+const getCharacter = (req, res) => {
+  // Validate or set default values before passing them to the Python script
+  const name = req.body.name || "random";
+  const charClass = req.body.class || "random";
+  const race = req.body.race || "random";
+  const level = req.body.level || 1; // Default level if not provided
+
+  const args = [
+    "scripts/Class_creator.py", // Ensure this is the correct path to your Python script
+    name,
+    charClass,
+    race,
+    String(level), // Convert level to a string to ensure all args are strings
+  ];
+
+  // Change "python" to "python3" or the correct path to your Python executable
+  const python = spawn("python3", args);
+
+  let dataToSend = "";
+  let isClosed = false; // Flag to indicate if the response has been sent
+
+  python.stdout.on("data", (data) => {
+    dataToSend += data.toString();
+  });
+
+  python.stderr.on("data", (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  python.on("error", (error) => {
+    console.error(`error: ${error.message}`);
+    if (!isClosed) {
+      res.status(500).send("An error occurred while generating the character.");
+      isClosed = true; // Update the flag
+    }
+  });
+
+  python.on("close", (code) => {
+    if (isClosed) return; // If the response is already sent, do nothing
+    console.log(`Child process exited with code ${code}`);
+    if (code === 0) {
+      try {
+        const jsonData = JSON.parse(dataToSend);
+        res.json(jsonData); // Use res.json to send JSON response directly
+      } catch (e) {
+        console.error("Failed to parse JSON:", e);
+        res.status(500).send("Failed to parse character data.");
+      }
+    } else {
+      res.status(500).send(`Python script exited with code ${code}`);
+    }
+    isClosed = true; // Update the flag
+  });
+};
+
 module.exports = {
   register,
   getMonstersByLocationAndCR,
@@ -323,4 +380,5 @@ module.exports = {
   getMonstersByLocation,
   getLocations,
   encounter,
+  getCharacter,
 };
