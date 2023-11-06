@@ -1,8 +1,12 @@
 import Sidebar from "../Components/UI/Sidebar/Sidebar";
 import React, { useState, useEffect } from "react";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
+import { SidebarContext } from "../store/sidebar-context";
+import { useContext } from "react";
 
 const RandomEncounterPage = () => {
+  const sidebarCtx = useContext(SidebarContext);
+
   const [value1, setValue1] = useState("");
   const [value2, setValue2] = useState("");
   const [message, setMessage] = useState(null);
@@ -154,12 +158,14 @@ const RandomEncounterPage = () => {
 
   return (
     <React.Fragment>
-      <Sidebar
-        createNewEncounter={createNew}
-        handleClick={handleClick}
-        uniqueTitles={uniqueTitles}
-        button={"+ New Encounter"}
-      />
+      {sidebarCtx.sidebarOpen && (
+        <Sidebar
+          createNewEncounter={createNew}
+          handleClick={handleClick}
+          uniqueTitles={uniqueTitles}
+          button={"+ New Encounter"}
+        />
+      )}
       <RandomEncounter
         currentEncounter={currentEncounter}
         currentTitle={currentTitle}

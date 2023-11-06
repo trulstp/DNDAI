@@ -19,6 +19,7 @@
   .feed h1, h2 {
     text-align: left;
     cursor: pointer;
+    color: var(--text-primary);
   }
 
 
