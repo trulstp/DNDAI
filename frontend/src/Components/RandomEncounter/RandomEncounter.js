@@ -17,6 +17,9 @@ const RandomEncounter = (props) => {
               images={props.images}
               setImages={props.setImages}
               imageGenerator={props.imageGenerator}
+              isVisible={props.isVisible}
+              setIsVisible={props.setIsVisible}
+              toggleVisibility={props.toggleVisibility}
             />
           )}
           {!props.feedActive && (

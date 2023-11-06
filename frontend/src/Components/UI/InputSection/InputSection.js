@@ -16,7 +16,7 @@ const InputSection = (props) => {
     "cold caves",
     "deep caves",
     "desert sandy caverns",
-    "don drow cities",
+    "drow cities",
     "duergar fortresses",
     "dungeons",
     "dungeons sewers",
@@ -83,6 +83,7 @@ const InputSection = (props) => {
     <div className={classes["bottom-section"]}>
       <div className={classes["select-section"]}>
         <FormSelect
+          width='200px'
           options={options}
           placeholder={"Locations"}
           isMulti={false}
@@ -90,6 +91,7 @@ const InputSection = (props) => {
           onChange={handleChange}
         />
         <FormSelect
+          width='200px'
           options={SecondOptions}
           placeholder={"Challenge Rating"}
           isMulti={false}

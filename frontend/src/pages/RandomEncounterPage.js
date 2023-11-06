@@ -12,6 +12,15 @@ const RandomEncounterPage = () => {
   const [encounter, setEncounter] = useState("");
   const [feedActive, setFeedActive] = useState(false);
   const [images, setImages] = useState(null);
+  const [isVisible, setIsVisible] = useState({
+    images: true,
+    location: true,
+    monsters: true,
+    scene: true,
+    gear: true,
+    treasure: true,
+    magicalItems: true,
+  });
 
   const createNew = () => {
     setFeedActive(false);
@@ -55,6 +64,11 @@ const RandomEncounterPage = () => {
       console.log(data);
       if (Array.isArray(data) && data.length > 0) {
         setImages(data);
+        setPreviousChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.title === currentTitle ? { ...chat, images: data } : chat
+          )
+        );
       } else {
         console.error("Invalid image data received");
       }
@@ -102,7 +116,7 @@ const RandomEncounterPage = () => {
       setEncounter("");
       setFeedActive(true);
     } catch (error) {
-      console.error(error);
+      console.error(" error here?", error);
     }
   };
 
@@ -134,6 +148,10 @@ const RandomEncounterPage = () => {
   );
   console.log(uniqueTitles);
 
+  const toggleVisibility = (section) => {
+    setIsVisible((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
   return (
     <React.Fragment>
       <Sidebar
@@ -158,6 +176,9 @@ const RandomEncounterPage = () => {
         images={images}
         imageGenerator={imageGenerator}
         setImages={setImages}
+        isVisible={isVisible}
+        setIsVisible={setIsVisible}
+        toggleVisibility={toggleVisibility}
       />
     </React.Fragment>
   );
