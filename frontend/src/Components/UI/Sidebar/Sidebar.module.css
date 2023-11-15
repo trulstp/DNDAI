@@ -1,23 +1,37 @@
 .side-bar {
     background-color: var(--color-secondary);
     height: 100vh;
-    width: 244px;
+    margin-top: 5rem;
+    width: 11rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    z-index: 103;
     margin-left: 5rem;
+    
+    transition: left 0.3s ease;
+  }
+
+  .sidebar-button {
+    display: flex;
+    margin-top: 1.5rem;
+    justify-content: center;
   }
 
   .history {
-    padding: 10px;
-    margin: 10px;
     height: 100%;
     overflow: scroll;
   }
+
+  ul {
+    padding: 0;
+    text-align: center;
+}
   
   .history li {
     list-style-type: none;
-    padding: 15px;
+    padding: 5px;
+    margin-top: 10px;
     cursor: pointer;
     color: var(--text-primary);
   }
@@ -25,6 +39,10 @@
   @media only screen and (max-width: 600px) {
     .side-bar {
         margin-left: 0;
-        
+        height: calc(100vh - 5rem);
+        position: absolute;
+        margin-top: 0rem;
+        z-index: 102;
+        width: 50%;
     }
   }

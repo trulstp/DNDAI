@@ -11,6 +11,7 @@ const {
   getLocations,
   encounter,
   getCharacter,
+  creator,
 } = require("../controller/dndController");
 
 const router = express.Router();
@@ -37,4 +38,5 @@ router.post("/schematic", encounter);
 
 router.post("/create-character", getCharacter);
 
+router.post("/openaiCharacter", creator);
 module.exports = router;
