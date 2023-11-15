@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { SidebarContext } from "../../../store/sidebar-context";
 import classes from "./Loading.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDragon } from "@fortawesome/free-solid-svg-icons";
@@ -26,10 +27,12 @@ const formatMonsterList = (monsters) => {
 };
 
 const Loading = (props) => {
+  const { sidebarOpen } = useContext(SidebarContext);
+  const history = !sidebarOpen ? "history" : "";
   const formattedEncounter = formatMonsterList(props.encounter);
 
   return (
-    <div className={classes.loading}>
+    <div className={`${classes.loading} ${classes[history]}`}>
       <FontAwesomeIcon
         icon={faDragon}
         bounce

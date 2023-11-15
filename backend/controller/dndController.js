@@ -87,6 +87,7 @@ const openaiImages = async (req, res) => {
 
   try {
     const image = await openai.images.generate({
+      model: "dall-e-3",
       prompt: req.body.message,
       n: 1,
       size: "1024x1024",
@@ -217,6 +218,97 @@ function standardizeLocation(location) {
   return location.toLowerCase().replace(/\s/g, "");
 }
 
+const characterSchema = {
+  type: "object",
+  properties: {
+    personality: {
+      type: "string",
+      description: "Describe the personality traits of the character.",
+    },
+    ideals: {
+      type: "string",
+      description:
+        "Describe the ideals of the character, what do they strive for?",
+    },
+    bonds: {
+      type: "string",
+      description:
+        "Describe the bonds of the character, what do they care for?",
+    },
+    flaws: {
+      type: "string",
+      description:
+        "Describe the flaws of the character, what are they afraid of?",
+    },
+    gear: {
+      type: "string",
+      description:
+        "describe the weapons and armor the character are using if they are wearing weapons and armor.",
+    },
+    character_portrait: {
+      type: "string",
+      description:
+        "Describe the character in intricate detail, include specific descriptions, shapes, colors, textures, patterns, and artistic styles.",
+    },
+    backstory: {
+      type: "string",
+      description: "Describe the characters backstory in intricate detail.",
+    },
+  },
+  required: [
+    "personality",
+    "ideals",
+    "bonds",
+    "flaws",
+    "gear",
+    "character_portrait",
+    "backstory",
+  ],
+};
+
+const creator = async (req, res) => {
+  const options = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a dungeons and dragons assistant helper and you are creating an detailed player character based on their stats, name, race, class, and level for a ttrpg game.",
+        },
+        {
+          role: "user",
+          content: `Create an detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, and they are at this level: ${req.body.message.level} make the description at least 800 words long`,
+        },
+      ],
+      functions: [{ name: "create_character", parameters: characterSchema }],
+      function_call: { name: "create_character" },
+      temperature: 1,
+
+      max_tokens: 2000,
+    },
+    url: "https://api.openai.com/v1/chat/completions",
+  };
+
+  try {
+    const response = await axios(options);
+    const characterData = await JSON.parse(
+      response.data.choices[0].message.function_call.arguments
+    );
+    res.json(characterData); // Send the encounter data as JSON
+    console.log(response.data);
+    console.log(characterData);
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 const encounterSchema = {
   type: "object",
   properties: {
@@ -260,6 +352,7 @@ const encounterSchema = {
     },
   },
   required: [
+    "title",
     "encounter",
     "location",
     "monsters",
@@ -302,9 +395,10 @@ const encounter = async (req, res) => {
 
   try {
     const response = await axios(options);
-    const encounterData = JSON.parse(
+    const encounterData = await JSON.parse(
       response.data.choices[0].message.function_call.arguments
     );
+
     res.json(encounterData); // Send the encounter data as JSON
     console.log(response.data);
     console.log(encounterData);
@@ -381,4 +475,5 @@ module.exports = {
   getLocations,
   encounter,
   getCharacter,
+  creator,
 };
