@@ -65,7 +65,7 @@ const RandomEncounterPage = () => {
       };
       const response = await fetch("http://localhost:4000/app/images", options);
       const data = await response.json();
-      console.log(data);
+
       if (Array.isArray(data) && data.length > 0) {
         setImages(data);
         setPreviousChats((prevChats) =>
@@ -88,10 +88,12 @@ const RandomEncounterPage = () => {
       const firstResponse = await fetch(
         `http://localhost:4000/app/encounter?location=${value1}&challengeRating=${value2}`
       );
+      if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
       setLoading(true);
       setEncounter(firstData);
       console.log(firstData);
+
       const options = {
         method: "POST",
         body: JSON.stringify({
@@ -109,30 +111,36 @@ const RandomEncounterPage = () => {
         "http://localhost:4000/app/schematic",
         options
       );
-      if (!secondResponse.ok) {
-        throw new Error(`HTTP error! Status: ${secondResponse.status}`);
-      }
+      if (!secondResponse.ok) throw new Error("Second fetch failed");
       const data = await secondResponse.json();
+
       console.log("testing", data);
-      console.log(data);
-      setMessage(data);
-      setLoading(false);
-      setEncounter("");
-      setFeedActive(true);
+      // Check if the response has the expected structure
+      if (data && typeof data === "object" && "title" in data) {
+        setMessage(data);
+        setFeedActive(true);
+      } else {
+        throw new Error("Unexpected data structure from second fetch");
+      }
     } catch (error) {
-      console.error(" error here?", error);
+      console.error("Error here?", error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Use effect for setting the title based on message
   useEffect(() => {
-    console.log(currentTitle, value1, message);
-    if (!currentTitle && value1 && message) {
+    if (message && !currentTitle) {
       setCurrentTitle(message.title);
     }
-    if (currentTitle && value1 && message) {
+  }, [message, currentTitle]);
+
+  // Use effect for updating the previousChats
+  useEffect(() => {
+    if (currentTitle && message) {
       setPreviousChats((prevChats) => [
         ...prevChats,
-
         {
           title: currentTitle,
           role: message.role,
@@ -140,7 +148,7 @@ const RandomEncounterPage = () => {
         },
       ]);
     }
-  }, [message, currentTitle]);
+  }, [currentTitle, message]);
 
   console.log(previousChats);
 
@@ -150,7 +158,6 @@ const RandomEncounterPage = () => {
   const uniqueTitles = Array.from(
     new Set(previousChats.map((previousChat) => previousChat.title).reverse())
   );
-  console.log(uniqueTitles);
 
   const toggleVisibility = (section) => {
     setIsVisible((prev) => ({ ...prev, [section]: !prev[section] }));

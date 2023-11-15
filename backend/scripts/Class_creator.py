@@ -9,7 +9,7 @@ d10 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 d12 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 
 class Character:
-    def __init__(self, name, race, characterclass, level, stats, hitpoints, speed, equipment, skills, saves, spells, language, size, abilities, classabilities):
+    def __init__(self, name, race, characterclass, level, stats, hitpoints, speed, equipment, skills, saves, spells, language, size, abilities, classabilities, alignment):
         self.name = name
         self.characterclass = characterclass
         self.race = race
@@ -25,14 +25,14 @@ class Character:
         self.size = size
         self.abilities = abilities
         self.classabilities = classabilities
-
-  
+        self.alignment = alignment  
     
     def converttojsonandsend(self):
         jsonobject = {"Name" : self.name,
                       "Race" : self.race,
                       "Class" : self.characterclass,
                       "Level" : self.level,
+                      "Alignment": self.alignment,
                       "Hitpoints": self.hitpoints,
                       "Strength": self.stats['Str'],
                       "Dexterity": self.stats['Dex'],
@@ -278,6 +278,11 @@ def createacharacter(name = "random", classname = "random", race = "random", lev
     if race == "random":
         race = random.choice(list(racedictionary.keys()))
 
+    alignment = random.choice(["Lawful", "Neutral", "Chaotic"]) + " " + random.choice(["Good", "Neutral", "Evil"])
+    if alignment == "Neutral Neutral":
+        alignment = "True Neutral"
+    
+
     stats = randomlycreatestats()
 
     priority = classdictionary[classname]["statpriority"]
@@ -408,7 +413,7 @@ def createacharacter(name = "random", classname = "random", race = "random", lev
         spells = classdictionary[classname]["spells"]
     saves = classdictionary[classname]["saves"]
 
-    character = Character(name, race, classname, level, stats, hp, speed, equipment, skills, saves, spells, language, size, abilitylist, classabilities)
+    character = Character(name, race, classname, level, stats, hp, speed, equipment, skills, saves, spells, language, size, abilitylist, classabilities, alignment)
 
     return character
 

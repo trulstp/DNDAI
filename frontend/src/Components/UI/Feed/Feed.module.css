@@ -3,17 +3,32 @@
     overflow-x: hidden;
     height: 100vh;
     width: 100%;
-    max-width: 700px;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     
+  }
+
+
+  .section-container section {
+    margin-left: 5rem;
+  }
+
+  .section-container img {
+    margin-left: 5rem;
+  }
+
+  .feed section {
+    padding: 10px 20px 10px 20px;
+    max-width: 700px;
   }
   
   .feed li {
     display: flex;
     background-color: #444654;
     width: 100%;
-    padding: 20px;
-    margin: 20px 0;
+    
   }
 
   .feed h1, h2 {
@@ -36,10 +51,50 @@
 
   .image {
     width: 700px;
-    height: 700px;
-
+    object-fit: fill;
+    max-height: 100%;
+    max-width: calc(100% - 6rem);
+    height: auto; /* Maintain aspect ratio */
   }
 
-  section {
-    padding: 3px;
+  .last-section {
+    margin-bottom: 24px;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .feed {
+      width: 100%;
+      height: 90vh;
+      max-width: 100%;
+    }
+
+    .feed section {
+      margin-left: 0rem;
+    }
+  
+    .section-container img {
+        margin-left: 0rem;
+      }
+
+  .feed h2 {
+    font-size: 20px;
+  }
+
+  .feed h1 {
+    font-size: 30px;
+  }
+  }
+ 
+  @media only screen and (max-width: 300px) {
+    .image {
+        width: 200px;
+        height: 200px;
+    }
+
+    .feed {
+      width: 100%;
+      height: 90vh;
+      max-width: 100%;
+    }
+
   }

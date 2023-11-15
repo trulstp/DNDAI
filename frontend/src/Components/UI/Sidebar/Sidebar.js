@@ -5,7 +5,9 @@ import React from "react";
 const Sidebar = (props) => {
   return (
     <section className={classes["side-bar"]}>
-      <Button onClick={props.createNewEncounter}>{props.button}</Button>
+      <div className={classes["sidebar-button"]}>
+        <Button onClick={props.createNewEncounter}>{props.button}</Button>
+      </div>
       <ul className={classes.history}>
         {props.uniqueTitles?.map((uniqueTitle, index) => (
           <li key={index} onClick={() => props.handleClick(uniqueTitle)}>
