@@ -1,14 +1,19 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
+import { SidebarContext } from "../../../store/sidebar-context";
 import Button from "../Buttons/Button";
 import classes from "./Feed.module.css";
 
 const Feed = (props) => {
   const feedContainerRef = useRef(null);
 
+  const { sidebarOpen } = useContext(SidebarContext);
+
+  const feedClass = !sidebarOpen ? "section-container" : "";
+
   return (
-    <div className={classes.feed} ref={feedContainerRef}>
+    <div className={`${classes.feed}`} ref={feedContainerRef}>
       {props.currentEncounter?.map((chatMessage, index) => (
-        <div key={index}>
+        <div key={index} className={classes[feedClass]}>
           <section>
             <p className={classes.role}>{chatMessage.role}</p>
             <h1 onClick={() => props.toggleVisibility("images")}>
@@ -19,7 +24,7 @@ const Feed = (props) => {
             (chatMessage.images || props.images) &&
             (chatMessage.images || props.images).map((image, index) => (
               <img
-                className={classes.image}
+                className={` ${classes.image} ${classes[feedClass]}`}
                 loading='lazy'
                 key={index}
                 src={image.url}
@@ -89,7 +94,7 @@ const Feed = (props) => {
           </section>
 
           <section
-            className={classes.section}
+            className={`${classes.section} ${classes["last-section"]}`}
             onClick={() => props.toggleVisibility("magicalItems")}
           >
             <h2 className={classes.heading}>Magical Items</h2>
