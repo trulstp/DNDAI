@@ -3,25 +3,20 @@
     overflow-x: hidden;
     height: 100vh;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
     
   }
 
-
-  .section-container section {
-    margin-left: 5rem;
-  }
-
-  .section-container img {
-    margin-left: 5rem;
-  }
+.section-container {
+    display: flex;  
+    flex-wrap: wrap;   
+    max-width: 1500px;
+    margin: 0 auto;
+}
 
   .feed section {
+    flex: 1 1 45%;
     padding: 10px 20px 10px 20px;
-    max-width: 700px;
+    max-width: 45%;
   }
   
   .feed li {
@@ -31,17 +26,28 @@
     
   }
 
-  .feed h1, h2 {
+  .feed h2 {
     text-align: left;
     cursor: pointer;
     color: var(--text-primary);
+    font-family: var(--font-tertiary);
   }
 
+  .feed h2 {
+    font-size: 32px;
+  }
 
-  
+  .feed h1 {
+    font-size: 48px;
+    padding-bottom: 20px;
+    margin: 0 auto;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    font-family: var(--font-tertiary);
+  }
+ 
   .feed p {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
     text-align: left;
   }
   
@@ -50,10 +56,12 @@
   } 
 
   .image {
-    width: 700px;
+   
     object-fit: fill;
     max-height: 100%;
-    max-width: calc(100% - 6rem);
+    width: 700px;
+    max-width: 100%;
+    border: 5px solid var(--text-primary) ;
     height: auto; /* Maintain aspect ratio */
   }
 
@@ -61,7 +69,16 @@
     margin-bottom: 24px;
   }
 
+  @media only screen and (max-width: 1000px) {
+    .feed section {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+  }
+
   @media only screen and (max-width: 600px) {
+
+
     .feed {
       width: 100%;
       height: 90vh;
@@ -70,18 +87,25 @@
 
     .feed section {
       margin-left: 0rem;
+      flex: none;
+      max-width: 100%;
     }
   
-    .section-container img {
-        margin-left: 0rem;
-      }
+    .section-container {
+        display: flex;  
+        flex-direction: column;
+
+        flex-wrap: nowrap;   
+    }
 
   .feed h2 {
-    font-size: 20px;
+    font-size: 32px;
   }
 
   .feed h1 {
-    font-size: 30px;
+    font-size: 48px;
+    margin: 0 auto;
+    
   }
   }
  
