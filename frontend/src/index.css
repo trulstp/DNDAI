@@ -1,16 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
-
+@font-face {
+  font-family: "draconis";
+  src: url("../src/fonts/Draconis-JRw6B.ttf") format('truetype');
+}
+@font-face {
+  font-family: "breathefire";
+  src: url("../src/fonts/BreatheFireIii-PKLOB.ttf") format("truetype");
+}
 :root {
+  
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  --text-primary: steelblue;
+  --text-primary: #B46746;
   --text-secondary: #ffffff;
+  --text-tertiary: #E84545;
   --color-primary: #343541;
   --color-secondary: #202123;
   --color-tertiary: #444654;
+
+  --font-tertiary: 'draconis';
+  --font-secondary: 'breathefire';
+
   --transition-speed: 600ms;
 }
+
+
 
 body {
   margin: 0;

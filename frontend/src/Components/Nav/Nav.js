@@ -1,18 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import classes from "./Nav.module.css";
 import { Link } from "react-router-dom";
 import { SidebarContext } from "../../store/sidebar-context";
 import { useContext } from "react";
 
 const Nav = () => {
-  const { handleSidebar, handleLightMode, lightMode, sidebarOpen } =
-    useContext(SidebarContext);
+  const {
+    handleSidebar,
+    handleLightMode,
+    lightMode,
+    sidebarOpen,
+    handleHover,
+  } = useContext(SidebarContext);
 
   const history = sidebarOpen ? "history" : "";
   const historyNav = sidebarOpen ? "historyNav" : "navbar";
 
   return (
-    <nav className={`${classes[historyNav]}`}>
+    <nav
+      className={`${classes[historyNav]}`}
+      onMouseEnter={() => handleHover()}
+      onMouseLeave={() => handleHover()}
+    >
       <ul className={classes["navbar-nav"]}>
         <li className={classes["logo"]}>
           <Link to='/' className={classes["nav-link-logo"]}>
@@ -29,8 +38,6 @@ const Nav = () => {
                 className={`${classes["link-text"]} ${classes["logo-text"]} ${classes["link-text-logo"]}`}
               >
                 <span className={classes["fa-secondary"]}>History</span>
-                <br />
-                <span className={classes["fa-secondary"]}>Open</span>
               </span>
             )}
 
@@ -42,13 +49,13 @@ const Nav = () => {
               role='img'
               xmlns='http://www.w3.org/2000/svg'
               viewBox='0 0 448 512'
-              class='svg-inline--fa fa-angle-double-right fa-w-14 fa-5x'
+              className={classes["svg-inline--fa"]}
             >
               <g class='fa-group'>
                 <path
                   fill='currentColor'
                   d='M224 273L88.37 409a23.78 23.78 0 0 1-33.8 0L32 386.36a23.94 23.94 0 0 1 0-33.89l96.13-96.37L32 159.73a23.94 23.94 0 0 1 0-33.89l22.44-22.79a23.78 23.78 0 0 1 33.8 0L223.88 239a23.94 23.94 0 0 1 .1 34z'
-                  className={classes["fa-secondary"]}
+                  className={classes["fa-primary"]}
                 ></path>
                 <path
                   fill='currentColor'
