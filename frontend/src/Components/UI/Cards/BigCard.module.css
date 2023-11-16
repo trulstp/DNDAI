@@ -1,0 +1,33 @@
+.bigcard {
+    width: 100%;
+    height: 100vh;
+    margin-left: 16rem;
+    flex-grow: 1;
+    transition: width var(--transition-speed), margin-left var(--transition-speed);
+ 
+    overflow-y: auto; /* Allows vertical scrolling if content overflows */
+}
+
+.hover {
+    width: 100%;
+    height: 100vh;
+    margin-left: 5rem;
+    flex-grow: 1;
+    overflow-y: auto; /* Allows vertical scrolling if content overflows */
+    transition: width var(--transition-speed), margin-left var(--transition-speed);
+}
+
+
+@media only screen and (max-width: 600px) {
+    .bigcard {
+        width: 100%;
+        height: 100vh;
+        margin-left: 0rem;
+    }
+
+    .hover {
+        width: 100%;
+        height: 100vh;
+        margin-left: 0rem
+    }
+}
