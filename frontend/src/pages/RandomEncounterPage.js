@@ -1,8 +1,8 @@
 import Sidebar from "../Components/UI/Sidebar/Sidebar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
-import { useContext } from "react";
+import BigCard from "../Components/UI/Cards/BigCard";
 
 const RandomEncounterPage = () => {
   const sidebarCtx = useContext(SidebarContext);
@@ -173,6 +173,7 @@ const RandomEncounterPage = () => {
           button={"+ New Encounter"}
         />
       )}
+
       <RandomEncounter
         currentEncounter={currentEncounter}
         currentTitle={currentTitle}

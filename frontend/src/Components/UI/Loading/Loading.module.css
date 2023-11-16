@@ -6,7 +6,8 @@
     height: 100vh;
     width: 700px;
     max-width: 100%;
-    margin-left: 5rem;
+    padding: 30px;
+    
 }
 
 .loading-text {
@@ -15,8 +16,4 @@
 
 .loading h2 {
     text-align: center;
-}
-
-.history {
-    margin-left: 5rem;
 }
