@@ -34,12 +34,14 @@ class Character:
                       "Level" : self.level,
                       "Alignment": self.alignment,
                       "Hitpoints": self.hitpoints,
+                      "Stats": {
                       "Strength": self.stats['Str'],
                       "Dexterity": self.stats['Dex'],
                       "Constitution": self.stats['Con'],
                       "Intelligence": self.stats['Int'],
                       "Wisdom": self.stats['Wis'],
                       "Charisma": self.stats['Cha'],
+        },
                       "Size": self.size,
                       "Speed": self.speed,
                       "Equipment": self.equipment,
@@ -47,7 +49,7 @@ class Character:
                       "Spells": self.spells,
                       "Languages": self.language,
                       "Abilities": self.abilities,
-                      "Class skills": self.classabilities
+                      "ClassSkills": self.classabilities
                       }
         jsonobject = json.dumps(jsonobject)
         print(jsonobject)

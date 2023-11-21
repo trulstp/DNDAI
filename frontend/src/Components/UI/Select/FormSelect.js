@@ -7,9 +7,11 @@ const FormSelect = (props) => {
     <Select
       isMulti={props.isMulti}
       name={props.name}
+      menuPlacement='auto'
+      menuPosition='fixed'
       placeholder={props.placeholder}
       options={props.options}
-      className={classes.Select}
+      className={`${classes.Select}`}
       onChange={props.onChange} // Pass the callback correctly
       value={props.value} // Pass the selected value(s) correctly
     />
