@@ -1,7 +1,11 @@
 .Select {
-    display: flex;
-    flex-direction: row-reverse;
+   
     margin: 0 auto;
-    margin-bottom: 40px;
+    margin: 40px 0px 20px 0px;
+  
+  
+    
+  border-radius: 0.5rem;
+  border: none;
     
 }

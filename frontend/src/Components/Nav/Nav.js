@@ -11,6 +11,7 @@ const Nav = () => {
     lightMode,
     sidebarOpen,
     handleHover,
+    handleHoverOff,
   } = useContext(SidebarContext);
 
   const history = sidebarOpen ? "history" : "";
@@ -20,7 +21,7 @@ const Nav = () => {
     <nav
       className={`${classes[historyNav]}`}
       onMouseEnter={() => handleHover()}
-      onMouseLeave={() => handleHover()}
+      onMouseLeave={() => handleHoverOff()}
     >
       <ul className={classes["navbar-nav"]}>
         <li className={classes["logo"]}>
@@ -37,7 +38,9 @@ const Nav = () => {
               <span
                 className={`${classes["link-text"]} ${classes["logo-text"]} ${classes["link-text-logo"]}`}
               >
-                <span className={classes["fa-secondary"]}>History</span>
+                <span className={classes["fa-secondary"]}>Encounter</span>
+                <br />
+                <span className={classes["fa-primary"]}>History</span>
               </span>
             )}
 
