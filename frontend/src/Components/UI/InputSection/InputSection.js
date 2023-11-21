@@ -1,5 +1,5 @@
 import classes from "./InputSection.module.css";
-
+import Card from "../Cards/Card";
 import FormSelect from "../Select/FormSelect";
 import Button from "../Buttons/Button";
 
@@ -98,24 +98,12 @@ const InputSection = (props) => {
           name={"CR"}
           onChange={handleChange2}
         />
+        <Button className={classes.submit} onClick={props.getMessages}>
+          Roll an Encounter
+        </Button>
       </div>
-      <Button className={classes.submit} onClick={props.getMessages}>
-        Roll an Encounter
-      </Button>
     </div>
   );
 };
 
 export default InputSection;
-
-/* <input
-          value={props.value1}
-          onChange={(e) => props.setValue(e.target.value)}
-        />
-        <Button className={classes.submit} onClick={props.getMessages}>
-          ➢
-        </Button> */
-
-/* <div className="container" onClick={}></div>
-        <div className="container" onClick={}></div>
-        <Button className={classes.submit} onClick={props.getMessages} /> */

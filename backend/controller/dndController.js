@@ -90,7 +90,27 @@ const openaiImages = async (req, res) => {
       model: "dall-e-3",
       prompt: req.body.message,
       n: 1,
-      size: "1024x1024",
+      size: "1792x1024",
+    });
+
+    console.log(image.data);
+    res.send(image.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+const openaiImages2 = async (req, res) => {
+  // Initialize the OpenAI client with the API key
+  const openai = new OpenAI(API_KEY);
+
+  try {
+    const image = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: req.body.message,
+      n: 1,
+      size: "1024x1792",
     });
 
     console.log(image.data);
@@ -240,10 +260,10 @@ const characterSchema = {
       description:
         "Describe the flaws of the character, what are they afraid of?",
     },
-    gear: {
+    roleplay: {
       type: "string",
       description:
-        "describe the weapons and armor the character are using if they are wearing weapons and armor.",
+        "Describe how to roleplay the character, what are their mannerisms?",
     },
     character_portrait: {
       type: "string",
@@ -252,7 +272,8 @@ const characterSchema = {
     },
     backstory: {
       type: "string",
-      description: "Describe the characters backstory in intricate detail.",
+      description:
+        "Describe the characters backstory in intricate detail. max 150 words",
     },
   },
   required: [
@@ -260,7 +281,7 @@ const characterSchema = {
     "ideals",
     "bonds",
     "flaws",
-    "gear",
+    "roleplay",
     "character_portrait",
     "backstory",
   ],
@@ -279,18 +300,18 @@ const creator = async (req, res) => {
         {
           role: "system",
           content:
-            "You are a dungeons and dragons assistant helper and you are creating an detailed player character based on their stats, name, race, class, and level for a ttrpg game.",
+            "You are a dungeons and dragons assistant helper and you are creating an detailed player character based on their stats, skills, alignment, name, race, class, and level for a ttrpg game.",
         },
         {
           role: "user",
-          content: `Create an detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, and they are at this level: ${req.body.message.level} make the description at least 800 words long`,
+          content: `Create an detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, this level: ${req.body.message.level}, this alignment: ${req.body.message.alignment}, these stats: ${req.body.message.stats}, and these skills: ${req.body.message.skills}. Make the character interesting to read.`,
         },
       ],
       functions: [{ name: "create_character", parameters: characterSchema }],
       function_call: { name: "create_character" },
       temperature: 1,
 
-      max_tokens: 2000,
+      max_tokens: 800,
     },
     url: "https://api.openai.com/v1/chat/completions",
   };
@@ -300,6 +321,7 @@ const creator = async (req, res) => {
     const characterData = await JSON.parse(
       response.data.choices[0].message.function_call.arguments
     );
+
     res.json(characterData); // Send the encounter data as JSON
     console.log(response.data);
     console.log(characterData);
@@ -319,11 +341,12 @@ const encounterSchema = {
     location: {
       type: "string",
       description:
-        "describe in great detail the location and the environment of the encounter.",
+        "Make a description of the location of the encounter, include the terrain, the weather, the time of day, and the lighting.",
     },
     monsters: {
       type: "string",
-      description: "describe in great detail the monsters in the encounter",
+      description:
+        "Make a description of the monsters in the encounter, include their appearance, their actions, their motivations, and their goals.",
     },
     scene: {
       type: "string",
@@ -377,11 +400,11 @@ const encounter = async (req, res) => {
         {
           role: "system",
           content:
-            "You are a dungeon master helper and you are creating an detailed encounter based on monsters and location for your players.",
+            "You are a dungeon master helper and you are creating an detailed encounter descriptions based on monsters and location for your players.",
         },
         {
           role: "user",
-          content: `Create an detailed encounter based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location} make the encounter at least 800 words long`,
+          content: `Create an detailed encounter descriptions based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location} make the encounter interesting to read`,
         },
       ],
       functions: [{ name: "create_encounter", parameters: encounterSchema }],
@@ -413,7 +436,7 @@ const { spawn } = require("child_process");
 const getCharacter = (req, res) => {
   // Validate or set default values before passing them to the Python script
   const name = req.body.name || "random";
-  const charClass = req.body.class || "random";
+  const charClass = req.body.classType || "random";
   const race = req.body.race || "random";
   const level = req.body.level || 1; // Default level if not provided
 
@@ -476,4 +499,5 @@ module.exports = {
   encounter,
   getCharacter,
   creator,
+  openaiImages2,
 };

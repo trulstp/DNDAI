@@ -17,11 +17,14 @@ export const SidebarProvider = ({ children }) => {
     }
 
 const handleHover = () => {
-    setHover(!hover);
+    setHover(true);
+}
+const handleHoverOff = () => {
+    setHover(false);
 }
 
     return (
-        <SidebarContext.Provider value={{ sidebarOpen, handleSidebar, lightMode, handleLightMode, hover, handleHover }}>
+        <SidebarContext.Provider value={{ sidebarOpen, handleSidebar, lightMode, handleLightMode, hover, handleHover, handleHoverOff }}>
             {children}
         </SidebarContext.Provider>
     );

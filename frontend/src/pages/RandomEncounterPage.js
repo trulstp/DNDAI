@@ -2,7 +2,6 @@ import Sidebar from "../Components/UI/Sidebar/Sidebar";
 import React, { useState, useEffect, useContext } from "react";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
-import BigCard from "../Components/UI/Cards/BigCard";
 
 const RandomEncounterPage = () => {
   const sidebarCtx = useContext(SidebarContext);
