@@ -54,7 +54,6 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
         </p>
 
         {/* Stats Section */}
-        <h2 className={styles.section}>Stats</h2>
         {/* Dynamically display each stat */}
         <div className={styles["stat-container"]}>
           <p>STR</p>
@@ -75,11 +74,11 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
 
         <h2 className={styles.section}>Class Skills</h2>
         {Object.entries(first.ClassSkills)
-          .filter(([level, classskills]) => classskills.length > 0) // Filter out empty arrays
-          .map(([level, classskills]) => (
+          .filter(([_, skills]) => Array.isArray(skills) && skills.length > 0)
+          .map(([level, skills]) => (
             <div key={level}>
               <p className={styles["paragraph"]}>Level {level}</p>
-              <p className={styles.paragraph}>{classskills.join(", ")}</p>
+              <p className={styles.paragraph}>{skills.join(", ")}</p>
             </div>
           ))}
 

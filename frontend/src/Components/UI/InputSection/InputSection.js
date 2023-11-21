@@ -81,6 +81,7 @@ const InputSection = (props) => {
 
   return (
     <div className={classes["bottom-section"]}>
+      <h1 className={classes.title}>Create a Random Encounter</h1>
       <div className={classes["select-section"]}>
         <FormSelect
           width='200px'
