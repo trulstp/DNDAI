@@ -1,5 +1,5 @@
-import React, { useRef, useContext } from "react";
-import { SidebarContext } from "../../../store/sidebar-context";
+import React, { useRef } from "react";
+
 import Button from "../Buttons/Button";
 import classes from "./Feed.module.css";
 
@@ -19,7 +19,7 @@ const Feed = (props) => {
               (chatMessage.images || props.images).map((image, index) => (
                 <section
                   className={classes.section}
-                  onClick={() => props.toggleVisibility("location")}
+                  onClick={() => props.toggleVisibility("images")}
                 >
                   <img
                     className={` ${classes.image}`}
@@ -31,14 +31,13 @@ const Feed = (props) => {
                 </section>
               ))}
             {!chatMessage.images && !props.images && (
-              <section
-                className={classes.section}
-                onClick={() => props.toggleVisibility("location")}
-              >
+              <section className={classes.section}>
                 <h2>Image</h2>
-                <Button onClick={() => props.imageGenerator()}>
-                  Generate Image?
-                </Button>
+                <div className={classes["image-button"]}>
+                  <Button onClick={() => props.imageGenerator()}>
+                    Generate Image?
+                  </Button>
+                </div>
               </section>
             )}
 

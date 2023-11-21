@@ -1,0 +1,321 @@
+.container {
+   display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "first-column second-column"
+                        "first-column backstory"
+                        "first-column spell-section  ";
+    padding-bottom: 7rem;
+}
+* {
+    box-sizing: border-box;
+  
+}
+.first-column {
+    
+    border-right: 2px solid var(--text-primary);
+    padding-top: 20px;
+    
+    grid-area: first-column;
+    
+    
+}
+
+.name {
+    border-bottom: 2px solid var(--text-primary);
+    font-size: 2rem;
+    padding: 10px;
+    margin: 0 auto; /* centers the element */
+    color: var(--text-primary);
+    font-family: var(--font-tertiary);
+    text-align: center;
+    width: 80%; /* width specified */
+    display: block; /* ensures it's a block-level element */
+  }
+  
+
+.charinfo {
+    margin: 10px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-family: var(--font-tertiary);
+
+}
+
+.image-section {
+    text-align: center;
+}
+
+.image-container { 
+    padding: 10px;
+    
+    text-align: center;
+}
+
+.characterImage {
+    
+    max-width: 80%;
+    border: 2px solid var(--text-primary); /* Style as needed */
+    
+}
+
+
+.paragraph {
+    color: var(--text-secondary);
+    width: 80%;
+    margin: 0 auto;
+    padding: 5px 0px;
+}
+
+.apiparagraph {
+    color: var(--text-secondary);
+}
+
+.stat-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    color: var(--text-secondary);
+    font-weight: bold;
+    border-top: 2px solid var(--text-primary);
+    width: 80%;
+}
+
+
+
+.stat-container2 {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 0 auto;
+    color: var(--text-secondary);
+    font-weight: bold;
+    width: 80%;
+    border-bottom: 2px solid var(--text-primary);
+}
+
+.stat-container2 p {
+    margin-bottom: 10px;
+    padding: 0px 5px 0px 5px;
+}
+
+.section {
+    font-size: 1.5rem;
+    width: 80%;
+    margin: 0 auto;
+    padding: 5px 0;
+    color: var(--text-primary);
+    font-family: var(--font-tertiary);
+}
+
+.second-column {
+grid-area: second-column;
+margin-top: 20px;
+}
+
+.gpt-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto;
+    width: 80%;
+    color: var(--text-secondary);
+    font-weight: bold;
+    border-bottom: 2px solid var(--text-primary);
+}
+
+.gpt-container p {
+    font-weight: normal;
+    text-align: left;
+}
+.gpt-container h2{
+text-align: left;
+}
+
+.section-container {
+    display: flex;
+    flex-direction: column;
+    
+    padding-left: 10px;
+}
+
+.backstory {
+    width: 80%;
+    margin: 0 auto;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    padding: 0px 25px;
+    grid-area: backstory;
+}
+.backstory-header {
+    color: var(--text-primary);
+    font-family: var(--font-tertiary);
+   
+}
+.backstory p {
+    color: var(--text-secondary);
+    text-align: left;
+    
+    margin-bottom: 0px;
+    margin-top: 5px;
+}
+
+.gpt-section {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-family: var(--font-tertiary);
+    margin-bottom: 0px;
+    margin-top: 5px;   
+}
+
+.spell-section {
+    width: 60%;
+    margin: 0 auto;
+    text-align: center;
+    grid-area: spell-section;
+}
+
+.spells {
+   
+    font-size: 2rem;
+    margin: 0px;
+    color: var(--text-primary);
+    font-family: var(--font-tertiary);
+    text-align: center;
+    
+}
+
+.info {
+    color: #929292;
+    font-family:  var(--font-tertiary);
+    margin: 0px;
+}
+
+.spell-level {
+    color: var(--text-secondary);
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--text-primary);
+    border-radius: 1px;
+    text-align: left;
+}
+
+.spell-section p {
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+@media only screen and (max-width: 1200px) {
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: "first-column second-column"
+        "spell-section spell-section"
+                             "backstory backstory"
+                             
+    }
+    .first-column {
+        width: 100%;
+        border-right: 2px solid var(--text-primary);
+       
+        margin: 0px 5px 0px 5px;
+    }
+    .second-column{
+        width: 100%;
+        
+    }
+    .gpt-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+       
+        margin: 0px 10px 0px 10px;
+        color: var(--text-secondary);
+        font-weight: bold;
+        border-bottom: none;
+    }
+
+    .section-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0px 5px 0px 5px;
+    }
+    .backstory {
+        padding: 0px;
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .container {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: "first-column"
+                             "spell-section"   
+                             "second-column"
+                             "backstory";
+                             
+        padding-bottom: 7rem;
+        
+        box-sizing: border-box; /* Include padding in the height calculation */
+      }
+      .first-column,
+      .second-column {
+        width: 100%;
+        border-right: none; /* Remove border since it's now a column layout */
+        height: auto; /* Change from fixed height to auto */
+        margin: 0 auto; /* centers the element */
+      }
+     
+    
+      .gpt-section {
+        padding: 10px;
+      }
+      .gpt-container {
+        margin: 0 auto;
+        width: 100%;
+        border-bottom: none;
+      }
+
+      .gpt-container p {
+        padding: 0 10px;
+      }
+      .section-container{
+        padding: 0px 15px 0px 15px;
+      }
+      
+      
+      .section{
+        width: 100%;
+        padding: 0px 15px 0px 25px;
+      }
+
+      .paragraph {
+        width: 100%;
+        padding: 10px 15px 10px 25px;
+      }
+
+      .backstory {
+        width: 100%;
+        padding: 0px 25px 10px 25px;
+      } 
+
+      
+      .spell-section {
+        width: 80%;
+        margin: 0 auto 0 auto;
+        box-sizing: border-box;
+      
+      }
+    
+      .charinfo {
+        margin: 0px;
+        padding: 10px;
+      }
+      
+}

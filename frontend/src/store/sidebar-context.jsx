@@ -5,5 +5,8 @@ export const SidebarContext = createContext({
     handleSidebar: () => {},
     lightMode: false,
     handleLightMode: () => {},
+    hover: false,
+    handleHover: () => {},
+    handleHoverOff: () => {},
 });
 
