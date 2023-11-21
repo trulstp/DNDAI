@@ -13,6 +13,7 @@ import classes from "./CharInput.module.css";
 const CharInput = (props) => {
   return (
     <div className={classes.inputcontainer}>
+      <h1>Create a Character</h1>
       <div>
         <input
           className={classes.CharInput}

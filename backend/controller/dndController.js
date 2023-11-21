@@ -1,5 +1,7 @@
 const monsterSchema = require("../models/DnDSchema");
 const axios = require("axios");
+const fetch = require("node-fetch");
+
 const dotenv = require("dotenv");
 const OpenAI = require("openai");
 dotenv.config();
@@ -288,45 +290,50 @@ const characterSchema = {
 };
 
 const creator = async (req, res) => {
-  const options = {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    data: {
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a dungeons and dragons assistant helper and you are creating an detailed player character based on their stats, skills, alignment, name, race, class, and level for a ttrpg game.",
-        },
-        {
-          role: "user",
-          content: `Create an detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, this level: ${req.body.message.level}, this alignment: ${req.body.message.alignment}, these stats: ${req.body.message.stats}, and these skills: ${req.body.message.skills}. Make the character interesting to read.`,
-        },
-      ],
-      functions: [{ name: "create_character", parameters: characterSchema }],
-      function_call: { name: "create_character" },
-      temperature: 1,
-
-      max_tokens: 800,
-    },
-    url: "https://api.openai.com/v1/chat/completions",
+  const url = "https://api.openai.com/v1/chat/completions";
+  const body = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a dungeons and dragons assistant helper and you are creating a detailed player character based on their stats, skills, alignment, name, race, class, and level for a ttrpg game, and then returning it in a JSON format",
+      },
+      {
+        role: "user",
+        content: `Create a detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, this level: ${req.body.message.level}, this alignment: ${req.body.message.alignment}, these stats: ${req.body.message.stats}, and these skills: ${req.body.message.skills}. Make the character interesting to read and give me the info in a JSON format`,
+      },
+    ],
+    functions: [{ name: "create_character", parameters: characterSchema }],
+    function_call: { name: "create_character" },
+    temperature: 1,
+    max_tokens: 1500,
   };
 
   try {
-    const response = await axios(options);
-    const characterData = await JSON.parse(
-      response.data.choices[0].message.function_call.arguments
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    const characterData = JSON.parse(
+      responseData.choices[0].message.function_call.arguments
     );
 
     res.json(characterData); // Send the encounter data as JSON
-    console.log(response.data);
+    console.log(responseData);
     console.log(characterData);
   } catch (error) {
-    console.error(JSON.stringify(error));
+    console.error(`Error: ${error.message}`);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -388,45 +395,50 @@ const encounterSchema = {
 };
 
 const encounter = async (req, res) => {
-  const options = {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    data: {
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a dungeon master helper and you are creating an detailed encounter descriptions based on monsters and location for your players.",
-        },
-        {
-          role: "user",
-          content: `Create an detailed encounter descriptions based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location} make the encounter interesting to read`,
-        },
-      ],
-      functions: [{ name: "create_encounter", parameters: encounterSchema }],
-      function_call: { name: "create_encounter" },
-      temperature: 1,
-
-      max_tokens: 1500,
-    },
-    url: "https://api.openai.com/v1/chat/completions",
+  const url = "https://api.openai.com/v1/chat/completions";
+  const body = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a dungeon master helper and you are creating detailed encounter descriptions based on monsters and location for your players.",
+      },
+      {
+        role: "user",
+        content: `Create detailed encounter descriptions based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location}. Make the encounter interesting to read.`,
+      },
+    ],
+    functions: [{ name: "create_encounter", parameters: encounterSchema }],
+    function_call: { name: "create_encounter" },
+    temperature: 1,
+    max_tokens: 1500,
   };
 
   try {
-    const response = await axios(options);
-    const encounterData = await JSON.parse(
-      response.data.choices[0].message.function_call.arguments
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    const encounterData = JSON.parse(
+      responseData.choices[0].message.function_call.arguments
     );
 
     res.json(encounterData); // Send the encounter data as JSON
-    console.log(response.data);
+    console.log(responseData);
     console.log(encounterData);
   } catch (error) {
-    console.error(error);
+    console.error(`Error: ${error.message}`);
     res.status(500).send("Internal Server Error");
   }
 };
