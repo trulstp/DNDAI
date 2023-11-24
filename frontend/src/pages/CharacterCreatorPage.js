@@ -12,14 +12,14 @@ import {
 
 const CharacterCreatorPage = () => {
   const sidebarCtx = useContext(SidebarContext);
+  const { previousChats, setPreviousChats } = sidebarCtx; // Use from context
   const [selections, setSelections] = useState({
     name: "",
-    race: raceOptions[0].value,
-    classType: classTypeOptions[0].value,
-    level: levelOptions[0].value,
+    race: "",
+    classType: "",
+    level: "",
   });
   const [message, setMessage] = useState(null);
-  const [previousChats, setPreviousChats] = useState([]);
   const [currentTitle, setCurrentTitle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [charInfo1, setCharInfo1] = useState("");
@@ -37,19 +37,11 @@ const CharacterCreatorPage = () => {
     setMessage(null);
     setSelections({
       name: "",
-      race: raceOptions[0].value,
-      classType: classTypeOptions[0].value,
-      level: levelOptions[0].value,
+      race: "",
+      classType: "",
+      level: "",
     });
     setCurrentTitle(null);
-    setImages(null);
-  };
-
-  const handleClick = (uniqueTitle) => {
-    setFeedActive(true);
-    setLoading(false);
-    setCurrentTitle(uniqueTitle);
-    setMessage(null);
     setImages(null);
   };
 
@@ -69,7 +61,7 @@ const CharacterCreatorPage = () => {
         },
       };
       const response = await fetch(
-        "http://localhost:4000/app/images2",
+        "https://dndai-785464cf00b0.herokuapp.com/app/images2",
         options
       );
       const data = await response.json();
@@ -101,7 +93,7 @@ const CharacterCreatorPage = () => {
       console.log("Selections sent:", options1.body); // Make sure this contains the correct data
 
       const firstResponse = await fetch(
-        `http://localhost:4000/app/create-character`,
+        `https://dndai-785464cf00b0.herokuapp.com/app/create-character`,
         options1
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
@@ -131,7 +123,7 @@ const CharacterCreatorPage = () => {
       console.log("Options sent:", options); // Make sure this contains the correct data
 
       const secondResponse = await fetch(
-        "http://localhost:4000/app/openaiCharacter",
+        "https://dndai-785464cf00b0.herokuapp.com/app/openaiCharacter",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");
@@ -156,7 +148,7 @@ const CharacterCreatorPage = () => {
         title: newTitle,
         first: charInfo1,
         second: charInfo2,
-        images: [], // Initialize images to an empty array
+        images: [],
       };
 
       setPreviousChats((prevChats) => {
@@ -171,7 +163,7 @@ const CharacterCreatorPage = () => {
 
       setFeedActive(true);
     }
-  }, [message, currentTitle, charInfo1, charInfo2]);
+  }, [message, currentTitle, charInfo1, charInfo2, setPreviousChats]); // Add setPreviousChats as a dependency
 
   const handleSidebarClick = (uniqueTitle) => {
     const selectedCharacter = previousChats.find(
