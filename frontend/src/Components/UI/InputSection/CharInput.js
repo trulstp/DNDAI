@@ -45,7 +45,17 @@ const CharInput = (props) => {
           isMulti={false}
           placeholder='Select Level'
         />
-        <Button onClick={() => props.getCharacter(props.selections)}>
+        <Button
+          onClick={() => {
+            const characterData = {
+              name: props.selections.name || "random",
+              race: props.selections.race || "random",
+              classType: props.selections.classType || "random",
+              level: props.selections.level || "random",
+            };
+            props.getCharacter(characterData);
+          }}
+        >
           Create Character
         </Button>
       </div>

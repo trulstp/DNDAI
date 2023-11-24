@@ -262,10 +262,15 @@ const characterSchema = {
       description:
         "Describe the flaws of the character, what are they afraid of?",
     },
-    roleplay: {
+    trinkets: {
       type: "string",
       description:
-        "Describe how to roleplay the character, what are their mannerisms?",
+        "Describe the trinkets and oddities of the character, what do they carry with them?",
+    },
+    quirks_and_habits: {
+      type: "string",
+      description:
+        "Describe the quirks and habits of the character, what are their mannerisms?",
     },
     character_portrait: {
       type: "string",
@@ -283,7 +288,8 @@ const characterSchema = {
     "ideals",
     "bonds",
     "flaws",
-    "roleplay",
+    "trinkets",
+    "quirks_and_habits",
     "character_portrait",
     "backstory",
   ],
@@ -355,25 +361,30 @@ const encounterSchema = {
       description:
         "Make a description of the monsters in the encounter, include their appearance, their actions, their motivations, and their goals.",
     },
-    scene: {
+    obstacles: {
       type: "string",
       description:
-        "Describe the setting, the actions of the monsters, how they view each other, and any potential challenges or interactions the player characters might face during this encounter.",
+        "Describe any obstacles or environmental hazards present in the encounter location that the player characters might have to navigate or deal with.",
     },
-    gear: {
+    allies_npcs: {
       type: "string",
       description:
-        "describe the weapons and armor the monsters in the encounter are using if they are wearing weapons and armor.",
+        "Specify if there are any non-player characters (NPCs) or potential allies present in the encounter. Describe their roles, relationships with the monsters, and whether they are friendly, hostile, or neutral toward the player characters.",
     },
-    treasure: {
+    treasure_rewards: {
       type: "string",
       description:
-        "describe the treasure the monsters in the encounter are guarding if there is any around.",
+        "Describe the treasure or rewards the monsters in the encounter are guarding or that the players might find.",
     },
-    magical_items: {
+    random_events_twists: {
       type: "string",
       description:
-        "describe the magical items the monsters in the encounter are guarding or using if there is any around.",
+        "Include unexpected events or plot twists that can occur during the encounter, adding an element of surprise and narrative depth.",
+    },
+    mood_atmosphere: {
+      type: "string",
+      description:
+        "Describe the overall mood and atmosphere of the encounter. Is it tense, eerie, jovial, or chaotic? Include sensory details such as sounds, smells, and the general emotional tone.",
     },
     poster_description: {
       type: "string",
@@ -383,13 +394,13 @@ const encounterSchema = {
   },
   required: [
     "title",
-    "encounter",
     "location",
     "monsters",
-    "scene",
-    "gear",
-    "treasure",
-    "magical_items",
+    "obstacles",
+    "allies_npcs",
+    "treasure_rewards",
+    "random_events_twists",
+    "mood_atmosphere",
     "poster_description",
   ],
 };

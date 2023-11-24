@@ -8,6 +8,10 @@ export const SidebarProvider = ({ children }) => {
 
     const [hover, setHover] = useState(false);
 
+    const [previousChats, setPreviousChats] = useState([]);
+
+    const [previousEncounter, setPreviousEncounter] = useState([]);
+
     const handleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -24,7 +28,7 @@ const handleHoverOff = () => {
 }
 
     return (
-        <SidebarContext.Provider value={{ sidebarOpen, handleSidebar, lightMode, handleLightMode, hover, handleHover, handleHoverOff }}>
+        <SidebarContext.Provider value={{ sidebarOpen, handleSidebar, lightMode, handleLightMode, hover, handleHover, handleHoverOff, previousChats, setPreviousChats, previousEncounter, setPreviousEncounter }}>
             {children}
         </SidebarContext.Provider>
     );
