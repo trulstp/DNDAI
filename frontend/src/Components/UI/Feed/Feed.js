@@ -55,6 +55,18 @@ const Feed = (props) => {
 
             <section
               className={classes.section}
+              onClick={() => props.toggleVisibility("mood_atmosphere")}
+            >
+              <h2 className={classes.heading}>Mood and Atmosphere</h2>
+              {props.isVisible.mood_atmosphere && (
+                <p className={classes.paragraph}>
+                  {chatMessage.content.mood_atmosphere}
+                </p>
+              )}
+            </section>
+
+            <section
+              className={classes.section}
               onClick={() => props.toggleVisibility("monsters")}
             >
               <h2 className={classes.heading}>Monsters</h2>
@@ -67,44 +79,48 @@ const Feed = (props) => {
 
             <section
               className={classes.section}
-              onClick={() => props.toggleVisibility("scene")}
+              onClick={() => props.toggleVisibility("obstacles")}
             >
-              <h2 className={classes.heading}>Scene</h2>
-              {props.isVisible.scene && (
-                <p className={classes.paragraph}>{chatMessage.content.scene}</p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("gear")}
-            >
-              <h2 className={classes.heading}>Gear</h2>
-              {props.isVisible.gear && (
-                <p className={classes.paragraph}>{chatMessage.content.gear}</p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("treasure")}
-            >
-              <h2 className={classes.heading}>Treasure</h2>
-              {props.isVisible.treasure && (
+              <h2 className={classes.heading}>Obstacles</h2>
+              {props.isVisible.obstacles && (
                 <p className={classes.paragraph}>
-                  {chatMessage.content.treasure}
+                  {chatMessage.content.obstacles}
                 </p>
               )}
             </section>
 
             <section
-              className={`${classes.section} ${classes["last-section"]}`}
-              onClick={() => props.toggleVisibility("magicalItems")}
+              className={classes.section}
+              onClick={() => props.toggleVisibility("allies_npcs")}
             >
-              <h2 className={classes.heading}>Magical Items</h2>
-              {props.isVisible.magicalItems && (
+              <h2 className={classes.heading}>Allied NPCs</h2>
+              {props.isVisible.allies_npcs && (
                 <p className={classes.paragraph}>
-                  {chatMessage.content.magical_items}
+                  {chatMessage.content.allies_npcs}
+                </p>
+              )}
+            </section>
+
+            <section
+              className={classes.section}
+              onClick={() => props.toggleVisibility("treasure_rewards")}
+            >
+              <h2 className={classes.heading}>Treasure</h2>
+              {props.isVisible.treasure_rewards && (
+                <p className={classes.paragraph}>
+                  {chatMessage.content.treasure_rewards}
+                </p>
+              )}
+            </section>
+
+            <section
+              className={classes.section}
+              onClick={() => props.toggleVisibility("random_events_twists")}
+            >
+              <h2 className={classes.heading}>Random Twists</h2>
+              {props.isVisible.random_events_twists && (
+                <p className={classes.paragraph}>
+                  {chatMessage.content.random_events_twists}
                 </p>
               )}
             </section>

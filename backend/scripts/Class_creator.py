@@ -280,6 +280,9 @@ def createacharacter(name = "random", classname = "random", race = "random", lev
     if race == "random":
         race = random.choice(list(racedictionary.keys()))
 
+    if level is None:
+        level = random.randint(1, 3)
+
     alignment = random.choice(["Lawful", "Neutral", "Chaotic"]) + " " + random.choice(["Good", "Neutral", "Evil"])
     if alignment == "Neutral Neutral":
         alignment = "True Neutral"
@@ -425,7 +428,7 @@ if __name__ == "__main__":
     name = sys.argv[1] if len(sys.argv) > 1 else "random"
     classname = sys.argv[2] if len(sys.argv) > 2 else "random"
     race = sys.argv[3] if len(sys.argv) > 3 else "random"
-    level = int(sys.argv[4]) if len(sys.argv) > 4 else 3
+    level = int(sys.argv[4]) if len(sys.argv) > 4 else None
 
     # Create the character using the provided or default arguments
     character = createacharacter(name, classname, race, level)

@@ -8,5 +8,9 @@ export const SidebarContext = createContext({
     hover: false,
     handleHover: () => {},
     handleHoverOff: () => {},
+    previousChats: [],
+    setPreviousChats: () => {},
+    previousEncounter: [],
+    setPreviousEncounter: () => {},
 });
 

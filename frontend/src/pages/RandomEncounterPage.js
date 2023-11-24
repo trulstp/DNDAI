@@ -5,11 +5,11 @@ import { SidebarContext } from "../store/sidebar-context";
 
 const RandomEncounterPage = () => {
   const sidebarCtx = useContext(SidebarContext);
-
+  const { previousEncounter, setPreviousEncounter } = sidebarCtx;
   const [value1, setValue1] = useState("");
   const [value2, setValue2] = useState("");
   const [message, setMessage] = useState(null);
-  const [previousChats, setPreviousChats] = useState([]);
+
   const [currentTitle, setCurrentTitle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [encounter, setEncounter] = useState("");
@@ -19,10 +19,11 @@ const RandomEncounterPage = () => {
     images: true,
     location: true,
     monsters: true,
-    scene: true,
-    gear: true,
-    treasure: true,
-    magicalItems: true,
+    allies_npcs: true,
+    random_events_twists: true,
+    treasure_rewards: true,
+    obstacles: true,
+    mood_atmosphere: true,
   });
 
   const createNew = () => {
@@ -62,12 +63,15 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch("http://localhost:4000/app/images", options);
+      const response = await fetch(
+        "https://dndai-785464cf00b0.herokuapp.com/app/images",
+        options
+      );
       const data = await response.json();
 
       if (Array.isArray(data) && data.length > 0) {
         setImages(data);
-        setPreviousChats((prevChats) =>
+        setPreviousEncounter((prevChats) =>
           prevChats.map((chat) =>
             chat.title === currentTitle ? { ...chat, images: data } : chat
           )
@@ -85,7 +89,7 @@ const RandomEncounterPage = () => {
 
     try {
       const firstResponse = await fetch(
-        `http://localhost:4000/app/encounter?location=${value1}&challengeRating=${value2}`
+        `https://dndai-785464cf00b0.herokuapp.com/app/encounter?location=${value1}&challengeRating=${value2}`
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
@@ -107,7 +111,7 @@ const RandomEncounterPage = () => {
       };
 
       const secondResponse = await fetch(
-        "http://localhost:4000/app/schematic",
+        "https://dndai-785464cf00b0.herokuapp.com/app/schematic",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");
@@ -138,7 +142,7 @@ const RandomEncounterPage = () => {
   // Use effect for updating the previousChats
   useEffect(() => {
     if (currentTitle && message) {
-      setPreviousChats((prevChats) => [
+      setPreviousEncounter((prevChats) => [
         ...prevChats,
         {
           title: currentTitle,
@@ -147,15 +151,19 @@ const RandomEncounterPage = () => {
         },
       ]);
     }
-  }, [currentTitle, message]);
+  }, [currentTitle, message, setPreviousEncounter]);
 
-  console.log(previousChats);
+  console.log(previousEncounter);
 
-  const currentEncounter = previousChats.filter(
-    (previousChat) => previousChat.title === currentTitle
+  const currentEncounter = previousEncounter.filter(
+    (previousEncounter) => previousEncounter.title === currentTitle
   );
   const uniqueTitles = Array.from(
-    new Set(previousChats.map((previousChat) => previousChat.title).reverse())
+    new Set(
+      previousEncounter
+        .map((previousEncounter) => previousEncounter.title)
+        .reverse()
+    )
   );
 
   const toggleVisibility = (section) => {

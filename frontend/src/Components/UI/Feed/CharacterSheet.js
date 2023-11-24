@@ -17,7 +17,7 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
       <div className={styles["first-column"]}>
         <h1 className={styles.name}>{first.Name}</h1>
         <h1 className={styles.charinfo}>
-          {first.Class} {first.Race} Level {first.Level}
+          {first.Race} {first.Class} Level {first.Level}
         </h1>
         <h2 className={styles.charinfo}>Alignment: {first.Alignment}</h2>
 
@@ -82,6 +82,9 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
             </div>
           ))}
 
+        <h2 className={styles.section}>Gear</h2>
+        <p className={styles.paragraph}>{first.Equipment.join(", ")}</p>
+
         <h2 className={styles.section}>Abilities</h2>
         <p className={styles.paragraph}>{first.Abilities.join(", ")}</p>
 
@@ -116,13 +119,13 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
           </div>
 
           <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Roleplay</h2>
-            <p>{second.roleplay}</p>
+            <h2 className={styles["gpt-section"]}>Quirks and Habits</h2>
+            <p>{second.quirks_and_habits}</p>
           </div>
 
           <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Gear</h2>
-            <p>{first.Equipment.join(", ")}</p>
+            <h2 className={styles["gpt-section"]}>Trinkets</h2>
+            <p>{second.trinkets}</p>
           </div>
         </div>
       </div>

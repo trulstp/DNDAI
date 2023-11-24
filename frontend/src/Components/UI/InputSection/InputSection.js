@@ -2,61 +2,9 @@ import classes from "./InputSection.module.css";
 import Card from "../Cards/Card";
 import FormSelect from "../Select/FormSelect";
 import Button from "../Buttons/Button";
+import { locations, numbersArray } from "../../Arrays/options";
 
 const InputSection = (props) => {
-  const locations = [
-    "abandoned buildings",
-    "alien dimension",
-    "ambush sites",
-    "battlegrounds",
-    "caves",
-    "caverns",
-    "coastal caves",
-    "coastal cliffs",
-    "cold caves",
-    "deep caves",
-    "desert sandy caverns",
-    "drow cities",
-    "duergar fortresses",
-    "dungeons",
-    "dungeons sewers",
-    "dwarven halls",
-    "elven cities",
-    "forests",
-    "fortresses",
-    "glades",
-    "graveyards",
-    "haunted places",
-    "icy mountains",
-    "jungles",
-    "lair",
-    "magma caverns",
-    "marshes",
-    "mountain caverns",
-    "mountain fortresses",
-    "mountains",
-    "oceans",
-    "patrol routes",
-    "plains",
-    "ritual sites",
-    "rocky terrains",
-    "ruins",
-    "strongholds",
-    "swamps",
-    "temples",
-    "tombs",
-    "tundras",
-    "underground",
-    "underground cities",
-    "underdark",
-    "volcanoes",
-    "wastelands",
-    "war camps",
-    "warm caves",
-  ];
-
-  const numbersArray = Array.from({ length: 24 }, (_, index) => index + 1);
-
   const options = locations.map((location) => ({
     value: location,
     label: location,

@@ -18,3 +18,8 @@
    border: none;
  
 }
+
+h1 {
+    font-family: var(--font-tertiary);
+    color: var(--text-primary);
+  }
