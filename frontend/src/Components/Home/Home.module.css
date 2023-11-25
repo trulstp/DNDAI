@@ -1,5 +1,5 @@
 .container {
-    overflow: hidden;
+    
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5px;
@@ -37,9 +37,13 @@
   }
   
   .square img {
-    max-width: 100%;
     
     margin-bottom: 5px;
+    object-fit: fill;
+   
+width: 40%;
+
+    height: auto; /* Maintain aspect ratio */
     
     
   }
@@ -71,19 +75,21 @@
   }
   
   /* Mobile view */
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     .container {
       
       gap: 5px;
-      
+      margin-bottom: 5rem;
     }
   
     .square {
       padding: 5px;
+      
     }
   
     .square img {
       width: 80%;
+
     }
   
     .square p {
