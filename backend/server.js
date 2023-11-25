@@ -20,4 +20,20 @@ app.use(cors());
 app.use("/app", monsterRoutes);
 app.use("/user", userRoutes);
 
+// Enable CORS for all routes
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // Allow requests from localhost
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
+// Your route handling code here
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
+
 app.listen(PORT, () => console.log(`server is up and running on ${PORT}`));
