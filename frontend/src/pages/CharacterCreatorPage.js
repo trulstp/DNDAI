@@ -4,11 +4,6 @@ import CharacterSheet from "../Components/UI/Feed/CharacterSheet";
 import Loading from "../Components/UI/Loading/Loading";
 import CharInput from "../Components/UI/InputSection/CharInput";
 import { SidebarContext } from "../store/sidebar-context";
-import {
-  raceOptions,
-  classTypeOptions,
-  levelOptions,
-} from "../Components/Arrays/options";
 
 const CharacterCreatorPage = () => {
   const sidebarCtx = useContext(SidebarContext);

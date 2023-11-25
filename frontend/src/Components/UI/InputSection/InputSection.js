@@ -1,5 +1,4 @@
 import classes from "./InputSection.module.css";
-import Card from "../Cards/Card";
 import FormSelect from "../Select/FormSelect";
 import Button from "../Buttons/Button";
 import { locations, numbersArray } from "../../Arrays/options";
