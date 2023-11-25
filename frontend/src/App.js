@@ -9,6 +9,7 @@ import EditProfilePage from "./pages/EditProfilePage";
 import RandomItemPage from "./pages/RandomItemPage";
 import MapsPage from "./pages/MapsPage";
 import CharacterCreatorPage from "./pages/CharacterCreatorPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import RandomEncounterPage from "./pages/RandomEncounterPage";
 import "./index.css";
 
@@ -35,6 +36,9 @@ const router = createBrowserRouter([
       // User profile related
       { path: "/profile", element: <ProfilePage /> },
       { path: "/profile/edit", element: <EditProfilePage /> },
+
+      // 404 page
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);
