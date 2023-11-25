@@ -9,31 +9,30 @@ import treasure from "../../Images/treasure-chest.png";
 const Home = () => {
   return (
     <div className={classes.container}>
-      <div className={classes.square}>
-        <Link to='/encounter'>
+      <Link to='/encounter'>
+        <div className={classes.square}>
           <img src={dragon} alt='monsters' />
           <p>Random Encounter</p>
-        </Link>
-      </div>
-
-      <div className={classes.square}>
-        <Link to='/creator'>
+        </div>
+      </Link>
+      <Link to='/creator'>
+        <div className={classes.square}>
           <img src={elf} alt='Characters' />
-          <p>Character</p>
-        </Link>
-      </div>
-      <div className={classes.square}>
-        <Link to='/mapmaker'>
+          <p>Character Creator</p>
+        </div>
+      </Link>
+      <Link to='/mapmaker'>
+        <div className={classes.square}>
           <img src={map} alt='a map' />
           <p>Maps</p>
-        </Link>
-      </div>
-      <div className={classes.square}>
-        <Link to='/treasure'>
+        </div>
+      </Link>
+      <Link to='/treasure'>
+        <div className={classes.square}>
           <img src={treasure} alt='a treasure chest' />
-          <p>Treasure</p>
-        </Link>
-      </div>
+          <p>Non-Combat Encounter</p>
+        </div>
+      </Link>
     </div>
   );
 };

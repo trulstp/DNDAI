@@ -2,17 +2,18 @@
     
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
+    gap: 10px;
     justify-content: center;
     align-items: center;
     margin-top: 5px;
     height: 100vh;
-    width: 100%;
+    width: auto;
     background-color: #1a1a2e;; /* A dark blue background similar to your image */
   }
   
   .square {
     display: flex;
+    background-color: var(--text-tertiary);
     flex-direction: column;
     justify-content: center;
     margin: 0 auto;
@@ -28,13 +29,6 @@
     transform: scale(1.05);
   }
 
-  .square a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-decoration: none;
-  }
   
   .square img {
     
@@ -58,32 +52,19 @@ width: 40%;
   }
   
   /* Individual square background colors */
-  .square:nth-child(1) {
-    background-color: #6aa84f; /* Green color similar to the "Encounters" square */
-  }
-  
-  .square:nth-child(2) {
-    background-color: #cc0000; /* Red color similar to the "Character" square */
-  }
-  
-  .square:nth-child(3) {
-    background-color: #f6bc00; /* Yellow color similar to the "Maps" square */
-  }
-  
-  .square:nth-child(4) {
-    background-color: #6d9eeb; /* Blue color similar to the "Treasure" square */
-  }
+
   
   /* Mobile view */
   @media (max-width: 600px) {
     .container {
-      
+   height: fit-content;
       gap: 5px;
       margin-bottom: 5rem;
     }
   
     .square {
       padding: 5px;
+      height: 45vh;
       
     }
   

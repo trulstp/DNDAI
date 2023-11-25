@@ -6,7 +6,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
-import RandomItemPage from "./pages/RandomItemPage";
+import NoCombatPage from "./pages/NoCombatPage";
 import MapsPage from "./pages/MapsPage";
 import CharacterCreatorPage from "./pages/CharacterCreatorPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
 
       // Game related pages
       { path: "/encounter", element: <RandomEncounterPage /> },
-      { path: "/treasure", element: <RandomItemPage /> },
+      { path: "/nocombat", element: <NoCombatPage /> },
       { path: "/mapmaker", element: <MapsPage /> },
       { path: "/creator", element: <CharacterCreatorPage /> },
 
