@@ -13,8 +13,6 @@ import RandomEncounterPage from "./pages/RandomEncounterPage";
 import "./index.css";
 
 import Root from "./pages/Root";
-import Nav from "./Components/Nav/Nav";
-
 const router = createBrowserRouter([
   {
     path: "/",
