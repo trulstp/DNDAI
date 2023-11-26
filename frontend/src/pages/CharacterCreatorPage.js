@@ -56,7 +56,7 @@ const CharacterCreatorPage = () => {
         },
       };
       const response = await fetch(
-        "https://161.35.71.29/backend/app/images2",
+        "http://161.35.71.29:3000/app/images2",
         options
       );
       const data = await response.json();
@@ -88,7 +88,7 @@ const CharacterCreatorPage = () => {
       console.log("Selections sent:", options1.body); // Make sure this contains the correct data
 
       const firstResponse = await fetch(
-        `https://161.35.71.29/backend/app/create-character`,
+        `http://161.35.71.29:3000/app/create-character`,
         options1
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
@@ -118,7 +118,7 @@ const CharacterCreatorPage = () => {
       console.log("Options sent:", options); // Make sure this contains the correct data
 
       const secondResponse = await fetch(
-        "https://161.35.71.29/backend/app/openaiCharacter",
+        "http://161.35.71.29:3000/app/openaiCharacter",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");

@@ -64,7 +64,7 @@ const RandomEncounterPage = () => {
         },
       };
       const response = await fetch(
-        "https://161.35.71.29/backend/app/images",
+        "http://161.35.71.29:3000/app/images",
         options
       );
       const data = await response.json();
@@ -89,7 +89,7 @@ const RandomEncounterPage = () => {
 
     try {
       const firstResponse = await fetch(
-        `https://161.35.71.29/backend/app/encounter?location=${value1}&challengeRating=${value2}`
+        `http://161.35.71.29:3000/app/encounter?location=${value1}&challengeRating=${value2}`
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
@@ -111,7 +111,7 @@ const RandomEncounterPage = () => {
       };
 
       const secondResponse = await fetch(
-        "https://161.35.71.29/backend/app/schematic",
+        "http://161.35.71.29:3000/app/schematic",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");
