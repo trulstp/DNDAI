@@ -313,7 +313,7 @@ const creator = async (req, res) => {
     functions: [{ name: "create_character", parameters: characterSchema }],
     function_call: { name: "create_character" },
     temperature: 1,
-    max_tokens: 1500,
+    max_tokens: 1000,
   };
 
   try {
@@ -423,7 +423,7 @@ const encounter = async (req, res) => {
     functions: [{ name: "create_encounter", parameters: encounterSchema }],
     function_call: { name: "create_encounter" },
     temperature: 1,
-    max_tokens: 1500,
+    max_tokens: 1000,
   };
 
   try {

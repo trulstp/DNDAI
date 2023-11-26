@@ -63,10 +63,7 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch(
-        "https://dndai-785464cf00b0.herokuapp.com/app/images",
-        options
-      );
+      const response = await fetch("https://161.35.71.29/app/images", options);
       const data = await response.json();
 
       if (Array.isArray(data) && data.length > 0) {
@@ -89,7 +86,7 @@ const RandomEncounterPage = () => {
 
     try {
       const firstResponse = await fetch(
-        `https://dndai-785464cf00b0.herokuapp.com/app/encounter?location=${value1}&challengeRating=${value2}`
+        `https://161.35.71.29/app/encounter?location=${value1}&challengeRating=${value2}`
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
@@ -111,7 +108,7 @@ const RandomEncounterPage = () => {
       };
 
       const secondResponse = await fetch(
-        "https://dndai-785464cf00b0.herokuapp.com/app/schematic",
+        "https://161.35.71.29/app/schematic",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");
@@ -206,7 +203,3 @@ const RandomEncounterPage = () => {
 };
 
 export default RandomEncounterPage;
-
-// `Generate a detailed encounter description involving the following monsters: ${firstData}.
-//           It takes place in the environment ${value1}. Describe the setting, the actions of the monsters,
-//           and any potential challenges or interactions the player characters might face during this encounter.`,
