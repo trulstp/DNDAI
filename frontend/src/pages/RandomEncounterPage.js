@@ -106,7 +106,7 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-
+      console.log("Options sent:", options); // Make sure this contains the correct data
       const secondResponse = await fetch(
         "https://trulstp.no/app/schematic",
         options
