@@ -63,10 +63,7 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch(
-        "http://161.35.71.29:3000/app/images",
-        options
-      );
+      const response = await fetch("https://trulstp.no/app/images", options);
       const data = await response.json();
 
       if (Array.isArray(data) && data.length > 0) {
@@ -89,7 +86,7 @@ const RandomEncounterPage = () => {
 
     try {
       const firstResponse = await fetch(
-        `http://161.35.71.29:3000/app/encounter?location=${value1}&challengeRating=${value2}`
+        `https://trulstp.no/app/encounter?location=${value1}&challengeRating=${value2}`
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
@@ -111,7 +108,7 @@ const RandomEncounterPage = () => {
       };
 
       const secondResponse = await fetch(
-        "http://161.35.71.29:3000/app/schematic",
+        "https://trulstp.no/app/schematic",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");

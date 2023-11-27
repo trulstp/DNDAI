@@ -1,5 +1,6 @@
 const express = require("express");
-const app = express();
+const https = require("https"); // Add the https module
+const fs = require("fs");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const monsterRoutes = require("./routes/dndRoutes");
@@ -16,10 +17,16 @@ const connectToMongo = async () => {
 
 connectToMongo();
 
+const app = express();
+const serverOptions = {
+  key: fs.readFileSync("/etc/letsencrypt/live/your_domain.com/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/your_domain.com/fullchain.pem"),
+};
+
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // Allow requests from localhost
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Origin", "https://supportroll.netlify.app");
   res.header(
     "Access-Control-Allow-Headers",
@@ -31,12 +38,9 @@ app.use((req, res, next) => {
 app.use("/app", monsterRoutes);
 app.use("/user", userRoutes);
 
-// Enable CORS for all routes
+// Create an HTTPS server
+const httpsServer = https.createServer(serverOptions, app);
 
-// Your route handling code here
-
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
-
-app.listen(PORT, () => console.log(`server is up and running on ${PORT}`));
+httpsServer.listen(PORT, () =>
+  console.log(`Server is up and running on ${PORT}`)
+);

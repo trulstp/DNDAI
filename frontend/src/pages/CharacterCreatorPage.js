@@ -55,10 +55,7 @@ const CharacterCreatorPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch(
-        "http://161.35.71.29:3000/app/images2",
-        options
-      );
+      const response = await fetch("https://trulstp.no/app/images2", options);
       const data = await response.json();
 
       if (Array.isArray(data) && data.length > 0) {
@@ -88,7 +85,7 @@ const CharacterCreatorPage = () => {
       console.log("Selections sent:", options1.body); // Make sure this contains the correct data
 
       const firstResponse = await fetch(
-        `http://161.35.71.29:3000/app/create-character`,
+        `https://trulstp.no/app/create-character`,
         options1
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
@@ -118,7 +115,7 @@ const CharacterCreatorPage = () => {
       console.log("Options sent:", options); // Make sure this contains the correct data
 
       const secondResponse = await fetch(
-        "http://161.35.71.29:3000/app/openaiCharacter",
+        "https://trulstp.no/app/openaiCharacter",
         options
       );
       if (!secondResponse.ok) throw new Error("Second fetch failed");
