@@ -27,7 +27,7 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
             images.map((image, index) => (
               <img
                 key={index}
-                src={image.url}
+                src={image}
                 alt='Character'
                 className={styles.characterImage}
               />

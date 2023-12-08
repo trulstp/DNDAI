@@ -9,23 +9,24 @@ const Feed = (props) => {
   return (
     <div className={`${classes.feed}`} ref={feedContainerRef}>
       {props.currentEncounter?.map((chatMessage, index) => (
-        <div>
+        <div key={index}>
           <h1 onClick={() => props.toggleVisibility("images")}>
             {chatMessage.content.title}
           </h1>
-          <div key={index} className={classes["section-container"]}>
+          <div className={classes["section-container"]}>
             {props.isVisible.images &&
               (chatMessage.images || props.images) &&
-              (chatMessage.images || props.images).map((image, index) => (
+              (chatMessage.images || props.images).map((image, imageIndex) => (
                 <section
+                  key={imageIndex}
                   className={classes.section}
                   onClick={() => props.toggleVisibility("images")}
                 >
                   <img
-                    className={` ${classes.image}`}
+                    className={classes.image}
                     loading='lazy'
                     key={index}
-                    src={image.url}
+                    src={image} // Directly using the AVIF image URL
                     alt={chatMessage.content.title}
                   />
                 </section>
