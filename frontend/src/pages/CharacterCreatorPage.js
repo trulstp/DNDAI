@@ -55,21 +55,25 @@ const CharacterCreatorPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch("https://trulstp.no/app/images2", options);
-      const data = await response.json();
 
-      if (Array.isArray(data) && data.length > 0) {
-        setImages(data);
-        setPreviousChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.title === currentTitle ? { ...chat, images: data } : chat
-          )
-        );
-      } else {
-        console.error("Invalid image data received");
+      const response = await fetch("https://trulstp.no/app/images2", options);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const imageBlob = await response.blob();
+      const imageUrl = URL.createObjectURL(imageBlob);
+
+      // Update the state with the new image URL
+      setImages([imageUrl]);
+      setPreviousChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.title === currentTitle ? { ...chat, images: [imageUrl] } : chat
+        )
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Error in image generation:", error);
     }
   };
 

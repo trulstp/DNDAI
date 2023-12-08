@@ -2,11 +2,13 @@
 
 @font-face {
   font-family: "draconis";
-  src: url("../src/fonts/Draconis-JRw6B.ttf") format('truetype');
+  src: url("../src/fonts/draconis-jrw6b-webfont.woff2") format('woff2');
+  font-display: swap;
 }
 @font-face {
   font-family: "breathefire";
-  src: url("../src/fonts/BreatheFireIii-PKLOB.ttf") format("truetype");
+  src: url("../src/fonts/breathefireiii-pklob-webfont.woff2") format("woff2");
+  font-display: swap;
 }
 :root {
   

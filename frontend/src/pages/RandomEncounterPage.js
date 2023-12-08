@@ -64,20 +64,22 @@ const RandomEncounterPage = () => {
         },
       };
       const response = await fetch("https://trulstp.no/app/images", options);
-      const data = await response.json();
 
-      if (Array.isArray(data) && data.length > 0) {
-        setImages(data);
-        setPreviousEncounter((prevChats) =>
-          prevChats.map((chat) =>
-            chat.title === currentTitle ? { ...chat, images: data } : chat
-          )
-        );
-      } else {
-        console.error("Invalid image data received");
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
       }
+
+      const imageBlob = await response.blob();
+      const imageUrl = URL.createObjectURL(imageBlob);
+
+      setImages([imageUrl]);
+      setPreviousEncounter((prevChats) =>
+        prevChats.map((chat) =>
+          chat.title === currentTitle ? { ...chat, images: [imageUrl] } : chat
+        )
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Error in imageGenerator:", error);
     }
   };
 
