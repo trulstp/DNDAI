@@ -152,6 +152,7 @@
         width: 100vw;
         height: 5rem;
         transition: none;
+        z-index: 101;
     }
 
     .historyNav{
@@ -159,6 +160,7 @@
         width: 100vw;
         height: 5rem;
         transition: none;
+        z-index: 101;
     }
 
     .logo {
@@ -193,16 +195,16 @@
         width: 16rem;
         height: 100vh;
         transition: width var(--transition-speed), filter var(--transition-speed);
-        z-index: 101;
+      
      }
 
      .historyNav .logo svg {
         margin-left: 11rem;
      }
 
-.historyNav .logo-text {
+    .historyNav .logo-text {
     left: 0px;
-}
+    }
 
       .navbar:hover {
         width: 16rem;

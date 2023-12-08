@@ -260,7 +260,7 @@ text-align: left;
                              "second-column"
                              "backstory";
                              
-        padding-bottom: 7rem;
+        margin-bottom: 5rem;
         
         box-sizing: border-box; /* Include padding in the height calculation */
       }

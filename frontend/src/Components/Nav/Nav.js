@@ -146,7 +146,7 @@ const Nav = () => {
             <span className={classes["link-text"]}>Character Creator</span>
           </Link>
         </li>
-        <li className={classes["nav-item"]}>
+        {/* <li className={classes["nav-item"]}>
           <Link to='/login' className={classes["nav-link"]}>
             <svg
               aria-hidden='true'
@@ -171,7 +171,7 @@ const Nav = () => {
             </svg>
             <span className={classes["link-text"]}>Login</span>
           </Link>
-        </li>
+        </li> */}
         <li className={classes["nav-item"]}>
           <div onClick={handleLightMode} className={classes["nav-link"]}>
             {!lightMode && (

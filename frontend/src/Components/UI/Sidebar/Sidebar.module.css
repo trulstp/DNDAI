@@ -45,7 +45,7 @@
         height: calc(100vh - 5rem);
         position: absolute;
         margin-top: 0rem;
-        z-index: 103;
+        z-index: 100;
         width: 50%;
         transition: width var(--transition-speed), margin-left var(--transition-speed);
         transform: translateX(0rem);
