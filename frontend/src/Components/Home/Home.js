@@ -1,7 +1,6 @@
 import classes from "./Home.module.css";
 import React from "react";
 import { Link } from "react-router-dom";
-import map from "../../Images/old-map.png";
 
 const Home = () => {
   return (
