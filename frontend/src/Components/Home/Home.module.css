@@ -1,32 +1,93 @@
-.container {
+
+.homebox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    height: 100%;
+    width: 100%;
+    background-color: #1a1a2e;; /* A dark blue background similar to your image */
+  }
+  
+  .svg {
+    width: auto; /* adjust as needed */
+    height: 100%; /* adjust as needed */
+    max-width: 100%; /* ensures SVG doesn't overflow its container */
+    max-height: 100%; /* ensures SVG doesn't overflow its container */
+    color: #ffffff;
+    padding-top: 5px;
+}
+  a {
+    text-decoration: none;
+  }
+ svg {
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 2rem;
     
+  }
+  
+  h2 {
+    text-decoration: none;
+    font-family: var(--font-secondary);
+    color: var(--text-primary);
+  }
+  
+  .homebox img {
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 2rem;
+  }
+  
+  /* Mobile view */
+  @media (max-width: 600px) {
+    .homebox {
+      padding: 5px;
+    }
+  
+    .homebox h1 {
+      font-size: 1.5rem;
+    }
+ 
+    .homebox a {
+      font-size: 1rem;
+    }
+  
+    .homebox img {
+      width: 80%;
+    }
+   
+}
+
+.container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     justify-content: center;
     align-items: center;
-    margin-top: 5px;
-    height: 100vh;
-    width: auto;
+    margin: 0 auto;
+    height: 70%;
+    width: 80%;
     background-color: #1a1a2e;; /* A dark blue background similar to your image */
   }
   
   .square {
     display: flex;
-    background-color: var(--text-tertiary);
+    background-color: var(--color-secondary);
     flex-direction: column;
     justify-content: center;
     margin: 0 auto;
     align-items: center;
     border-radius: 10px;
-   width: 100%;
+    width: 100%;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s;
-    height: 50vh;
+    height: 30vh;
   }
   
   .square:hover {
-    transform: scale(1.05);
+    background-color: var(--color-tertiary);
   }
 
   
@@ -61,20 +122,6 @@ width: 40%;
       gap: 5px;
       margin-bottom: 5rem;
     }
-  
-    .square {
-      padding: 5px;
-      height: 45vh;
-      
-    }
-  
-    .square img {
-      width: 80%;
 
-    }
-  
-    .square p {
-      font-size: 16px;
-    }
   }
   
