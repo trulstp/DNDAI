@@ -88,17 +88,39 @@ const openaiImages = async (req, res) => {
   const openai = new OpenAI(API_KEY);
 
   try {
-    const image = await openai.images.generate({
+    const apiResponse = await openai.images.generate({
       model: "dall-e-3",
       prompt: req.body.message,
       n: 1,
       size: "1792x1024",
     });
 
-    console.log(image.data);
-    res.send(image.data);
+    if (
+      !apiResponse.data ||
+      !Array.isArray(apiResponse.data) ||
+      apiResponse.data.length === 0
+    ) {
+      throw new Error("No images returned");
+    }
+
+    const imageUrl = apiResponse.data[0].url;
+
+    // Download the image from the URL
+    const response = await fetch(imageUrl);
+    // Check if response status is not in the 200-299 range
+    if (res.status < 200 || res.status >= 300) {
+      console.error("Failed to download image:", res.status, res.statusText);
+      throw new Error("Failed to download image");
+    }
+
+    const imageBuffer = await response.buffer();
+
+    // Convert the image to AVIF format using sharp
+    const avifImage = await sharp(imageBuffer).toFormat("avif").toBuffer();
+
+    res.type("image/avif").send(avifImage);
   } catch (error) {
-    console.log(error);
+    console.error("Error in openaiImages:", error);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -108,17 +130,38 @@ const openaiImages2 = async (req, res) => {
   const openai = new OpenAI(API_KEY);
 
   try {
-    const image = await openai.images.generate({
+    const apiResponse = await openai.images.generate({
       model: "dall-e-3",
       prompt: req.body.message,
       n: 1,
       size: "1024x1792",
     });
+    if (
+      !apiResponse.data ||
+      !Array.isArray(apiResponse.data) ||
+      apiResponse.data.length === 0
+    ) {
+      throw new Error("No images returned");
+    }
 
-    console.log(image.data);
-    res.send(image.data);
+    const imageUrl = apiResponse.data[0].url;
+
+    // Download the image from the URL
+    const response = await fetch(imageUrl);
+    // Check if response status is not in the 200-299 range
+    if (res.status < 200 || res.status >= 300) {
+      console.error("Failed to download image:", res.status, res.statusText);
+      throw new Error("Failed to download image");
+    }
+
+    const imageBuffer = await response.buffer();
+
+    // Convert the image to AVIF format using sharp
+    const avifImage = await sharp(imageBuffer).toFormat("avif").toBuffer();
+
+    res.type("image/avif").send(avifImage);
   } catch (error) {
-    console.log(error);
+    console.error("Error in openaiImages:", error);
     res.status(500).send("Internal Server Error");
   }
 };
