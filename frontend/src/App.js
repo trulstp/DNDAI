@@ -37,7 +37,7 @@ const router = createBrowserRouter([
       { path: "/profile", element: <ProfilePage /> },
       { path: "/profile/edit", element: <EditProfilePage /> },
 
-      // 404 page
+      // 404 pagexs
       { path: "*", element: <NotFoundPage /> },
     ],
   },
