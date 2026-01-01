@@ -1,6 +1,7 @@
-const monsterSchema = require("../models/DnDSchema");
+// const monsterSchema = require("../models/DnDSchema");
 const axios = require("axios");
 const fetch = require("node-fetch");
+const sharp = require("sharp");
 
 const dotenv = require("dotenv");
 const OpenAI = require("openai");
@@ -62,7 +63,7 @@ const openaimessage = async (req, res) => {
       "Content-Type": "application/json",
     },
     data: {
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
@@ -89,7 +90,7 @@ const openaiImages = async (req, res) => {
 
   try {
     const apiResponse = await openai.images.generate({
-      model: "dall-e-3",
+      model: "gpt-image-1-mini",
       prompt: req.body.message,
       n: 1,
       size: "1792x1024",
@@ -108,8 +109,12 @@ const openaiImages = async (req, res) => {
     // Download the image from the URL
     const response = await fetch(imageUrl);
     // Check if response status is not in the 200-299 range
-    if (res.status < 200 || res.status >= 300) {
-      console.error("Failed to download image:", res.status, res.statusText);
+    if (response.status < 200 || response.status >= 300) {
+      console.error(
+        "Failed to download image:",
+        response.status,
+        response.statusText
+      );
       throw new Error("Failed to download image");
     }
 
@@ -131,7 +136,7 @@ const openaiImages2 = async (req, res) => {
 
   try {
     const apiResponse = await openai.images.generate({
-      model: "dall-e-3",
+      model: "gpt-image-1-mini",
       prompt: req.body.message,
       n: 1,
       size: "1024x1792",

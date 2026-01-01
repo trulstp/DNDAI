@@ -2,6 +2,7 @@ import Sidebar from "../Components/UI/Sidebar/Sidebar";
 import React, { useState, useEffect, useContext } from "react";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
+const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const RandomEncounterPage = () => {
   const sidebarCtx = useContext(SidebarContext);
@@ -63,7 +64,7 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch("https://trulstp.no/app/images", options);
+      const response = await fetch(`${API}/app/images`, options);
 
       if (!response.ok) {
         throw new Error("Failed to fetch image");
@@ -88,7 +89,7 @@ const RandomEncounterPage = () => {
 
     try {
       const firstResponse = await fetch(
-        `https://trulstp.no/app/encounter?location=${value1}&challengeRating=${value2}`
+        `${API}/app/encounter?location=${value1}&challengeRating=${value2}`
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
@@ -109,10 +110,8 @@ const RandomEncounterPage = () => {
         },
       };
       console.log("Options sent:", options); // Make sure this contains the correct data
-      const secondResponse = await fetch(
-        "https://trulstp.no/app/schematic",
-        options
-      );
+      const secondResponse = await fetch(`${API}/app/schematic`, options);
+
       if (!secondResponse.ok) throw new Error("Second fetch failed");
       const data = await secondResponse.json();
 

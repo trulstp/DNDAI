@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./Nav.module.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SidebarContext } from "../../store/sidebar-context";
 import { useContext } from "react";
 
@@ -13,6 +13,12 @@ const Nav = () => {
     handleHover,
     handleHoverOff,
   } = useContext(SidebarContext);
+
+  const location = useLocation();
+
+  const historyTitle = location.pathname.startsWith("/creator")
+    ? "Character"
+    : "Encounter";
 
   const history = sidebarOpen ? "history" : "";
   const historyNav = sidebarOpen ? "historyNav" : "navbar";
@@ -38,7 +44,7 @@ const Nav = () => {
               <span
                 className={`${classes["link-text"]} ${classes["logo-text"]} ${classes["link-text-logo"]}`}
               >
-                <span className={classes["fa-secondary"]}>Encounter</span>
+                <span className={classes["fa-secondary"]}>{historyTitle}</span>
                 <br />
                 <span className={classes["fa-primary"]}>History</span>
               </span>

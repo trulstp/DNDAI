@@ -4,6 +4,7 @@ import CharacterSheet from "../Components/UI/Feed/CharacterSheet";
 import Loading from "../Components/UI/Loading/Loading";
 import CharInput from "../Components/UI/InputSection/CharInput";
 import { SidebarContext } from "../store/sidebar-context";
+const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const CharacterCreatorPage = () => {
   const sidebarCtx = useContext(SidebarContext);
@@ -56,7 +57,7 @@ const CharacterCreatorPage = () => {
         },
       };
 
-      const response = await fetch("https://trulstp.no/app/images2", options);
+      const response = await fetch(`${API}/app/images2`, options);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -89,9 +90,10 @@ const CharacterCreatorPage = () => {
       console.log("Selections sent:", options1.body); // Make sure this contains the correct data
 
       const firstResponse = await fetch(
-        `https://trulstp.no/app/create-character`,
+        `${API}/app/create-character`,
         options1
       );
+
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
       console.log("First data received:", firstData);
@@ -118,10 +120,8 @@ const CharacterCreatorPage = () => {
       };
       console.log("Options sent:", options); // Make sure this contains the correct data
 
-      const secondResponse = await fetch(
-        "https://trulstp.no/app/openaiCharacter",
-        options
-      );
+      const secondResponse = await fetch(`${API}/app/openaiCharacter`, options);
+
       if (!secondResponse.ok) throw new Error("Second fetch failed");
       const data = await secondResponse.json();
       setCharInfo2(data);
