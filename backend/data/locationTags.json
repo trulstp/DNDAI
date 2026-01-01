@@ -1,0 +1,6 @@
+{
+  "forest": { "types": ["Beast", "Fey", "Plant"], "keywords": ["wolf", "bear", "spider", "dryad", "treant"] },
+  "cave":   { "types": ["Aberration", "Monstrosity", "Ooze"], "keywords": ["bat", "spider", "dark"] },
+  "swamp":  { "types": ["Beast", "Undead", "Plant"], "keywords": ["swarm", "hag", "leech"] },
+  "undead": { "types": ["Undead"], "keywords": ["skeleton", "zombie", "ghost"] }
+}
