@@ -360,7 +360,7 @@ const creator = async (req, res) => {
       },
     },
     temperature: 1,
-    max_completion_tokens: 1000,
+    max_completion_tokens: 4000,
   };
 
   try {
@@ -379,6 +379,10 @@ const creator = async (req, res) => {
     }
 
     const responseData = await response.json();
+
+    if (responseData.choices?.[0]?.finish_reason === "length") {
+      throw new Error("OpenAI response was cut off by the token limit");
+    }
 
     const toolCall = responseData.choices?.[0]?.message?.tool_calls?.[0];
 
@@ -496,7 +500,7 @@ const encounter = async (req, res) => {
       },
     },
     temperature: 1,
-    max_completion_tokens: 1000,
+    max_completion_tokens: 4000,
   };
 
   try {
@@ -517,6 +521,10 @@ const encounter = async (req, res) => {
     const responseData = await response.json();
 
     console.log("OpenAI response:", JSON.stringify(responseData, null, 2));
+
+    if (responseData.choices?.[0]?.finish_reason === "length") {
+      throw new Error("OpenAI response was cut off by the token limit");
+    }
 
     const toolCall = responseData.choices?.[0]?.message?.tool_calls?.[0];
 
