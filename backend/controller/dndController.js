@@ -340,7 +340,7 @@ const creator = async (req, res) => {
       {
         role: "system",
         content:
-          "You are a dungeons and dragons assistant helper and you are creating a detailed player character based on their stats, skills, alignment, name, race, class, and level for a ttrpg game, and then returning it in a JSON format",
+          "You are a dungeons and dragons assistant helper and you are creating a detailed player character based on their stats, skills, alignment, name, race, class, and level for a ttrpg game.",
       },
       {
         role: "user",
@@ -349,6 +349,7 @@ const creator = async (req, res) => {
     ],
     functions: [{ name: "create_character", parameters: characterSchema }],
     function_call: { name: "create_character" },
+
     temperature: 1,
     max_tokens: 1000,
   };
@@ -444,8 +445,9 @@ const encounterSchema = {
 
 const encounter = async (req, res) => {
   const url = "https://api.openai.com/v1/chat/completions";
+
   const body = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-5.4-mini",
     messages: [
       {
         role: "system",
@@ -457,10 +459,23 @@ const encounter = async (req, res) => {
         content: `Create detailed encounter descriptions based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location}. Make the encounter interesting to read.`,
       },
     ],
-    functions: [{ name: "create_encounter", parameters: encounterSchema }],
-    function_call: { name: "create_encounter" },
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "create_encounter",
+          parameters: encounterSchema,
+        },
+      },
+    ],
+    tool_choice: {
+      type: "function",
+      function: {
+        name: "create_encounter",
+      },
+    },
     temperature: 1,
-    max_tokens: 1000,
+    max_completion_tokens: 1000,
   };
 
   try {
@@ -474,17 +489,31 @@ const encounter = async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorData = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status} - ${errorData}`);
     }
 
     const responseData = await response.json();
-    const encounterData = JSON.parse(
-      responseData.choices[0].message.function_call.arguments,
-    );
 
-    res.json(encounterData); // Send the encounter data as JSON
-    console.log(responseData);
-    console.log(encounterData);
+    console.log("OpenAI response:", JSON.stringify(responseData, null, 2));
+
+    const toolCall = responseData.choices?.[0]?.message?.tool_calls?.[0];
+
+    if (!toolCall) {
+      throw new Error("No tool call returned by OpenAI");
+    }
+
+    const argumentsString = toolCall.function?.arguments;
+
+    if (!argumentsString) {
+      throw new Error("OpenAI returned an empty function argument");
+    }
+
+    const encounterData = JSON.parse(argumentsString);
+
+    res.json(encounterData);
+
+    console.log("Encounter data:", encounterData);
   } catch (error) {
     console.error(`Error: ${error.message}`);
     res.status(500).send("Internal Server Error");
