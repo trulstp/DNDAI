@@ -1,8 +1,7 @@
-// const monsterSchema = require("../models/DnDSchema");
+const monsterSchema = require("../models/DnDSchema");
 const axios = require("axios");
 const fetch = require("node-fetch");
 const sharp = require("sharp");
-
 const dotenv = require("dotenv");
 const OpenAI = require("openai");
 dotenv.config();
@@ -47,7 +46,10 @@ const register = async (req, res) => {
       res.json(data);
     }
   } catch (err) {
-    res.status(400).json(err);
+    console.error("Register error:", err);
+    res.status(400).json({
+      error: err.message,
+    });
   }
 };
 
@@ -85,7 +87,6 @@ const openaimessage = async (req, res) => {
 };
 
 const openaiImages = async (req, res) => {
-  // Initialize the OpenAI client with the API key
   const openai = new OpenAI(API_KEY);
 
   try {
@@ -93,7 +94,7 @@ const openaiImages = async (req, res) => {
       model: "gpt-image-1-mini",
       prompt: req.body.message,
       n: 1,
-      size: "1792x1024",
+      size: "1536x1024",
     });
 
     if (
@@ -104,21 +105,13 @@ const openaiImages = async (req, res) => {
       throw new Error("No images returned");
     }
 
-    const imageUrl = apiResponse.data[0].url;
+    const imageData = apiResponse.data[0].b64_json;
 
-    // Download the image from the URL
-    const response = await fetch(imageUrl);
-    // Check if response status is not in the 200-299 range
-    if (response.status < 200 || response.status >= 300) {
-      console.error(
-        "Failed to download image:",
-        response.status,
-        response.statusText
-      );
-      throw new Error("Failed to download image");
+    if (!imageData) {
+      throw new Error("No base64 image data returned");
     }
 
-    const imageBuffer = await response.buffer();
+    const imageBuffer = Buffer.from(imageData, "base64");
 
     // Convert the image to AVIF format using sharp
     const avifImage = await sharp(imageBuffer).toFormat("avif").toBuffer();
@@ -131,7 +124,6 @@ const openaiImages = async (req, res) => {
 };
 
 const openaiImages2 = async (req, res) => {
-  // Initialize the OpenAI client with the API key
   const openai = new OpenAI(API_KEY);
 
   try {
@@ -139,8 +131,9 @@ const openaiImages2 = async (req, res) => {
       model: "gpt-image-1-mini",
       prompt: req.body.message,
       n: 1,
-      size: "1024x1792",
+      size: "1024x1536",
     });
+
     if (
       !apiResponse.data ||
       !Array.isArray(apiResponse.data) ||
@@ -149,24 +142,20 @@ const openaiImages2 = async (req, res) => {
       throw new Error("No images returned");
     }
 
-    const imageUrl = apiResponse.data[0].url;
+    const imageData = apiResponse.data[0].b64_json;
 
-    // Download the image from the URL
-    const response = await fetch(imageUrl);
-    // Check if response status is not in the 200-299 range
-    if (res.status < 200 || res.status >= 300) {
-      console.error("Failed to download image:", res.status, res.statusText);
-      throw new Error("Failed to download image");
+    if (!imageData) {
+      throw new Error("No base64 image data returned");
     }
 
-    const imageBuffer = await response.buffer();
+    const imageBuffer = Buffer.from(imageData, "base64");
 
     // Convert the image to AVIF format using sharp
     const avifImage = await sharp(imageBuffer).toFormat("avif").toBuffer();
 
     res.type("image/avif").send(avifImage);
   } catch (error) {
-    console.error("Error in openaiImages:", error);
+    console.error("Error in openaiImages2:", error);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -380,7 +369,7 @@ const creator = async (req, res) => {
 
     const responseData = await response.json();
     const characterData = JSON.parse(
-      responseData.choices[0].message.function_call.arguments
+      responseData.choices[0].message.function_call.arguments,
     );
 
     res.json(characterData); // Send the encounter data as JSON
@@ -490,7 +479,7 @@ const encounter = async (req, res) => {
 
     const responseData = await response.json();
     const encounterData = JSON.parse(
-      responseData.choices[0].message.function_call.arguments
+      responseData.choices[0].message.function_call.arguments,
     );
 
     res.json(encounterData); // Send the encounter data as JSON
