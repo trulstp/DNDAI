@@ -94,6 +94,7 @@ const openaiImages = async (req, res) => {
       prompt: req.body.message,
       n: 1,
       size: "1536x1024",
+      quality: "medium",
     });
 
     if (
@@ -122,13 +123,18 @@ const openaiImages = async (req, res) => {
   }
 };
 
+// Shared look for character creator portraits
+const PORTRAIT_STYLE =
+  "Style: moody oil painting, rough visible brushstrokes, muted earthy tones, soft painterly lighting, background visible, three-quarter view.";
+
 const openaiImages2 = async (req, res) => {
   try {
     const apiResponse = await openai.images.generate({
       model: "gpt-image-1-mini",
-      prompt: req.body.message,
+      prompt: `${req.body.message}\n\n${PORTRAIT_STYLE}`,
       n: 1,
       size: "1024x1536",
+      quality: "low",
     });
 
     if (
