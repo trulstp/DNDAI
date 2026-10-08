@@ -89,7 +89,9 @@ const RandomEncounterPage = () => {
 
     try {
       const firstResponse = await fetch(
-        `${API}/app/encounter?location=${value1}&challengeRating=${value2}`
+        `${API}/app/encounter?location=${encodeURIComponent(
+          value1
+        )}&challengeRating=${encodeURIComponent(value2)}`
       );
       if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();

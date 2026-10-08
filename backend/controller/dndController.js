@@ -157,52 +157,74 @@ const openaiImages2 = async (req, res) => {
   }
 };
 
-// gets a monster based on location, challenge rating, and setting
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+const MAX_ENCOUNTER_SIZE = 8;
+const KIN_PREFERENCE = 0.7;
+
+// Exact, case-insensitive location match; the input is escaped so it can't act as a regex
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const locationQuery = (location) => ({
+  location: { $regex: `^${escapeRegex(location)}$`, $options: "i" },
+});
+
+const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
+
+// Picks a random item, each item's chance proportional to weight(item)
+function pickWeighted(items, weight) {
+  const total = items.reduce((sum, item) => sum + weight(item), 0);
+  let roll = Math.random() * total;
+  for (const item of items) {
+    roll -= weight(item);
+    if (roll <= 0) return item;
   }
+  return items[items.length - 1];
 }
 
+// Builds an encounter from a lead monster plus followers that fill the CR budget
+function buildEncounter(monsters, budget) {
+  const candidates = monsters.filter(
+    (m) => m.challengeRating > 0 && m.challengeRating <= budget
+  );
+  if (candidates.length === 0) return [];
+
+  // Lead chance is proportional to CR, so higher budgets usually get a monster that matches them
+  const lead = pickWeighted(candidates, (m) => m.challengeRating);
+  const selected = [lead];
+  let remainingCR = budget - lead.challengeRating;
+
+  // Followers too weak to matter at this budget are skipped to avoid swarms of trivial creatures
+  const minFollowerCR = budget / MAX_ENCOUNTER_SIZE;
+  while (selected.length < MAX_ENCOUNTER_SIZE) {
+    const fits = candidates.filter(
+      (m) => m.challengeRating <= remainingCR && m.challengeRating >= minFollowerCR
+    );
+    if (fits.length === 0) break;
+
+    // Prefer the lead's kind so the group reads as one band
+    const kin = fits.filter((m) => m.groupTag === lead.groupTag);
+    const pool = kin.length > 0 && Math.random() < KIN_PREFERENCE ? kin : fits;
+    const follower = pickRandom(pool);
+    selected.push(follower);
+    remainingCR -= follower.challengeRating;
+  }
+
+  return selected;
+}
+
+// gets a random encounter for a location within a challenge rating budget
 const getMonstersByLocationAndCR = async (req, res) => {
   try {
-    const { location, challengeRating } = req.query;
-
-    // Fetch all monsters of the given location
-    const potentialMonsters = await monsterSchema.find({
-      location: { $regex: location, $options: "i" },
-    });
-
-    let selectedMonsters = [];
-    let remainingCR = parseInt(challengeRating, 10);
-
-    // Create a pool of monsters based on their CR and the total available CR
-    let monsterPool = [];
-    for (const monster of potentialMonsters) {
-      const maxAppearances = Math.floor(remainingCR / monster.challengeRating);
-      for (let i = 0; i < maxAppearances; i++) {
-        monsterPool.push(monster);
-      }
+    const { location } = req.query;
+    const budget = parseFloat(req.query.challengeRating);
+    if (typeof location !== "string" || !location || !(budget > 0)) {
+      return res
+        .status(400)
+        .json({ error: "location and a positive challengeRating are required" });
     }
 
-    // Shuffle multiple times for increased randomness
-    shuffleArray(monsterPool);
-    shuffleArray(monsterPool);
-    shuffleArray(monsterPool);
+    const monsters = await monsterSchema.find(locationQuery(location));
+    const encounter = buildEncounter(monsters, budget);
 
-    for (const monster of monsterPool) {
-      if (monster.challengeRating <= remainingCR) {
-        selectedMonsters.push(monster);
-        remainingCR -= monster.challengeRating;
-      }
-
-      if (remainingCR <= 0) break;
-    }
-
-    // Return only the monster names as requested
-    const monsterNames = selectedMonsters.map((monster) => monster.monsterName);
-    res.json(monsterNames);
+    res.json(encounter.map((monster) => monster.monsterName));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -211,11 +233,12 @@ const getMonstersByLocationAndCR = async (req, res) => {
 const getMonstersByLocation = async (req, res) => {
   try {
     const { location } = req.query;
+    if (typeof location !== "string" || !location) {
+      return res.status(400).json({ error: "location is required" });
+    }
 
     // Fetch all monsters of the given location
-    const monsters = await monsterSchema.find({
-      location: { $regex: location, $options: "i" },
-    });
+    const monsters = await monsterSchema.find(locationQuery(location));
 
     // Filter the results to only include monsterName, challengeRating, and groupTag
     const filteredMonsters = monsters.map((monster) => ({
@@ -607,6 +630,7 @@ const getCharacter = (req, res) => {
 };
 
 module.exports = {
+  buildEncounter,
   register,
   getMonstersByLocationAndCR,
   getAllMonsters,
