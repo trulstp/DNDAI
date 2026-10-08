@@ -82,13 +82,12 @@ const openaimessage = async (req, res) => {
     res.send(response.data);
     console.log(response.data);
   } catch (error) {
-    console.log(error);
+    console.error("Error in openaimessage:", error.message);
+    res.status(500).send("Internal Server Error");
   }
 };
 
 const openaiImages = async (req, res) => {
-  const openai = new OpenAI(API_KEY);
-
   try {
     const apiResponse = await openai.images.generate({
       model: "gpt-image-1-mini",
@@ -124,8 +123,6 @@ const openaiImages = async (req, res) => {
 };
 
 const openaiImages2 = async (req, res) => {
-  const openai = new OpenAI(API_KEY);
-
   try {
     const apiResponse = await openai.images.generate({
       model: "gpt-image-1-mini",
@@ -335,7 +332,7 @@ const characterSchema = {
 const creator = async (req, res) => {
   const url = "https://api.openai.com/v1/chat/completions";
   const body = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-5.4-mini",
     messages: [
       {
         role: "system",
@@ -344,14 +341,26 @@ const creator = async (req, res) => {
       },
       {
         role: "user",
-        content: `Create a detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, this level: ${req.body.message.level}, this alignment: ${req.body.message.alignment}, these stats: ${req.body.message.stats}, and these skills: ${req.body.message.skills}. Make the character interesting to read and give me the info in a JSON format`,
+        content: `Create a detailed dnd player character based on this name: ${req.body.message.name}, this race: ${req.body.message.race}, this class: ${req.body.message.class}, this level: ${req.body.message.level}, this alignment: ${req.body.message.alignment}, these stats: ${JSON.stringify(req.body.message.stats)}, and these skills: ${req.body.message.skills}. Make the character interesting to read.`,
       },
     ],
-    functions: [{ name: "create_character", parameters: characterSchema }],
-    function_call: { name: "create_character" },
-
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "create_character",
+          parameters: characterSchema,
+        },
+      },
+    ],
+    tool_choice: {
+      type: "function",
+      function: {
+        name: "create_character",
+      },
+    },
     temperature: 1,
-    max_tokens: 1000,
+    max_completion_tokens: 4000,
   };
 
   try {
@@ -365,17 +374,33 @@ const creator = async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorData = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status} - ${errorData}`);
     }
 
     const responseData = await response.json();
-    const characterData = JSON.parse(
-      responseData.choices[0].message.function_call.arguments,
-    );
 
-    res.json(characterData); // Send the encounter data as JSON
-    console.log(responseData);
-    console.log(characterData);
+    if (responseData.choices?.[0]?.finish_reason === "length") {
+      throw new Error("OpenAI response was cut off by the token limit");
+    }
+
+    const toolCall = responseData.choices?.[0]?.message?.tool_calls?.[0];
+
+    if (!toolCall) {
+      throw new Error("No tool call returned by OpenAI");
+    }
+
+    const argumentsString = toolCall.function?.arguments;
+
+    if (!argumentsString) {
+      throw new Error("OpenAI returned an empty function argument");
+    }
+
+    const characterData = JSON.parse(argumentsString);
+
+    res.json(characterData);
+
+    console.log("Character data:", characterData);
   } catch (error) {
     console.error(`Error: ${error.message}`);
     res.status(500).send("Internal Server Error");
@@ -475,7 +500,7 @@ const encounter = async (req, res) => {
       },
     },
     temperature: 1,
-    max_completion_tokens: 1000,
+    max_completion_tokens: 4000,
   };
 
   try {
@@ -496,6 +521,10 @@ const encounter = async (req, res) => {
     const responseData = await response.json();
 
     console.log("OpenAI response:", JSON.stringify(responseData, null, 2));
+
+    if (responseData.choices?.[0]?.finish_reason === "length") {
+      throw new Error("OpenAI response was cut off by the token limit");
+    }
 
     const toolCall = responseData.choices?.[0]?.message?.tool_calls?.[0];
 
