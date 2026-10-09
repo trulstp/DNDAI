@@ -12,7 +12,8 @@ const RandomEncounter = (props) => {
 
     const monsterCount = {};
     monsters.forEach((monster) => {
-      monsterCount[monster] = (monsterCount[monster] || 0) + 1;
+      const name = monster.monsterName ?? monster;
+      monsterCount[name] = (monsterCount[name] || 0) + 1;
     });
 
     return Object.entries(monsterCount)

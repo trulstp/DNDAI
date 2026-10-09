@@ -2,6 +2,7 @@ import Sidebar from "../Components/UI/Sidebar/Sidebar";
 import React, { useState, useEffect, useContext } from "react";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
+import { blobToDataUrl } from "../util/blobToDataUrl";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const RandomEncounterPage = () => {
@@ -70,8 +71,7 @@ const RandomEncounterPage = () => {
         throw new Error("Failed to fetch image");
       }
 
-      const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
+      const imageUrl = await blobToDataUrl(await response.blob());
 
       setImages([imageUrl]);
       setPreviousEncounter((prevChats) =>
@@ -105,6 +105,7 @@ const RandomEncounterPage = () => {
           message: {
             monsters: firstData,
             location: value1,
+            challengeRating: value2,
           },
         }),
         headers: {
