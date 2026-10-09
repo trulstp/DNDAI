@@ -127,11 +127,35 @@ const openaiImages = async (req, res) => {
 const PORTRAIT_STYLE =
   "Style: moody oil painting, rough visible brushstrokes, muted earthy tones, soft painterly lighting, background visible, three-quarter view.";
 
+// Signature features the image model tends to drop unless told explicitly
+const RACE_FEATURES = {
+  Dragonborn: "draconic head with a snout, scaled skin, no hair, no tail",
+  Dwarf: "short and stocky, broad shoulders, about 4 feet tall",
+  Elf: "pointed ears, slender build, ageless features",
+  Gnome: "very small, about 3 feet tall, large expressive eyes",
+  "Half-Elf": "subtly pointed ears, mix of human and elven features",
+  Halfling: "small, about 3 feet tall, youthful round face, bare feet",
+  "Half-Orc":
+    "two large tusks jutting upward from the lower jaw, clearly visible, grey-green skin, heavy brow",
+  Human: "",
+  Tiefling: "horns, a long tail, solid-coloured eyes",
+};
+
+function buildPortraitPrompt({ message, race, characterClass }) {
+  const features = RACE_FEATURES[race];
+  const subject = race
+    ? `Subject: a ${race}${characterClass ? ` ${characterClass}` : ""}${
+        features ? ` (${features})` : ""
+      }.`
+    : "";
+  return [subject, message, PORTRAIT_STYLE].filter(Boolean).join("\n\n");
+}
+
 const openaiImages2 = async (req, res) => {
   try {
     const apiResponse = await openai.images.generate({
       model: "gpt-image-1-mini",
-      prompt: `${req.body.message}\n\n${PORTRAIT_STYLE}`,
+      prompt: buildPortraitPrompt(req.body),
       n: 1,
       size: "1024x1536",
       quality: "low",
@@ -230,7 +254,13 @@ const getMonstersByLocationAndCR = async (req, res) => {
     const monsters = await monsterSchema.find(locationQuery(location));
     const encounter = buildEncounter(monsters, budget);
 
-    res.json(encounter.map((monster) => monster.monsterName));
+    res.json(
+      encounter.map(({ monsterName, challengeRating, groupTag }) => ({
+        monsterName,
+        challengeRating,
+        groupTag,
+      }))
+    );
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -497,6 +527,56 @@ const encounterSchema = {
   ],
 };
 
+const FRACTIONAL_CR = { 0.125: "1/8", 0.25: "1/4", 0.5: "1/2" };
+const formatCR = (cr) => FRACTIONAL_CR[cr] || String(cr);
+
+// Groups the encounter into "3× Ghoul (CR 1, Undead)" lines, keeping the lead monster first
+function describeMonsters(monsters) {
+  const groups = new Map();
+  for (const monster of monsters) {
+    // Older clients send plain monster names
+    const entry =
+      typeof monster === "string" ? { monsterName: monster } : monster;
+    const group = groups.get(entry.monsterName);
+    if (group) group.count++;
+    else groups.set(entry.monsterName, { ...entry, count: 1 });
+  }
+
+  return [...groups.values()]
+    .map(({ monsterName, challengeRating, groupTag, count }) => {
+      const details = [
+        challengeRating !== undefined && `CR ${formatCR(challengeRating)}`,
+        groupTag,
+      ].filter(Boolean);
+      return `- ${count}× ${monsterName}${
+        details.length ? ` (${details.join(", ")})` : ""
+      }`;
+    })
+    .join("\n");
+}
+
+function buildEncounterPrompt({ monsters = [], location, challengeRating }) {
+  const totalCR = monsters.reduce(
+    (sum, m) => sum + (Number(m?.challengeRating) || 0),
+    0
+  );
+  const difficulty = challengeRating
+    ? `The encounter was built for a challenge rating budget of ${challengeRating}${
+        totalCR ? ` (the monsters total CR ${formatCR(totalCR)})` : ""
+      }, so the threat, tactics and rewards should match that level. Never mention challenge ratings, levels or game balance in the text.`
+    : "";
+
+  return [
+    `Create a detailed encounter in this type of location: ${location}.`,
+    `It features exactly these monsters, in these numbers. The first one listed leads the group:`,
+    describeMonsters(monsters),
+    difficulty,
+    "Make the encounter interesting to read.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 const encounter = async (req, res) => {
   const url = "https://api.openai.com/v1/chat/completions";
 
@@ -510,7 +590,7 @@ const encounter = async (req, res) => {
       },
       {
         role: "user",
-        content: `Create detailed encounter descriptions based on these monsters: ${req.body.message.monsters} in this type of location: ${req.body.message.location}. Make the encounter interesting to read.`,
+        content: buildEncounterPrompt(req.body.message),
       },
     ],
     tools: [
@@ -637,6 +717,8 @@ const getCharacter = (req, res) => {
 
 module.exports = {
   buildEncounter,
+  buildEncounterPrompt,
+  buildPortraitPrompt,
   register,
   getMonstersByLocationAndCR,
   getAllMonsters,

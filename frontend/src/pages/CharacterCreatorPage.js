@@ -4,6 +4,7 @@ import CharacterSheet from "../Components/UI/Feed/CharacterSheet";
 import Loading from "../Components/UI/Loading/Loading";
 import CharInput from "../Components/UI/InputSection/CharInput";
 import { SidebarContext } from "../store/sidebar-context";
+import { blobToDataUrl } from "../util/blobToDataUrl";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const CharacterCreatorPage = () => {
@@ -51,7 +52,11 @@ const CharacterCreatorPage = () => {
 
       const options = {
         method: "POST",
-        body: JSON.stringify({ message: currentDescription }),
+        body: JSON.stringify({
+          message: currentDescription,
+          race: currentEncounter.first?.Race,
+          characterClass: currentEncounter.first?.Class,
+        }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -63,8 +68,7 @@ const CharacterCreatorPage = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
+      const imageUrl = await blobToDataUrl(await response.blob());
 
       // Update the state with the new image URL
       setImages([imageUrl]);
