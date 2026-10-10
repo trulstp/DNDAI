@@ -1,14 +1,14 @@
 .button {
-    border: solid 0.5px rgba(255, 255, 255, 0.5);
+    border: solid 0.5px var(--border-subtle);
     background-color: transparent;
     border-radius: 5px;
     padding: 10px;
     margin: 10px;
-    color: white;
+    color: var(--text-secondary);
     cursor: pointer;
   }
 
   .button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: solid 1px rgba(255, 255, 255, 0.5);
+    background-color: var(--hover-tint);
+    border: solid 1px var(--border-subtle);
   }

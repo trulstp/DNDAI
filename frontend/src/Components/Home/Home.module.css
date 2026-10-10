@@ -7,7 +7,7 @@
     margin: 0 auto;
     height: 100%;
     width: 100%;
-    background-color: #1a1a2e;; /* A dark blue background similar to your image */
+    background-color: var(--color-primary); /* A dark blue background similar to your image */
   }
   
   .svg {
@@ -15,7 +15,7 @@
     height: 100%; /* adjust as needed */
     max-width: 100%; /* ensures SVG doesn't overflow its container */
     max-height: 100%; /* ensures SVG doesn't overflow its container */
-    color: #ffffff;
+    color: var(--icon-color);
     padding-top: 5px;
 }
   a {
@@ -69,7 +69,7 @@
     margin: 0 auto;
     height: 70%;
     width: 80%;
-    background-color: #1a1a2e;; /* A dark blue background similar to your image */
+    background-color: var(--color-primary); /* A dark blue background similar to your image */
   }
   
   .square {
@@ -81,7 +81,7 @@
     align-items: center;
     border-radius: 10px;
     width: 100%;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 3px 3px 10px var(--shadow);
     transition: transform 0.3s;
     height: 30vh;
   }
@@ -109,7 +109,7 @@ width: 40%;
     font-size: 18px;
     font-weight: bold;
     text-decoration: none;
-    color: #ffffff; /* White text */
+    color: var(--text-secondary);
   }
   
   /* Individual square background colors */

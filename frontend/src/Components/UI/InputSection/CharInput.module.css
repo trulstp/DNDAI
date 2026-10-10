@@ -11,11 +11,12 @@
 
 .CharInput {
    width: 200px;
-   background-color: white;
+   background-color: var(--color-secondary);
+   color: var(--text-secondary);
    padding: 0.5rem;
     font-size: 16px;
    border-radius: 0.5rem;
-   border: none;
+   border: 1px solid var(--color-tertiary);
  
 }
 

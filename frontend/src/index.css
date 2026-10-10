@@ -10,21 +10,58 @@
   src: url("../src/fonts/breathefireiii-pklob-webfont.woff2") format("woff2");
   font-display: swap;
 }
+/* Theme colours. Dark is the default; [data-theme="light"] on <html> switches to light.
+   Components should use these variables rather than hard-coded colours. */
 :root {
-  
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  --text-primary: #B46746;
-  --text-secondary: #ffffff;
-  --text-tertiary: #E84545;
-  --color-primary: #343541;
-  --color-secondary: #202123;
-  --color-tertiary: #444654;
+  color-scheme: dark;
+
+  --text-primary: #B46746; /* accent: headings, labels, borders */
+  --text-secondary: #ffffff; /* strongest text */
+  --text-tertiary: #E84545; /* highlight red */
+  --text-body: rgba(255, 255, 255, 0.85);
+  --text-muted: rgba(255, 255, 255, 0.65);
+  --text-faint: rgba(255, 255, 255, 0.45);
+
+  --color-primary: #343541; /* page background */
+  --color-secondary: #202123; /* nav, sidebar and cards */
+  --color-tertiary: #444654; /* hover and dividers */
+
+  --border-subtle: rgba(255, 255, 255, 0.5);
+  --hover-tint: rgba(255, 255, 255, 0.1);
+  --shadow: rgba(0, 0, 0, 0.2);
+  --icon-color: #ffffff;
+  --scrollbar-track: #1e1e24;
+  --scrollbar-thumb: #6649b8;
 
   --font-tertiary: 'draconis';
   --font-secondary: 'breathefire';
 
   --transition-speed: 600ms;
+}
+
+/* Parchment light theme */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --text-primary: #9C5232;
+  --text-secondary: #2B2420;
+  --text-tertiary: #C23A2B;
+  --text-body: rgba(43, 36, 32, 0.88);
+  --text-muted: rgba(43, 36, 32, 0.65);
+  --text-faint: rgba(43, 36, 32, 0.5);
+
+  --color-primary: #F4EDE1;
+  --color-secondary: #FFFAF1;
+  --color-tertiary: #E6DCCB;
+
+  --border-subtle: rgba(43, 36, 32, 0.35);
+  --hover-tint: rgba(43, 36, 32, 0.06);
+  --shadow: rgba(60, 40, 20, 0.15);
+  --icon-color: #3A2F28;
+  --scrollbar-track: #E6DCCB;
+  --scrollbar-thumb: #9C5232;
 }
 
 
@@ -41,18 +78,19 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-  background: #1e1e24;
+  background: var(--scrollbar-track);
 }
 
 body::-webkit-scrollbar-thumb {
-  background: #6649b8;
+  background: var(--scrollbar-thumb);
 }
 
 
 
 
 .App {
-  background-color: #343541;
+  background-color: var(--color-primary);
+  transition: background-color 0.3s;
   display: flex;
   width: 100vw;
   height: 100vh;
