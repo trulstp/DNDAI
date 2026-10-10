@@ -21,6 +21,7 @@ const RandomEncounterPage = () => {
     images: true,
     location: true,
     monsters: true,
+    stat_blocks: true,
     allies_npcs: true,
     random_events_twists: true,
     treasure_rewards: true,
@@ -149,10 +150,12 @@ const RandomEncounterPage = () => {
           title: currentTitle,
           role: message.role,
           content: message,
+          // Monsters rolled for this encounter, used for stat blocks
+          monsterList: Array.isArray(encounter) ? encounter : [],
         },
       ]);
     }
-  }, [currentTitle, message, setPreviousEncounter]);
+  }, [currentTitle, message, encounter, setPreviousEncounter]);
 
   console.log(previousEncounter);
 

@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 
 import Button from "../Buttons/Button";
+import MonsterList from "./MonsterList";
 import classes from "./Feed.module.css";
 
 const Feed = (props) => {
@@ -77,6 +78,18 @@ const Feed = (props) => {
                 </p>
               )}
             </section>
+
+            {/* Older saved encounters have no monster list */}
+            {chatMessage.monsterList?.length > 0 && (
+              <MonsterList
+                key={chatMessage.monsterList
+                  .map((monster) => monster.monsterName)
+                  .join(",")}
+                monsters={chatMessage.monsterList}
+                isVisible={props.isVisible.stat_blocks}
+                toggleVisibility={() => props.toggleVisibility("stat_blocks")}
+              />
+            )}
 
             <section
               className={classes.section}

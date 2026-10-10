@@ -15,6 +15,7 @@ const {
   getCharacter,
   creator,
   openaiImages2,
+  getStatblocks,
 } = require("../controller/dndController");
 
 const router = express.Router();
@@ -44,6 +45,9 @@ router.get("/all", requireDb, getAllMonsters);
 router.get("/location", requireDb, getMonstersByLocation);
 
 router.get("/locations", requireDb, getLocations);
+
+// url Example: http://localhost:4000/app/statblocks?names=Wraith,Mummy
+router.get("/statblocks", requireDb, getStatblocks);
 
 router.post("/schematic", encounter);
 
