@@ -1,4 +1,5 @@
 const monsterSchema = require("../models/DnDSchema");
+const Statblock = require("../models/statblockSchema");
 const axios = require("axios");
 const fetch = require("node-fetch");
 const sharp = require("sharp");
@@ -284,6 +285,54 @@ const getMonstersByLocation = async (req, res) => {
     }));
 
     res.json(filteredMonsters);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const MAX_STATBLOCK_NAMES = 20;
+
+// gets SRD stat blocks for a comma-separated list of monster names, null for monsters without one
+const getStatblocks = async (req, res) => {
+  try {
+    const names = [
+      ...new Set(
+        String(req.query.names || "")
+          .split(",")
+          .map((name) => name.trim())
+          .filter(Boolean)
+      ),
+    ];
+    if (names.length === 0 || names.length > MAX_STATBLOCK_NAMES) {
+      return res.status(400).json({
+        error: `names must list between 1 and ${MAX_STATBLOCK_NAMES} monsters`,
+      });
+    }
+
+    const keys = names.map((name) => name.toLowerCase());
+    const found = await Statblock.find(
+      { nameKeys: { $in: keys } },
+      { _id: 0, __v: 0 }
+    ).lean();
+
+    const statblocks = {};
+    for (const name of names) {
+      const key = name.toLowerCase();
+      const matches = found.filter((statblock) => statblock.nameKeys.includes(key));
+      // An exact name match wins over one that ignores the parenthetical,
+      // so "Giant Rat" isn't answered with "Giant Rat (Diseased)"
+      const match =
+        matches.find((statblock) => statblock.name.toLowerCase() === key) ||
+        matches[0];
+      if (match) {
+        const { nameKeys, ...statblock } = match;
+        statblocks[name] = statblock;
+      } else {
+        statblocks[name] = null;
+      }
+    }
+
+    res.json(statblocks);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -717,6 +766,7 @@ const getCharacter = (req, res) => {
 
 module.exports = {
   buildEncounter,
+  getStatblocks,
   buildEncounterPrompt,
   buildPortraitPrompt,
   register,

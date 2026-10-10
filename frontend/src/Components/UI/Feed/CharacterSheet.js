@@ -1,155 +1,170 @@
-// CharacterSheet.js
 import Button from "../Buttons/Button";
 import React from "react";
-import styles from "./CharacterSheet.module.css"; // Ensure this path matches your CSS module file
+import { modifier } from "./StatBlock";
+import card from "./StatBlock.module.css";
+import styles from "./CharacterSheet.module.css";
+
+const ABILITIES = [
+  ["STR", "Strength"],
+  ["DEX", "Dexterity"],
+  ["CON", "Constitution"],
+  ["INT", "Intelligence"],
+  ["WIS", "Wisdom"],
+  ["CHA", "Charisma"],
+];
+
+const PERSONALITY = [
+  ["Personality", "personality"],
+  ["Ideals", "ideals"],
+  ["Bonds", "bonds"],
+  ["Flaws", "flaws"],
+  ["Quirks and Habits", "quirks_and_habits"],
+  ["Trinkets", "trinkets"],
+];
+
+const ordinal = (n) =>
+  `${n}${{ 1: "st", 2: "nd", 3: "rd" }[n] || "th"}`;
+const spellLevelLabel = (level) =>
+  Number(level) === 0 ? "Cantrips" : `${ordinal(Number(level))} Level`;
+
+// The generator gives a class feature list per level, or a single string for some levels
+const asList = (value) =>
+  Array.isArray(value) ? value : value ? [value] : [];
+
+// Dragonborn ancestry arrives as a [colour, damage type] pair
+const formatTrait = (trait) =>
+  Array.isArray(trait)
+    ? `Draconic Ancestry: ${trait[0]} (${trait[1].toLowerCase()})`
+    : trait;
+
+const Property = ({ label, items }) =>
+  items?.length ? (
+    <p className={card.property}>
+      <strong>{label}</strong> {items.join(", ")}
+    </p>
+  ) : null;
 
 const CharacterSheet = ({ characterData, imageGenerator, images }) => {
   if (!characterData || !characterData.first || !characterData.second) {
     return <div>Loading character data...</div>;
   }
   const { first, second } = characterData;
-  const hasSpells =
-    first.Spells &&
-    Object.values(first.Spells).some((spells) => spells.length > 0);
+
+  const classFeatures = Object.entries(first.ClassSkills || {})
+    .map(([level, features]) => [level, asList(features)])
+    .filter(([, features]) => features.length > 0);
+  const spells = Object.entries(first.Spells || {}).filter(
+    ([, levelSpells]) => levelSpells?.length > 0
+  );
 
   return (
-    <div className={styles.container}>
-      <div className={styles["first-column"]}>
-        <h1 className={styles.name}>{first.Name}</h1>
-        <h1 className={styles.charinfo}>
-          {first.Race} {first.Class} Level {first.Level}
-        </h1>
-        <h2 className={styles.charinfo}>Alignment: {first.Alignment}</h2>
-
-        <div className={styles["image-section"]}>
-          <h2 className={styles.section}>Character Image</h2>
+    <div className={styles.sheet}>
+      <div className={styles.column}>
+        <div className={styles.portrait}>
           {images && images.length > 0 ? (
             images.map((image, index) => (
               <img
                 key={index}
                 src={image}
-                alt='Character'
-                className={styles.characterImage}
+                alt={`${first.Name} the ${first.Race} ${first.Class}`}
+                className={styles.image}
               />
             ))
           ) : (
-            <div className={styles["image-button"]}>
-              <Button onClick={imageGenerator}>Generate Image?</Button>
-            </div>
+            <Button onClick={imageGenerator}>Generate Image?</Button>
           )}
         </div>
 
-        <h2 className={styles.section}>Stats</h2>
-        <p className={styles.paragraph}>
-          Hit Points:{" "}
-          <span className={styles.apiparagraph}>{first.Hitpoints}</span>
-        </p>
+        <div className={`${card.statblock} ${styles.character}`}>
+          <h1 className={`${card.name} ${styles.name}`}>{first.Name}</h1>
+          <p className={card.type}>
+            {first.Size} {first.Race.toLowerCase()} {first.Class.toLowerCase()}
+            , level {first.Level}, {first.Alignment.toLowerCase()}
+          </p>
 
-        <p className={styles.paragraph}>
-          Size: <span className={styles.apiparagraph}>{first.Size}</span>{" "}
-        </p>
+          <hr className={card.rule} />
+          <p className={card.property}>
+            <strong>Hit Points</strong> {first.Hitpoints}
+          </p>
+          <p className={card.property}>
+            <strong>Speed</strong> {first.Speed}
+          </p>
 
-        <p className={styles.paragraph}>
-          Speed: <span className={styles.apiparagraph}>{first.Speed}</span>{" "}
-        </p>
-
-        {/* Stats Section */}
-        {/* Dynamically display each stat */}
-        <div className={styles["stat-container"]}>
-          <p>STR</p>
-          <p>DEX</p>
-          <p>CON</p>
-          <p>INT</p>
-          <p>WIS</p>
-          <p>CHA</p>
-        </div>
-        <div className={styles["stat-container2"]}>
-          <p>{first.Stats.Strength}</p>
-          <p>{first.Stats.Dexterity}</p>
-          <p>{first.Stats.Constitution}</p>
-          <p>{first.Stats.Intelligence}</p>
-          <p>{first.Stats.Wisdom}</p>
-          <p>{first.Stats.Charisma}</p>
-        </div>
-
-        <h2 className={styles.section}>Class Skills</h2>
-        {Object.entries(first.ClassSkills)
-          .filter(([_, skills]) => Array.isArray(skills) && skills.length > 0)
-          .map(([level, skills]) => (
-            <div key={level}>
-              <p className={styles["paragraph"]}>Level {level}</p>
-              <p className={styles.paragraph}>{skills.join(", ")}</p>
-            </div>
-          ))}
-
-        <h2 className={styles.section}>Gear</h2>
-        <p className={styles.paragraph}>{first.Equipment.join(", ")}</p>
-
-        <h2 className={styles.section}>Abilities</h2>
-        <p className={styles.paragraph}>{first.Abilities.join(", ")}</p>
-
-        <h2 className={styles.section}>Skills</h2>
-        <p className={styles.paragraph}>{first.Skills.join(", ")}</p>
-
-        <h2 className={styles.section}>Languages</h2>
-        <p className={styles.paragraph}>{first.Languages.join(", ")}</p>
-      </div>
-
-      <div className={styles["second-column"]}>
-        {/* Displaying the personality traits, bonds, ideals, etc. */}
-        <div className={styles["gpt-container"]}>
-          <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Personality</h2>
-            <p>{second.personality}</p>
+          <hr className={card.rule} />
+          <div className={card.abilities}>
+            {ABILITIES.map(([abbr, ability]) => (
+              <div key={abbr} className={card.ability}>
+                <strong>{abbr}</strong>
+                <span>
+                  {first.Stats[ability]} ({modifier(first.Stats[ability])})
+                </span>
+              </div>
+            ))}
           </div>
 
-          <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Bonds</h2>
-            <p>{second.bonds}</p>
-          </div>
+          <hr className={card.rule} />
+          <Property label='Skills' items={first.Skills} />
+          <Property label='Languages' items={first.Languages} />
+          <Property label='Gear' items={first.Equipment} />
+          <Property
+            label='Traits & Proficiencies'
+            items={first.Abilities?.map(formatTrait)}
+          />
 
-          <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Ideals</h2>
-            <p>{second.ideals}</p>
-          </div>
-
-          <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Flaws</h2>
-            <p>{second.flaws}</p>
-          </div>
-
-          <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Quirks and Habits</h2>
-            <p>{second.quirks_and_habits}</p>
-          </div>
-
-          <div className={styles["section-container"]}>
-            <h2 className={styles["gpt-section"]}>Trinkets</h2>
-            <p>{second.trinkets}</p>
-          </div>
         </div>
       </div>
 
-      <div className={styles["backstory"]}>
-        <h2 className={styles["backstory-header"]}>Backstory</h2>
-        <p>{second.backstory}</p>
-      </div>
-
-      {/* Display spells if available */}
-      {hasSpells && (
-        <div className={styles["spell-section"]}>
-          <h1 className={styles.spells}>Spells</h1>
-          {Object.entries(first.Spells).map(
-            ([level, spells]) =>
-              spells.length > 0 && (
-                <div key={level}>
-                  <p className={styles["spell-level"]}>Level {level}</p>
-                  <p>{spells.join(", ")}</p>
-                </div>
-              )
+      <div className={styles.column}>
+        <div className={styles.traits}>
+          {PERSONALITY.map(([label, field]) =>
+            second[field] ? (
+              <div key={field} className={styles.card}>
+                <h2 className={styles.heading}>{label}</h2>
+                <p>{second[field]}</p>
+              </div>
+            ) : null
           )}
         </div>
-      )}
+
+        {second.backstory && (
+          <div className={`${styles.card} ${styles.backstory}`}>
+            <h2 className={styles.heading}>Backstory</h2>
+            <p>{second.backstory}</p>
+          </div>
+        )}
+
+        {(classFeatures.length > 0 || spells.length > 0) && (
+          <div className={`${card.statblock} ${styles.features}`}>
+            {classFeatures.length > 0 && (
+              <>
+                <h4 className={card.subheading}>Class Features</h4>
+                {classFeatures.map(([level, features]) => (
+                  <p key={level} className={card.entry}>
+                    <strong>
+                      <em>Level {level}.</em>
+                    </strong>{" "}
+                    {features.join(", ")}
+                  </p>
+                ))}
+              </>
+            )}
+
+            {spells.length > 0 && (
+              <>
+                <h4 className={card.subheading}>Spells</h4>
+                {spells.map(([level, levelSpells]) => (
+                  <p key={level} className={card.entry}>
+                    <strong>
+                      <em>{spellLevelLabel(level)}.</em>
+                    </strong>{" "}
+                    {levelSpells.join(", ")}
+                  </p>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
