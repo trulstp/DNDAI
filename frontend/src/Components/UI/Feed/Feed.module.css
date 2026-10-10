@@ -28,7 +28,7 @@
   
   .feed li {
     display: flex;
-    background-color: #444654;
+    background-color: var(--color-tertiary);
     width: 100%;
     
   }
@@ -54,7 +54,7 @@
   }
  
   .feed p {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-body);
     text-align: left;
   }
   

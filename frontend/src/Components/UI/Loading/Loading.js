@@ -15,7 +15,7 @@ const Loading = (props) => {
         icon={faDragon}
         bounce
         size='xl'
-        style={{ color: "#ff0000" }}
+        style={{ color: "var(--text-tertiary)" }}
       />
       <h2 className={classes["loading-text"]}>{props.text || "Loading..."}</h2>
     </div>

@@ -1,8 +1,8 @@
 /* FILEPATH: /Users/trulsteigepettersen/Desktop/DNDAI-new/DNDAI/frontend/src/Components/Login/Login.module.css */
 
 .login {
-    background-color: #1a1a2e; /* dark blue background */
-    color: #a8b2d1; /* lighter blue text */
+    background-color: var(--color-primary);
+    color: var(--text-body);
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -17,7 +17,7 @@
 h1 {
     font-size: 3rem;
     margin-bottom: 2rem;
-    color:steelblue
+    color: var(--text-primary)
 }
 
 form {
@@ -58,8 +58,8 @@ input[type="checkbox"] {
 }
 
 button[type="submit"] {
-    background-color: #fff; /* white button */
-    color: #1a1a2e; /* dark blue text */
+    background-color: var(--text-primary);
+    color: var(--color-secondary);
     padding: 0.5rem 1rem;
     font-size: 1.5rem;
     border-radius: 0.5rem;

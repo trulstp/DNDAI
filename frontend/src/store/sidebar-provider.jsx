@@ -22,6 +22,19 @@ const saveHistory = (key, history) => {
     }
 };
 
+const THEME_KEY = 'supportroll.theme';
+
+// Saved choice first, otherwise follow the device's light/dark setting
+const initialLightMode = () => {
+    try {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved) return saved === 'light';
+    } catch {
+        // Storage unavailable; fall through to the device setting
+    }
+    return window.matchMedia?.('(prefers-color-scheme: light)').matches ?? false;
+};
+
 // History list that persists across page reloads
 const usePersistentHistory = (key) => {
     const [history, setHistory] = useState(() => loadHistory(key));
@@ -36,7 +49,12 @@ const usePersistentHistory = (key) => {
 export const SidebarProvider = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const [lightMode, setLightMode] = useState(false);
+    const [lightMode, setLightMode] = useState(initialLightMode);
+
+    // index.css switches every theme colour on this attribute
+    useEffect(() => {
+        document.documentElement.dataset.theme = lightMode ? 'light' : 'dark';
+    }, [lightMode]);
 
     const [hover, setHover] = useState(false);
 
@@ -48,8 +66,15 @@ export const SidebarProvider = ({ children }) => {
         setSidebarOpen(!sidebarOpen);
     };
 
+    // Only an explicit choice is saved, so until then the app keeps following the device setting
     const handleLightMode = () => {
-        setLightMode(!lightMode);
+        const next = !lightMode;
+        setLightMode(next);
+        try {
+            localStorage.setItem(THEME_KEY, next ? 'light' : 'dark');
+        } catch {
+            // Storage unavailable; the theme still applies for this visit
+        }
     }
 
 const handleHover = () => {

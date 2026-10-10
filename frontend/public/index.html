@@ -25,6 +25,19 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Support Roll</title>
+    <!-- Apply the saved or device theme before the app loads, so the page doesn't flash dark first -->
+    <script>
+      (function () {
+        var theme;
+        try {
+          theme = localStorage.getItem("supportroll.theme");
+        } catch (e) {}
+        if (!theme) {
+          theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
