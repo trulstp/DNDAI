@@ -66,30 +66,36 @@ Support Roll helps you prep a session in seconds. Pick a location and a challeng
 
 ```
 DNDAI/
+├── .nvmrc                     # Node version (24)
 ├── backend/
 │   ├── server.js              # Express app, CORS, MongoDB connection, HTTP/HTTPS
 │   ├── routes/
-│   │   ├── dndRoutes.js       # /app/* endpoints
-│   │   └── userRoutes.js      # /user/* (placeholder)
+│   │   └── dndRoutes.js       # /app/* endpoints
 │   ├── controller/
 │   │   └── dndController.js   # Encounter, character and image logic
 │   ├── models/
 │   │   ├── DnDSchema.js       # Monster schema
-│   │   └── userSchema.js      # User schema (not yet used)
+│   │   └── statblockSchema.js # SRD stat blocks from Open5e
 │   ├── services/
-│   │   └── open5eClient.js    # Cached Open5e API client (work in progress)
+│   │   └── open5eClient.js    # Open5e API client used by the sync script
 │   ├── scripts/
-│   │   └── Class_creator.py   # Character generator
-│   └── data/
-│       └── locationTags.json
+│   │   ├── Class_creator.py   # Character generator
+│   │   ├── seedMonsters.js    # Loads data/monsterSeed.js into MongoDB
+│   │   └── syncOpen5e.js      # Copies SRD stat blocks from Open5e into MongoDB
+│   ├── data/
+│   │   └── monsterSeed.js     # Monsters per location
+│   └── test/                  # npm test
 └── frontend/
+    ├── index.html
+    ├── vite.config.js
     ├── netlify.toml
     ├── public/
     └── src/
-        ├── App.js             # Routes
+        ├── App.jsx            # Routes
         ├── pages/             # Route-level pages
         ├── Components/        # Nav, Feed, CharacterSheet, inputs, UI kit
-        └── store/             # Sidebar / session-history context
+        ├── store/             # History, sidebar and theme context
+        └── util/              # Small shared helpers
 ```
 
 ---
@@ -188,7 +194,7 @@ All endpoints are under `/app`.
 
 ## Roadmap
 
-- [ ] User accounts (login, register, profile; UI exists, backend pending)
+- [ ] User accounts (login, register, profile)
 - [ ] Save encounters and characters to the user's profile
 - [ ] Non-combat encounter generator
 - [ ] Map maker

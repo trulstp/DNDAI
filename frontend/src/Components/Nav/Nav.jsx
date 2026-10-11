@@ -106,13 +106,6 @@ const Nav = () => {
             <span className={classes["link-text"]}>Character Creator</span>
           </NavLink>
         </li>
-        {/* Hidden until login works:
-        <li className={classes["nav-item"]}>
-          <NavLink to='/login' className={navLinkClass} aria-label='Login'>
-            <FontAwesomeIcon icon={faRightToBracket} />
-            <span className={classes["link-text"]}>Login</span>
-          </NavLink>
-        </li> */}
         <li className={`${classes["nav-item"]} ${classes["nav-bottom"]}`}>
           <button
             type='button'

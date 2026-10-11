@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faRotateRight,
   faTriangleExclamation,
   faWandMagicSparkles,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import choice from "../Choice/Choice.module.css";
 import classes from "./Feedback.module.css";
+import { SidebarContext } from "../../../store/sidebar-context";
 
 // A failed request, with a way to try again
 export const ErrorBanner = ({ message, onRetry }) => (
@@ -27,6 +29,33 @@ export const ErrorBanner = ({ message, onRetry }) => (
     )}
   </div>
 );
+
+// Says what was removed when browser storage filled up. The live region is always there
+// so screen readers announce the message when it appears
+export const StorageNotice = () => {
+  const { storageNotice, dismissStorageNotice } = useContext(SidebarContext);
+  return (
+    <div className={classes["notice-region"]} role='status'>
+      {storageNotice && (
+        <div className={`${classes.banner} ${classes.notice}`}>
+          <FontAwesomeIcon
+            icon={faTriangleExclamation}
+            className={classes["banner-icon"]}
+          />
+          <span className={classes["banner-text"]}>{storageNotice}</span>
+          <button
+            type='button'
+            className={classes.retry}
+            onClick={dismissStorageNotice}
+          >
+            <FontAwesomeIcon icon={faXmark} className={classes["retry-icon"]} />
+            Dismiss
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const IMAGE_KINDS = {
   artwork: {
