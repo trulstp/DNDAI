@@ -1,19 +1,48 @@
 .loading {
-    display: flex;
-    justify-content: center;
-    align-items: space-between;
-    flex-direction: column;
-    height: 100vh;
-   
-    max-width: 100%;
-    padding: 30px;
-    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 100vh;
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.loading-text {
-    color: var(--text-secondary);
+/* Sized explicitly: some global svg rules would otherwise stretch it */
+.icon {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+  color: var(--text-tertiary);
 }
 
-.loading h2 {
-    text-align: center;
+.title {
+  margin: 0;
+  font-family: var(--font-tertiary);
+  font-size: 2.2rem;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.detail {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    animation: none;
+  }
 }

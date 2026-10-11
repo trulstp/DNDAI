@@ -3,6 +3,13 @@
   box-sizing: border-box;
 }
 
+.actions {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 20px 20px 0;
+  box-sizing: border-box;
+}
+
 /* Two columns that each size to their own content, so neither stretches the other */
 .sheet {
   display: grid;

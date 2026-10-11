@@ -1,10 +1,8 @@
 /* Encounter view, styled to match the character sheet cards */
 
+/* Scrolls with the page rather than in a container of its own */
 .feed {
   width: 100%;
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -19,8 +17,22 @@
   text-align: left;
 }
 
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 4px;
+}
+
+.summary {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 .title {
-  margin: 0 0 4px;
+  margin: 0;
   text-align: center;
   font-family: var(--font-tertiary);
   color: var(--text-tertiary);

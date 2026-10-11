@@ -13,7 +13,8 @@ import {
   faSun,
 } from "@fortawesome/free-solid-svg-icons";
 
-// The current page's icon is shown in colour; NavLink also sets aria-current
+// The current page's icon is shown in colour; NavLink also sets aria-current.
+// The reset state makes the page show a fresh input screen, even when you're already on it
 const navLinkClass = ({ isActive }) =>
   `${classes["nav-link"]} ${isActive ? classes.active : ""}`;
 
@@ -86,6 +87,7 @@ const Nav = () => {
         <li className={classes["nav-item"]}>
           <NavLink
             to='/encounter'
+            state={{ reset: true }}
             className={navLinkClass}
             aria-label='Random Encounter'
           >
@@ -96,6 +98,7 @@ const Nav = () => {
         <li className={classes["nav-item"]}>
           <NavLink
             to='/creator'
+            state={{ reset: true }}
             className={navLinkClass}
             aria-label='Character Creator'
           >
