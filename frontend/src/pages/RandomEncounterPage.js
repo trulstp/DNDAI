@@ -173,6 +173,7 @@ const RandomEncounterPage = () => {
           activeId={feedActive ? currentId : null}
           onToggleFavorite={toggleFavorite}
           onDelete={deleteEncounter}
+          title='Encounter'
           button={"+ New Encounter"}
         />
       )}

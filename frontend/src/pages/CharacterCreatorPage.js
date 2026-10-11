@@ -158,6 +158,7 @@ const CharacterCreatorPage = () => {
         <Sidebar
           createNewEncounter={createNew}
           handleClick={handleSidebarClick}
+          title='Character'
           button='+ New Character'
           items={historyItems}
           activeId={feedActive ? currentId : null}

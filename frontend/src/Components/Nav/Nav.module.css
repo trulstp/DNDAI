@@ -188,11 +188,6 @@
         transition: width var(--transition-speed), filter var(--transition-speed);
     }
 
-    /* With the history sidebar open, the nav is as wide as the sidebar's header */
-    .historyNav {
-        width: 16rem;
-    }
-
     .navbar:hover,
     .navbar:focus-within {
         width: 16rem;
@@ -204,7 +199,6 @@
     }
 
     /* The name appears to the right of the logo when the nav expands */
-    .historyNav .logo-text,
     .navbar:hover .logo-text,
     .navbar:focus-within .logo-text {
         left: 5rem;

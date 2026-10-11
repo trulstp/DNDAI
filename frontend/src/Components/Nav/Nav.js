@@ -33,9 +33,7 @@ const Nav = () => {
     : "Encounter";
 
   return (
-    <nav
-      className={`${classes.navbar} ${sidebarOpen ? classes.historyNav : ""}`}
-    >
+    <nav className={classes.navbar}>
       <ul className={classes["navbar-nav"]}>
         <li className={classes["logo"]}>
           <Link
@@ -43,23 +41,11 @@ const Nav = () => {
             className={classes["nav-link-logo"]}
             aria-label='Support Roll home'
           >
-            {!sidebarOpen ? (
-              <span
-                className={`${classes["link-text"]} ${classes["logo-text"]} ${classes["link-text-logo"]}`}
-              >
-                <span className={classes["fa-secondary"]}>Support</span>
-                <br />
-                <span className={classes["fa-primary"]}>Roll</span>
-              </span>
-            ) : (
-              <span
-                className={`${classes["link-text"]} ${classes["logo-text"]} ${classes["link-text-logo"]}`}
-              >
-                <span className={classes["fa-secondary"]}>{historyTitle}</span>
-                <br />
-                <span className={classes["fa-primary"]}>History</span>
-              </span>
-            )}
+            <span className={`${classes["link-text"]} ${classes["logo-text"]}`}>
+              <span className={classes["fa-secondary"]}>Support</span>
+              <br />
+              <span className={classes["fa-primary"]}>Roll</span>
+            </span>
 
             <img src={logo} alt='' className={classes["logo-mark"]} />
           </Link>

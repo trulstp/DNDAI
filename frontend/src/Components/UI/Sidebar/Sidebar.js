@@ -46,7 +46,7 @@ const HistoryItem = ({
     <li className={`${classes.item} ${active ? classes.active : ""}`}>
       <button
         type='button'
-        className={classes.title}
+        className={classes["item-title"]}
         onClick={() => onSelect(item.id)}
         aria-current={active ? "true" : undefined}
       >
@@ -140,7 +140,14 @@ const Sidebar = (props) => {
         onClick={closeSidebar}
         aria-hidden='true'
       />
-      <section className={classes["side-bar"]} aria-label='History'>
+      <section
+        className={classes["side-bar"]}
+        aria-label={`${props.title} history`}
+      >
+        <h2 className={classes.title}>
+          <span>{props.title}</span>
+          <span>History</span>
+        </h2>
         <div className={classes["sidebar-button"]}>
           <Button
             onClick={() => {
