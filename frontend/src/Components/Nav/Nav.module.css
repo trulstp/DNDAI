@@ -1,17 +1,10 @@
 .navbar {
+    position: fixed;
     width: 5rem;
     height: 100vh;
-    position: fixed;
     background-color: var(--color-secondary);
     box-sizing: border-box;
-}
-
-.historyNav {
-    width: 5rem;
-    height: 100vh;
-    position: fixed;
-    background-color: var(--color-secondary);
-    box-sizing: border-box;
+    z-index: 101;
 }
 
 .navbar-nav {
@@ -26,15 +19,10 @@
 
 .nav-item {
     width: 100%;
-    
 }
 
-.nav-item:last-child {
-    margin-top: auto;
-    margin: 0;
-}
-
-.nav-item:nth-child(5) {
+/* The theme toggle sits at the bottom of the nav */
+.nav-bottom {
     margin-top: auto;
 }
 
@@ -45,15 +33,52 @@
     height: 5rem;
     color: var(--text-primary);
     text-decoration: none;
-    white-space: nowrap; /* Prevent text wrapping */
-    overflow: hidden; /* Hide overflow */
-    text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     filter: grayscale(100%) opacity(0.7);
     transition: var(--transition-speed);
 }
 
+.nav-link:hover {
+    filter: grayscale(0%) opacity(1);
+    background: var(--color-primary);
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+/* The page you're on is shown in colour */
+.active {
+    filter: none;
+}
+
 .history {
     background: var(--color-primary);
+}
+
+/* History and the theme toggle are buttons; make them look like the link items */
+.nav-button {
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: none;
+    font: inherit;
+    text-align: left;
+}
+
+.nav-button:focus-visible,
+.nav-link:focus-visible,
+.nav-link-logo:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: -4px;
+    filter: none;
+}
+
+.nav-link svg {
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    margin: 0 1.5rem;
 }
 
 /* The scroll is wider than it is tall, so it is drawn a little larger to match the other icons;
@@ -79,37 +104,6 @@
     margin-left: 1rem;
 }
 
-.nav-link:hover {
-    filter: grayscale(0%) opacity(1);
-    background: var(--color-primary);
-    color: var(--text-primary);
-    text-decoration: underline;
-}
-
-/* History and the theme toggle are buttons; make them look like the link items */
-.nav-button {
-    width: 100%;
-    padding: 0;
-    background: none;
-    border: none;
-    font: inherit;
-    text-align: left;
-}
-
-.nav-button:focus-visible,
-.nav-link:focus-visible {
-    outline: 2px solid var(--text-primary);
-    outline-offset: -4px;
-    filter: none;
-}
-
-.nav-link svg {
-    height: 2rem;
-    width: 2rem;
-   min-width: 2rem;
-   margin: 0 1.5rem; 
-}
-
 .logo-mark {
     width: 2.75rem;
     min-width: 2.75rem;
@@ -123,7 +117,6 @@
 
 .fa-secondary {
     color: var(--text-primary);
-    
 }
 
 .fa-primary,
@@ -142,18 +135,17 @@
     width: 100%;
 }
 
-
-
-.logo-text
-{
+/* Off-screen until the nav expands */
+.logo-text {
     font-size: 1.5rem;
-  display: inline;
-  position: absolute;
-  left: -999px;
-  transition: var(--transition-speed);
-  text-align: start;
+    display: inline;
+    position: absolute;
+    left: -999px;
+    transition: var(--transition-speed);
+    text-align: start;
 }
 
+/* Phones: a bar along the bottom, with the logo as the home link */
 @media only screen and (max-width: 600px) {
     h2 {
         text-align: center;
@@ -164,68 +156,54 @@
         width: 100vw;
         height: 5rem;
         transition: none;
-        z-index: 101;
-    }
-
-    .historyNav{
-        bottom: 0;
-        width: 100vw;
-        height: 5rem;
-        transition: none;
-        z-index: 101;
-    }
-
-    .logo {
-        display: none;
     }
 
     .navbar-nav {
         flex-direction: row;
     }
 
-    
+    .logo {
+        margin-bottom: 0;
+    }
 
-    .nav-link {
+    .nav-link,
+    .nav-link-logo {
         justify-content: center;
     }
 
-    
-    
-}  
+    .logo-mark {
+        margin: 0;
+    }
 
+    .nav-bottom {
+        margin-top: 0;
+    }
+}
+
+/* Larger screens: a column down the left that expands on hover or keyboard focus,
+   over the page rather than pushing it aside */
 @media only screen and (min-width: 600px) {
     .navbar {
         top: 0;
-        
-        height: 100vh;
-        transition: width var(--transition-speed), filter var(--transition-speed);
-        z-index: 101;
-      }
-
-     .historyNav {
-        top: 0;
-        width: 16rem;
-        height: 100vh;
-        transition: width var(--transition-speed), filter var(--transition-speed);
-      
-     }
-
-    /* The name appears to the right of the logo when the nav expands */
-    .historyNav .logo-text {
-    left: 5rem;
+        /* Same speed as the page making room, so they move together */
+        transition: width 0.3s ease-out;
     }
 
-      .navbar:hover {
+    /* Not while the history sidebar is open: the expanded nav would cover it */
+    /* :focus-visible means keyboard focus; a mouse click leaves a link focused too */
+    .navbar:not(.sidebar-open):hover,
+    .navbar:not(.sidebar-open):has(:focus-visible) {
         width: 16rem;
-      }
-    
-      .navbar:hover .link-text {
+    }
+
+    .navbar:not(.sidebar-open):hover .link-text,
+    .navbar:not(.sidebar-open):has(:focus-visible) .link-text {
         display: inline;
     }
 
-    
-      .navbar:hover .logo-text
-      {
+    /* The name appears to the right of the logo when the nav expands */
+    .navbar:not(.sidebar-open):hover .logo-text,
+    .navbar:not(.sidebar-open):has(:focus-visible) .logo-text {
         left: 5rem;
-      }
+    }
 }

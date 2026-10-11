@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { SidebarContext } from './sidebar-context';
 import { newId } from '../util/newId';
 
@@ -72,8 +73,34 @@ const usePersistentHistory = (key) => {
     return [history, setHistory];
 };
 
+// Pages that have a history sidebar
+const HISTORY_PAGES = ['/encounter', '/creator'];
+
 export const SidebarProvider = ({ children }) => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    // The user's choice; the sidebar only actually opens on pages that have one
+    const [sidebarRequested, setSidebarRequested] = useState(false);
+    const { pathname } = useLocation();
+    const historyAvailable = HISTORY_PAGES.some((page) => pathname.startsWith(page));
+    const sidebarOpen = sidebarRequested && historyAvailable;
+
+    // The nav expands on hover or keyboard focus, and the page makes room for it
+    // (except while the history sidebar is open, which already takes that space)
+    const [navHovered, setNavHovered] = useState(false);
+    const [navFocused, setNavFocused] = useState(false);
+    const navExpanded = (navHovered || navFocused) && !sidebarOpen;
+
+    const handleSidebar = () => setSidebarRequested((open) => !open);
+    const closeSidebar = () => setSidebarRequested(false);
+
+    // Escape closes the sidebar
+    useEffect(() => {
+        if (!sidebarOpen) return undefined;
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') setSidebarRequested(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [sidebarOpen]);
 
     const [lightMode, setLightMode] = useState(initialLightMode);
 
@@ -82,15 +109,9 @@ export const SidebarProvider = ({ children }) => {
         document.documentElement.dataset.theme = lightMode ? 'light' : 'dark';
     }, [lightMode]);
 
-    const [hover, setHover] = useState(false);
-
     const [previousChats, setPreviousChats] = usePersistentHistory('supportroll.characters');
 
     const [previousEncounter, setPreviousEncounter] = usePersistentHistory('supportroll.encounters');
-
-    const handleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
-    };
 
     // Only an explicit choice is saved, so until then the app keeps following the device setting
     const handleLightMode = () => {
@@ -103,15 +124,8 @@ export const SidebarProvider = ({ children }) => {
         }
     }
 
-const handleHover = () => {
-    setHover(true);
-}
-const handleHoverOff = () => {
-    setHover(false);
-}
-
     return (
-        <SidebarContext.Provider value={{ sidebarOpen, handleSidebar, lightMode, handleLightMode, hover, handleHover, handleHoverOff, previousChats, setPreviousChats, previousEncounter, setPreviousEncounter }}>
+        <SidebarContext.Provider value={{ sidebarOpen, historyAvailable, handleSidebar, closeSidebar, navExpanded, setNavHovered, setNavFocused, lightMode, handleLightMode, previousChats, setPreviousChats, previousEncounter, setPreviousEncounter }}>
             {children}
         </SidebarContext.Provider>
     );

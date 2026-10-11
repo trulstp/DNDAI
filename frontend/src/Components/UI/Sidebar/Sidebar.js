@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import classes from "./Sidebar.module.css";
 import Button from "../Buttons/Button";
+import { SidebarContext } from "../../../store/sidebar-context";
+
+// On phones the sidebar covers the page, so it closes once a choice is made
+const isPhone = () => window.matchMedia?.("(max-width: 600px)").matches;
 
 // One saved item: select it, star it, and (when onDelete is given) delete it after a confirm
-const HistoryItem = ({ item, active, onSelect, onToggleFavorite, onDelete }) => {
+const HistoryItem = ({
+  item,
+  active,
+  onSelect,
+  onToggleFavorite,
+  onDelete,
+}) => {
   const [confirming, setConfirming] = useState(false);
 
   if (confirming) {
@@ -36,7 +46,7 @@ const HistoryItem = ({ item, active, onSelect, onToggleFavorite, onDelete }) => 
     <li className={`${classes.item} ${active ? classes.active : ""}`}>
       <button
         type='button'
-        className={classes.title}
+        className={classes["item-title"]}
         onClick={() => onSelect(item.id)}
         aria-current={active ? "true" : undefined}
       >
@@ -104,10 +114,18 @@ const withLabels = (items) => {
 
 // items: [{ id, title, favorite }], newest first
 const Sidebar = (props) => {
+  const { closeSidebar } = useContext(SidebarContext);
+  const closeOnPhone = () => {
+    if (isPhone()) closeSidebar();
+  };
+
   const items = withLabels(props.items);
   const itemProps = {
     activeId: props.activeId,
-    onSelect: props.handleClick,
+    onSelect: (id) => {
+      props.handleClick(id);
+      closeOnPhone();
+    },
     onToggleFavorite: props.onToggleFavorite,
     onDelete: props.onDelete,
   };
@@ -115,18 +133,40 @@ const Sidebar = (props) => {
   const others = items.filter((item) => !item.favorite);
 
   return (
-    <section className={classes["side-bar"]}>
-      <div className={classes["sidebar-button"]}>
-        <Button onClick={props.createNewEncounter}>{props.button}</Button>
-      </div>
-      <div className={classes.scroll}>
-        <HistoryGroup label='Favourites' items={favorites} {...itemProps} />
-        <HistoryGroup label='Recent' items={others} {...itemProps} />
-        {items.length === 0 && (
-          <p className={classes.empty}>Nothing saved yet.</p>
-        )}
-      </div>
-    </section>
+    <>
+      {/* Only shown on phones: dims the page, and tapping it closes the sidebar */}
+      <div
+        className={classes.backdrop}
+        onClick={closeSidebar}
+        aria-hidden='true'
+      />
+      <section
+        className={classes["side-bar"]}
+        aria-label={`${props.title} history`}
+      >
+        <h2 className={classes.title}>
+          <span>{props.title}</span>
+          <span>History</span>
+        </h2>
+        <div className={classes["sidebar-button"]}>
+          <Button
+            onClick={() => {
+              props.createNewEncounter();
+              closeOnPhone();
+            }}
+          >
+            {props.button}
+          </Button>
+        </div>
+        <div className={classes.scroll}>
+          <HistoryGroup label='Favourites' items={favorites} {...itemProps} />
+          <HistoryGroup label='Recent' items={others} {...itemProps} />
+          {items.length === 0 && (
+            <p className={classes.empty}>Nothing saved yet.</p>
+          )}
+        </div>
+      </section>
+    </>
   );
 };
 

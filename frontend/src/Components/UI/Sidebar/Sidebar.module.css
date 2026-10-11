@@ -1,16 +1,52 @@
+/* A panel beside the nav. It sits underneath the nav, so it slides out from behind the
+   icons, and the expanded nav (on hover) covers it like it covers the page */
 .side-bar {
-  background-color: var(--color-secondary);
-  transition: width var(--transition-speed), margin-left var(--transition-speed);
-  transform: translateX(-11rem);
-  /* Starts below the nav header, so it is shorter than the screen */
-  height: calc(100vh - 5rem);
-  margin-top: 5rem;
+  position: fixed;
+  top: 0;
+  left: 5rem;
   width: 11rem;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  position: absolute;
-  z-index: 103;
+  background-color: var(--color-secondary);
+  border-left: 1px solid var(--color-tertiary);
   box-sizing: border-box;
+  z-index: 100;
+  animation: slide-in 0.3s ease-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-bar {
+    animation: none;
+  }
+}
+
+/* Lines up with the logo row of the nav */
+.title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 5rem;
+  margin: 0;
+  padding: 0 1rem;
+  font-family: var(--font-secondary);
+  font-size: 1.3rem;
+  line-height: 1.1;
+  letter-spacing: 0.1ch;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.title span:last-child {
+  color: var(--text-tertiary);
 }
 
 .sidebar-button {
@@ -63,7 +99,7 @@
   background-color: var(--color-tertiary);
 }
 
-.title {
+.item-title {
   display: block;
   width: 100%;
   padding: 8px 10px;
@@ -78,12 +114,12 @@
   cursor: pointer;
 }
 
-.active .title {
+.active .item-title {
   color: var(--text-secondary);
   font-weight: 600;
 }
 
-.title:focus-visible,
+.item-title:focus-visible,
 .icon:focus-visible,
 .danger:focus-visible,
 .cancel:focus-visible {
@@ -203,15 +239,29 @@
   }
 }
 
+.backdrop {
+  display: none;
+}
+
+/* Phones: a drawer over a dimmed page, above the bottom nav's top edge */
 @media only screen and (max-width: 600px) {
+  .backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 5rem;
+    z-index: 102;
+    background-color: rgba(0, 0, 0, 0.45);
+  }
+
   .side-bar {
-    margin-left: 0;
+    left: 0;
+    width: min(80vw, 20rem);
     height: calc(100vh - 5rem);
-    position: absolute;
-    margin-top: 0rem;
-    z-index: 100;
-    width: 50%;
-    transition: width var(--transition-speed), margin-left var(--transition-speed);
-    transform: translateX(0rem);
+    border-left: none;
+    box-shadow: 4px 0 16px var(--shadow);
+    z-index: 103;
   }
 }

@@ -4,9 +4,11 @@ import classes from "./BigCard.module.css";
 import { SidebarContext } from "../../../store/sidebar-context";
 
 const BigCard = (props) => {
-  const { sidebarOpen, hover } = useContext(SidebarContext);
+  const { sidebarOpen, navExpanded } = useContext(SidebarContext);
 
-  const className = sidebarOpen || hover ? classes.bigcard : classes.hover;
+  // The page moves aside for the open history sidebar or the expanded nav, so nothing covers its text
+  const className =
+    sidebarOpen || navExpanded ? classes["with-sidebar"] : classes.collapsed;
 
   return <div className={className}>{props.children}</div>;
 };
