@@ -209,6 +209,11 @@ const CharacterCreatorPage = () => {
     });
   };
 
+  const deleteCharacter = (title) => {
+    setPreviousChats((prev) => prev.filter((c) => c.title !== title));
+    if (title === currentTitle) createNew();
+  };
+
   return (
     <>
       {sidebarCtx.sidebarOpen && (
@@ -219,6 +224,7 @@ const CharacterCreatorPage = () => {
           items={historyItems}
           activeTitle={feedActive ? currentTitle : null}
           onToggleFavorite={toggleFavorite}
+          onDelete={deleteCharacter}
         />
       )}
 
