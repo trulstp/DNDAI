@@ -83,6 +83,12 @@ export const SidebarProvider = ({ children }) => {
     const historyAvailable = HISTORY_PAGES.some((page) => pathname.startsWith(page));
     const sidebarOpen = sidebarRequested && historyAvailable;
 
+    // The nav expands on hover or keyboard focus, and the page makes room for it
+    // (except while the history sidebar is open, which already takes that space)
+    const [navHovered, setNavHovered] = useState(false);
+    const [navFocused, setNavFocused] = useState(false);
+    const navExpanded = (navHovered || navFocused) && !sidebarOpen;
+
     const handleSidebar = () => setSidebarRequested((open) => !open);
     const closeSidebar = () => setSidebarRequested(false);
 
@@ -119,7 +125,7 @@ export const SidebarProvider = ({ children }) => {
     }
 
     return (
-        <SidebarContext.Provider value={{ sidebarOpen, historyAvailable, handleSidebar, closeSidebar, lightMode, handleLightMode, previousChats, setPreviousChats, previousEncounter, setPreviousEncounter }}>
+        <SidebarContext.Provider value={{ sidebarOpen, historyAvailable, handleSidebar, closeSidebar, navExpanded, setNavHovered, setNavFocused, lightMode, handleLightMode, previousChats, setPreviousChats, previousEncounter, setPreviousEncounter }}>
             {children}
         </SidebarContext.Provider>
     );

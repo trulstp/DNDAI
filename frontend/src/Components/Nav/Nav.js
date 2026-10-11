@@ -24,6 +24,8 @@ const Nav = () => {
     lightMode,
     sidebarOpen,
     historyAvailable,
+    setNavHovered,
+    setNavFocused,
   } = useContext(SidebarContext);
 
   const location = useLocation();
@@ -35,6 +37,15 @@ const Nav = () => {
   return (
     <nav
       className={`${classes.navbar} ${sidebarOpen ? classes["sidebar-open"] : ""}`}
+      onMouseEnter={() => setNavHovered(true)}
+      onMouseLeave={() => setNavHovered(false)}
+      // Keyboard focus only: a mouse click also focuses the link, but shouldn't keep the nav open
+      onFocus={(event) => setNavFocused(event.target.matches(":focus-visible"))}
+      onBlur={(event) => {
+        // Only when focus leaves the nav, not when it moves between its items
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setNavFocused(false);
+      }}
     >
       <ul className={classes["navbar-nav"]}>
         <li className={classes["logo"]}>
