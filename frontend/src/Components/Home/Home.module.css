@@ -1,127 +1,255 @@
-
-.homebox {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-    height: 100%;
-    width: 100%;
-    background-color: var(--color-primary); /* A dark blue background similar to your image */
-  }
-  
-  .svg {
-    width: auto; /* adjust as needed */
-    height: 100%; /* adjust as needed */
-    max-width: 100%; /* ensures SVG doesn't overflow its container */
-    max-height: 100%; /* ensures SVG doesn't overflow its container */
-    color: var(--icon-color);
-    padding-top: 5px;
-}
-  a {
-    text-decoration: none;
-  }
- svg {
-    width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    margin-bottom: 2rem;
-    
-  }
-  
-  h2 {
-    text-decoration: none;
-    font-family: var(--font-secondary);
-    color: var(--text-primary);
-  }
-  
-  .homebox img {
-    width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    margin-bottom: 2rem;
-  }
-  
-  /* Mobile view */
-  @media (max-width: 600px) {
-    .homebox {
-      padding: 5px;
-    }
-  
-    .homebox h1 {
-      font-size: 1.5rem;
-    }
- 
-    .homebox a {
-      font-size: 1rem;
-    }
-  
-    .homebox img {
-      width: 80%;
-    }
-   
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  box-sizing: border-box;
+  text-align: left;
 }
 
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-    height: 70%;
-    width: 80%;
-    background-color: var(--color-primary); /* A dark blue background similar to your image */
-  }
-  
-  .square {
-    display: flex;
-    background-color: var(--color-secondary);
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
-    align-items: center;
-    border-radius: 10px;
-    width: 100%;
-    box-shadow: 3px 3px 10px var(--shadow);
-    transition: transform 0.3s;
-    height: 30vh;
-  }
-  
-  .square:hover {
-    background-color: var(--color-tertiary);
+/* Header */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logo {
+  width: 140px;
+  height: 140px;
+  filter: drop-shadow(0 6px 14px var(--shadow));
+}
+
+.title {
+  margin: 0.75rem 0 0;
+  font-size: 3.4rem;
+  line-height: 1.1;
+}
+
+.tagline {
+  margin: 0.5rem 0 0;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+}
+
+/* Feature cards */
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  background-color: var(--color-secondary);
+  border-top: 4px solid var(--text-primary);
+  border-radius: 0 0 10px 10px;
+  color: var(--text-body);
+  text-decoration: none;
+  box-shadow: 0 4px 14px var(--shadow);
+  transition: transform 0.15s, background-color 0.15s;
+}
+
+.feature:hover {
+  transform: translateY(-3px);
+  background-color: var(--color-tertiary);
+}
+
+.feature:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 3px;
+}
+
+.feature-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  color: var(--text-primary);
+}
+
+/* text-align is explicit: Nav.module.css centres every h2 on phones */
+.feature-title {
+  margin: 0.25rem 0 0;
+  text-align: left;
+  font-family: var(--font-tertiary);
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+.feature-description {
+  margin: 0;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.feature-action {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.action-icon {
+  width: 0.9em;
+  height: 0.9em;
+  transition: transform 0.15s;
+}
+
+.feature:hover .action-icon {
+  transform: translateX(4px);
+}
+
+/* Shared section heading */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.section-title {
+  margin: 0;
+  text-align: left;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--text-primary);
+  font-family: var(--font-tertiary);
+  font-size: 1.6rem;
+  color: var(--text-primary);
+}
+
+/* Recent encounters and characters */
+.recent {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.recent-heading {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.recent-empty {
+  margin: 0;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  background-color: var(--color-secondary);
+  border-left: 3px solid var(--text-primary);
+  border-radius: 0 8px 8px 0;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.recent-item:hover {
+  background-color: var(--color-tertiary);
+}
+
+.recent-item:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.recent-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  color: var(--text-primary);
+}
+
+.recent-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recent-title,
+.recent-detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-title {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.recent-detail {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Coming soon */
+.soon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.soon-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 1px dashed var(--color-tertiary);
+  border-radius: 8px;
+  color: var(--text-faint);
+}
+
+.soon-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.footer {
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-tertiary);
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* Phones: one column and room for the fixed bottom nav */
+@media only screen and (max-width: 700px) {
+  .home {
+    gap: 2rem;
+    padding: 2rem 1rem 7rem;
   }
 
-  
-  .square img {
-    
-    margin-bottom: 5px;
-    object-fit: fill;
-   
-width: 40%;
-
-    height: auto; /* Maintain aspect ratio */
-    
-    
+  .logo {
+    width: 104px;
+    height: 104px;
   }
-  
-  .square p {
-    text-align: center;
-    margin-top: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    color: var(--text-secondary);
-  }
-  
-  /* Individual square background colors */
 
-  
-  /* Mobile view */
-  @media (max-width: 600px) {
-    .container {
-   height: fit-content;
-      gap: 5px;
-      margin-bottom: 5rem;
-    }
-
+  .title {
+    font-size: 2.6rem;
   }
-  
+
+  .features,
+  .recent {
+    grid-template-columns: 1fr;
+  }
+}
