@@ -191,3 +191,7 @@ test("the health check answers without the database", async () => {
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { status: "ok", database: "disconnected" });
 });
+
+test("the client IP debug route is off unless turned on", async () => {
+  assert.equal((await app.getRoot("/debug/client-ip")).status, 404);
+});

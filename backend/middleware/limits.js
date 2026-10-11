@@ -1,5 +1,6 @@
+const { isIP } = require("net");
 const mongoose = require("mongoose");
-const { rateLimit } = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const Usage = require("../models/usageSchema");
 
 // Limits on the routes that call OpenAI, which is what costs money. Both can be changed
@@ -8,8 +9,23 @@ const positive = (value, fallback) => (Number(value) > 0 ? Number(value) : fallb
 const AI_LIMIT_PER_HOUR = positive(process.env.AI_LIMIT_PER_HOUR, 20);
 const AI_LIMIT_PER_DAY = positive(process.env.AI_LIMIT_PER_DAY, 150);
 
+// The visitor's IP address. Behind Cloudflare (as on Render) requests arrive through a varying
+// number of proxies, so counting them with TRUST_PROXY isn't reliable. Cloudflare puts the
+// visitor's address in CF-Connecting-IP, replacing any value the visitor sent, so CLIENT_IP_HEADER
+// names a header like that to read instead. Only set it when every request comes through that proxy
+const CLIENT_IP_HEADER = process.env.CLIENT_IP_HEADER?.trim().toLowerCase();
+
+function clientIp(req) {
+  const fromHeader = CLIENT_IP_HEADER && req.get(CLIENT_IP_HEADER)?.trim();
+  return fromHeader && isIP(fromHeader) ? fromHeader : req.ip;
+}
+
+// IPv6 visitors are grouped by their /56 network, since one home connection gets a whole block
+const keyGenerator = (req) => ipKeyGenerator(clientIp(req));
+
 // Every route: generous for people, only stops scripts hammering the server
 const generalLimit = rateLimit({
+  keyGenerator,
   windowMs: 60 * 1000,
   limit: 120,
   standardHeaders: "draft-8",
@@ -19,6 +35,7 @@ const generalLimit = rateLimit({
 
 // OpenAI routes, per visitor (IP address). An encounter or character with artwork is two requests
 const aiVisitorLimit = rateLimit({
+  keyGenerator,
   windowMs: 60 * 60 * 1000,
   limit: AI_LIMIT_PER_HOUR,
   standardHeaders: "draft-8",
@@ -76,4 +93,4 @@ const aiDailyCap = async (req, res, next) => {
 // Per visitor first, so one visitor using up their own limit doesn't use up the daily budget
 const aiLimits = [aiVisitorLimit, aiDailyCap];
 
-module.exports = { generalLimit, aiLimits, AI_LIMIT_PER_HOUR, AI_LIMIT_PER_DAY };
+module.exports = { generalLimit, aiLimits, clientIp, AI_LIMIT_PER_HOUR, AI_LIMIT_PER_DAY };

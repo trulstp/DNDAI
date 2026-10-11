@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const monsterRoutes = require("./routes/dndRoutes");
-const { generalLimit } = require("./middleware/limits");
+const os = require("os");
+const { generalLimit, clientIp } = require("./middleware/limits");
 
 // Sites allowed to call the API, comma separated
 const corsOrigins = (
@@ -35,6 +36,26 @@ app.get("/health", (req, res) => {
     database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
 });
+
+// For setting up a new host: shows which address the rate limits see for you, and the headers
+// it could come from. Off unless DEBUG_CLIENT_IP=true; turn it off again once the limits are set up
+if (process.env.DEBUG_CLIENT_IP === "true") {
+  app.get("/debug/client-ip", (req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.json({
+      limitedAs: clientIp(req),
+      reqIp: req.ip,
+      socket: req.socket.remoteAddress,
+      instance: os.hostname(),
+      headers: Object.fromEntries(
+        ["x-forwarded-for", "cf-connecting-ip", "true-client-ip", "x-real-ip"].map((name) => [
+          name,
+          req.get(name) ?? null,
+        ])
+      ),
+    });
+  });
+}
 
 app.use("/app", generalLimit, monsterRoutes);
 
