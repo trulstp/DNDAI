@@ -83,7 +83,6 @@ const openaimessage = async (req, res) => {
   try {
     const response = await axios(options);
     res.send(response.data);
-    console.log(response.data);
   } catch (error) {
     console.error("Error in openaimessage:", error.message);
     res.status(500).send("Internal Server Error");
@@ -340,6 +339,8 @@ const getStatblocks = async (req, res) => {
       });
     }
 
+    // Stat blocks change only when the SRD sync runs, so browsers can reuse them for a day
+    res.set("Cache-Control", "public, max-age=86400");
     res.json(await findStatblocks(names));
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -516,7 +517,6 @@ const creator = async (req, res) => {
 
     res.json(characterData);
 
-    console.log("Character data:", characterData);
   } catch (error) {
     console.error(`Error: ${error.message}`);
     res.status(500).send("Internal Server Error");
@@ -740,7 +740,6 @@ const encounter = async (req, res) => {
 
     const responseData = await response.json();
 
-    console.log("OpenAI response:", JSON.stringify(responseData, null, 2));
 
     if (responseData.choices?.[0]?.finish_reason === "length") {
       throw new Error("OpenAI response was cut off by the token limit");
@@ -762,7 +761,6 @@ const encounter = async (req, res) => {
 
     res.json(encounterData);
 
-    console.log("Encounter data:", encounterData);
   } catch (error) {
     console.error(`Error: ${error.message}`);
     res.status(500).send("Internal Server Error");
