@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../Components/UI/Sidebar/Sidebar";
 import CharacterSheet from "../Components/UI/Feed/CharacterSheet";
 import Loading from "../Components/UI/Loading/Loading";
@@ -178,6 +179,18 @@ const CharacterCreatorPage = () => {
       setFeedActive(true);
     }
   };
+
+  // Opened from the home page's Recent list: show that character, then clear the request
+  // so a reload doesn't reopen it
+  const location = useLocation();
+  const navigate = useNavigate();
+  const openTitle = location.state?.openTitle;
+  useEffect(() => {
+    if (!openTitle) return;
+    handleSidebarClick(openTitle);
+    navigate(location.pathname, { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openTitle]);
 
   const currentEncounter =
     previousChats.find((chat) => chat.title === currentTitle) || {};

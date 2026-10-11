@@ -79,6 +79,16 @@ h1 {
   color: var(--text-primary);
 }
 
+/* Default subheading style (loading text, placeholder pages); components override it with classes */
+h2 {
+  font-family: var(--font-secondary);
+  color: var(--text-primary);
+}
+
+a {
+  text-decoration: none;
+}
+
 body::-webkit-scrollbar {
   width: 0.25rem;
 }

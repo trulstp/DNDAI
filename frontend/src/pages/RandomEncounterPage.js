@@ -1,5 +1,6 @@
 import Sidebar from "../Components/UI/Sidebar/Sidebar";
 import React, { useState, useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
@@ -169,6 +170,20 @@ const RandomEncounterPage = () => {
         .reverse()
     )
   );
+
+  // Opened from the home page's Recent list: show that encounter, then clear the request
+  // so a reload doesn't reopen it
+  const location = useLocation();
+  const navigate = useNavigate();
+  const openTitle = location.state?.openTitle;
+  useEffect(() => {
+    if (!openTitle) return;
+    if (previousEncounter.some((entry) => entry.title === openTitle)) {
+      handleClick(openTitle);
+    }
+    navigate(location.pathname, { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openTitle]);
 
   const toggleVisibility = (section) => {
     setIsVisible((prev) => ({ ...prev, [section]: !prev[section] }));
