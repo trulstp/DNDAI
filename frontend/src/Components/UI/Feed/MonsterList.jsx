@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import StatBlock from "./StatBlock";
 import { CollapsibleSubsection } from "../Collapsible/Collapsible";
 import classes from "./MonsterList.module.css";
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+import { API, noteServerResponse } from "../../../util/api";
 
 const FRACTIONAL_CR = { 0.125: "1/8", 0.25: "1/4", 0.5: "1/2" };
 const formatCR = (cr) => FRACTIONAL_CR[cr] || String(cr);
@@ -34,6 +34,7 @@ const MonsterList = ({ monsters, isVisible, toggleVisibility }) => {
     setStatus("loading");
     fetch(`${API}/app/statblocks?names=${encodeURIComponent(namesKey)}`)
       .then((response) => {
+        noteServerResponse();
         if (!response.ok) throw new Error(`Status ${response.status}`);
         return response.json();
       })

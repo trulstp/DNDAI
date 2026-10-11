@@ -7,10 +7,10 @@ import CharInput from "../Components/UI/InputSection/CharInput";
 import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
+import { API } from "../util/api";
 import { newId } from "../util/newId";
 import { preferredImageFormat } from "../util/imageFormat";
 import { useDocumentTitle } from "../util/useDocumentTitle";
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 const EMPTY_SELECTIONS = { name: "", race: "", classType: "", level: "" };
 
