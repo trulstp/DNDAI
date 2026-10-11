@@ -6,7 +6,6 @@ const open5e = require("../controller/open5eController");
 const {
   register,
   getAllMonsters,
-  openaimessage,
   openaiImages,
   getMonstersByLocationAndCR,
   getMonstersByLocation,
@@ -30,8 +29,6 @@ const requireDb = (req, res, next) => {
 
 // url Example: http://localhost:4000/user/register body: json format { "monsterName" : "Beholder", "challengeRating" : 13, "location" : "Underdark", "groupTag" : "Beholder" }
 router.post("/register", requireDb, register);
-
-router.post("/completions", openaimessage);
 
 router.post("/images", openaiImages);
 
