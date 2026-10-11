@@ -74,6 +74,17 @@ const RandomEncounterPage = () => {
       console.error("Poster description not found");
       return;
     }
+    // The server only draws descriptions it signed; encounters saved before that have no signature
+    const signature = entry.content.poster_signature;
+    if (!signature) {
+      setImageStatus({
+        state: "error",
+        message:
+          "This encounter was saved before an update, so artwork can't be made for it. Roll a new encounter to get artwork.",
+        id: entry.id,
+      });
+      return;
+    }
 
     try {
       setImageStatus({ state: "loading", id: entry.id });
@@ -81,6 +92,7 @@ const RandomEncounterPage = () => {
         method: "POST",
         body: JSON.stringify({
           message: description,
+          signature,
           format: await preferredImageFormat(),
         }),
         headers: { "Content-Type": "application/json" },

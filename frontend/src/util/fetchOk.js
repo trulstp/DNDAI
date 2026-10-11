@@ -1,10 +1,29 @@
 // fetch that throws an Error with a message suitable for showing to the user
+
+// Responses the backend marks with a code have their own message
+const messageForCode = {
+  AI_HOURLY_LIMIT:
+    "You've reached the hourly limit for AI generations. Try again in a while.",
+  AI_DAILY_LIMIT:
+    "Support Roll has reached its daily limit for AI generations. Try again tomorrow.",
+  UNSIGNED_IMAGE_PROMPT:
+    "Artwork can't be made for this one. Generate a new one to get artwork.",
+};
+
 const messageForStatus = (status) => {
   if (status === 429) return "Too many requests. Wait a moment and try again.";
   if (status === 503) return "The monster database isn't available right now.";
   if (status >= 500)
     return "Something went wrong while generating. The AI service may be busy, so try again.";
   return "The request wasn't accepted. Check your choices and try again.";
+};
+
+const codeOf = async (response) => {
+  try {
+    return (await response.json())?.code;
+  } catch {
+    return undefined;
+  }
 };
 
 export const fetchOk = async (url, options) => {
@@ -16,6 +35,9 @@ export const fetchOk = async (url, options) => {
       "Couldn't reach the server. Check that the backend is running."
     );
   }
-  if (!response.ok) throw new Error(messageForStatus(response.status));
+  if (!response.ok) {
+    const code = await codeOf(response);
+    throw new Error(messageForCode[code] || messageForStatus(response.status));
+  }
   return response;
 };

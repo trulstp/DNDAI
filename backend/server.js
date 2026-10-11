@@ -1,22 +1,10 @@
-const express = require("express");
+// Loaded first, so every module sees the settings in .env
+require("dotenv").config();
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const monsterRoutes = require("./routes/dndRoutes");
-const cors = require("cors");
-
-dotenv.config();
+const app = require("./app");
 
 const PORT = process.env.PORT || 5000;
 const useHttps = process.env.USE_HTTPS === "true";
-
-const app = express();
-
-app.use(
-  cors({ origin: ["http://localhost:3000", "https://supportroll.netlify.app"] })
-);
-app.use(express.json());
-
-app.use("/app", monsterRoutes);
 
 (async () => {
   // Optional MongoDB
