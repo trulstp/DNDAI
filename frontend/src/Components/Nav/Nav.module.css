@@ -188,19 +188,20 @@
         transition: width var(--transition-speed), filter var(--transition-speed);
     }
 
-    .navbar:hover,
-    .navbar:focus-within {
+    /* Not while the history sidebar is open: the expanded nav would cover it */
+    .navbar:not(.sidebar-open):hover,
+    .navbar:not(.sidebar-open):focus-within {
         width: 16rem;
     }
 
-    .navbar:hover .link-text,
-    .navbar:focus-within .link-text {
+    .navbar:not(.sidebar-open):hover .link-text,
+    .navbar:not(.sidebar-open):focus-within .link-text {
         display: inline;
     }
 
     /* The name appears to the right of the logo when the nav expands */
-    .navbar:hover .logo-text,
-    .navbar:focus-within .logo-text {
+    .navbar:not(.sidebar-open):hover .logo-text,
+    .navbar:not(.sidebar-open):focus-within .logo-text {
         left: 5rem;
     }
 }

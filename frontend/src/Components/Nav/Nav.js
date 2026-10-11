@@ -33,7 +33,9 @@ const Nav = () => {
     : "Encounter";
 
   return (
-    <nav className={classes.navbar}>
+    <nav
+      className={`${classes.navbar} ${sidebarOpen ? classes["sidebar-open"] : ""}`}
+    >
       <ul className={classes["navbar-nav"]}>
         <li className={classes["logo"]}>
           <Link
