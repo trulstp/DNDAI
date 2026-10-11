@@ -6,6 +6,7 @@ import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
 import { newId } from "../util/newId";
+import { preferredImageFormat } from "../util/imageFormat";
 import { useDocumentTitle } from "../util/useDocumentTitle";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
@@ -78,7 +79,10 @@ const RandomEncounterPage = () => {
       setImageStatus({ state: "loading", id: entry.id });
       const response = await fetchOk(`${API}/app/images`, {
         method: "POST",
-        body: JSON.stringify({ message: description }),
+        body: JSON.stringify({
+          message: description,
+          format: await preferredImageFormat(),
+        }),
         headers: { "Content-Type": "application/json" },
       });
       const imageUrl = await blobToDataUrl(await response.blob());

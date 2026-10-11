@@ -89,6 +89,16 @@ const openaimessage = async (req, res) => {
   }
 };
 
+// Browsers that can't show AVIF (older Safari and iOS) ask for WebP instead.
+// AVIF is the default: about half the size of WebP for these images
+const IMAGE_FORMATS = ["avif", "webp"];
+
+async function encodeImage(imageBuffer, requestedFormat) {
+  const format = IMAGE_FORMATS.includes(requestedFormat) ? requestedFormat : "avif";
+  const data = await sharp(imageBuffer).toFormat(format).toBuffer();
+  return { type: `image/${format}`, data };
+}
+
 const openaiImages = async (req, res) => {
   try {
     const apiResponse = await openai.images.generate({
@@ -115,10 +125,8 @@ const openaiImages = async (req, res) => {
 
     const imageBuffer = Buffer.from(imageData, "base64");
 
-    // Convert the image to AVIF format using sharp
-    const avifImage = await sharp(imageBuffer).toFormat("avif").toBuffer();
-
-    res.type("image/avif").send(avifImage);
+    const { type, data } = await encodeImage(imageBuffer, req.body.format);
+    res.type(type).send(data);
   } catch (error) {
     console.error("Error in openaiImages:", error);
     res.status(500).send("Internal Server Error");
@@ -179,10 +187,8 @@ const openaiImages2 = async (req, res) => {
 
     const imageBuffer = Buffer.from(imageData, "base64");
 
-    // Convert the image to AVIF format using sharp
-    const avifImage = await sharp(imageBuffer).toFormat("avif").toBuffer();
-
-    res.type("image/avif").send(avifImage);
+    const { type, data } = await encodeImage(imageBuffer, req.body.format);
+    res.type(type).send(data);
   } catch (error) {
     console.error("Error in openaiImages2:", error);
     res.status(500).send("Internal Server Error");
@@ -849,6 +855,7 @@ const getCharacter = (req, res) => {
 
 module.exports = {
   abilitiesFor,
+  encodeImage,
   buildEncounter,
   getStatblocks,
   buildEncounterPrompt,

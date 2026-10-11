@@ -8,6 +8,7 @@ import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
 import { newId } from "../util/newId";
+import { preferredImageFormat } from "../util/imageFormat";
 import { useDocumentTitle } from "../util/useDocumentTitle";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
@@ -72,6 +73,7 @@ const CharacterCreatorPage = () => {
           message: description,
           race: character.first?.Race,
           characterClass: character.first?.Class,
+          format: await preferredImageFormat(),
         }),
         headers: { "Content-Type": "application/json" },
       });
