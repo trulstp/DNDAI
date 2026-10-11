@@ -36,12 +36,9 @@ const RandomEncounter = (props) => {
           {props.feedActive && (
             <Feed
               currentEncounter={props.currentEncounter}
-              images={props.images}
-              setImages={props.setImages}
               imageGenerator={props.imageGenerator}
               imageStatus={props.imageStatus}
               isVisible={props.isVisible}
-              setIsVisible={props.setIsVisible}
               toggleVisibility={props.toggleVisibility}
             />
           )}

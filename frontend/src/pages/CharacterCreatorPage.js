@@ -7,26 +7,23 @@ import CharInput from "../Components/UI/InputSection/CharInput";
 import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
+import { newId } from "../util/newId";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
+
+const EMPTY_SELECTIONS = { name: "", race: "", classType: "", level: "" };
 
 const CharacterCreatorPage = () => {
   const sidebarCtx = useContext(SidebarContext);
   const { previousChats, setPreviousChats } = sidebarCtx; // Use from context
-  const [selections, setSelections] = useState({
-    name: "",
-    race: "",
-    classType: "",
-    level: "",
-  });
-  const [message, setMessage] = useState(null);
-  const [currentTitle, setCurrentTitle] = useState(null);
+  const [selections, setSelections] = useState(EMPTY_SELECTIONS);
+  const [currentId, setCurrentId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [charInfo1, setCharInfo1] = useState("");
   const [feedActive, setFeedActive] = useState(false);
-  const [images, setImages] = useState(null);
-  const [charInfo2, setCharInfo2] = useState("");
   const [error, setError] = useState(null);
+  // Tied to the character it was started for, so switching characters mid-generation can't mix them up
   const [imageStatus, setImageStatus] = useState({ state: "idle" });
+
+  const currentCharacter = previousChats.find((chat) => chat.id === currentId);
 
   const handleChange = (field, value) => {
     setSelections((prev) => ({ ...prev, [field]: value }));
@@ -34,55 +31,40 @@ const CharacterCreatorPage = () => {
 
   const createNew = () => {
     setError(null);
-    setImageStatus({ state: "idle" });
     setFeedActive(false);
     setLoading(false);
-    setMessage(null);
-    setSelections({
-      name: "",
-      race: "",
-      classType: "",
-      level: "",
-    });
-    setCurrentTitle(null);
-    setImages(null);
+    setSelections(EMPTY_SELECTIONS);
+    setCurrentId(null);
   };
 
   const imageGenerator = async () => {
-    try {
-      const currentDescription = currentEncounter.second.character_portrait;
-      if (!currentDescription) {
-        console.error("Poster description not found");
-        return;
-      }
+    const character = currentCharacter;
+    const description = character?.second?.character_portrait;
+    if (!description) {
+      console.error("Portrait description not found");
+      return;
+    }
 
-      const options = {
+    try {
+      setImageStatus({ state: "loading", id: character.id });
+      const response = await fetchOk(`${API}/app/images2`, {
         method: "POST",
         body: JSON.stringify({
-          message: currentDescription,
-          race: currentEncounter.first?.Race,
-          characterClass: currentEncounter.first?.Class,
+          message: description,
+          race: character.first?.Race,
+          characterClass: character.first?.Class,
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-
-      setImageStatus({ state: "loading" });
-      const response = await fetchOk(`${API}/app/images2`, options);
+        headers: { "Content-Type": "application/json" },
+      });
       const imageUrl = await blobToDataUrl(await response.blob());
 
-      // Update the state with the new image URL
-      setImages([imageUrl]);
-      setPreviousChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.title === currentTitle ? { ...chat, images: [imageUrl] } : chat
-        )
+      setPreviousChats((prev) =>
+        prev.map((c) => (c.id === character.id ? { ...c, images: [imageUrl] } : c))
       );
       setImageStatus({ state: "idle" });
     } catch (error) {
       console.error("Error in image generation:", error);
-      setImageStatus({ state: "error", message: error.message });
+      setImageStatus({ state: "error", message: error.message, id: character.id });
     }
   };
 
@@ -90,44 +72,39 @@ const CharacterCreatorPage = () => {
     setError(null);
     setLoading(true);
     try {
-      const options1 = {
+      const firstResponse = await fetchOk(`${API}/app/create-character`, {
         method: "POST",
         body: JSON.stringify(selections),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const firstResponse = await fetchOk(
-        `${API}/app/create-character`,
-        options1
-      );
-      const firstData = await firstResponse.json();
-      setCharInfo1(firstData);
+        headers: { "Content-Type": "application/json" },
+      });
+      const first = await firstResponse.json();
 
-      const options = {
+      const secondResponse = await fetchOk(`${API}/app/openaiCharacter`, {
         method: "POST",
         body: JSON.stringify({
           message: {
-            name: firstData.Name || "", // Fallback to an empty string if undefined
-            class: firstData.Class || "",
-            race: firstData.Race || "",
-            level: firstData.Level || "",
-            alignment: firstData.Alignment || "",
-            stats: firstData.Stats || "",
-            skills: firstData.Skills || "",
+            name: first.Name || "", // Fallback to an empty string if undefined
+            class: first.Class || "",
+            race: first.Race || "",
+            level: first.Level || "",
+            alignment: first.Alignment || "",
+            stats: first.Stats || "",
+            skills: first.Skills || "",
           },
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
+      });
+      const second = await secondResponse.json();
+
+      const character = {
+        id: newId(),
+        title: `${first.Name} the ${first.Race} ${first.Class}`,
+        first,
+        second,
+        images: [],
       };
-      const secondResponse = await fetchOk(
-        `${API}/app/openaiCharacter`,
-        options
-      );
-      const data = await secondResponse.json();
-      setCharInfo2(data);
-      setMessage(data);
+      setPreviousChats((prev) => [...prev, character]);
+      setCurrentId(character.id);
       setFeedActive(true);
     } catch (error) {
       console.error("Error creating character:", error);
@@ -137,44 +114,10 @@ const CharacterCreatorPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (message && !currentTitle) {
-      const newTitle = `${charInfo1.Name} the ${charInfo1.Race} ${charInfo1.Class}`;
-      setCurrentTitle(newTitle);
-
-      const newCharacter = {
-        title: newTitle,
-        first: charInfo1,
-        second: charInfo2,
-        images: [],
-      };
-
-      setPreviousChats((prevChats) => {
-        const existingCharacter = prevChats.find(
-          (chat) => chat.title === newTitle
-        );
-        if (!existingCharacter) {
-          return [...prevChats, newCharacter];
-        }
-        return prevChats;
-      });
-
-      setFeedActive(true);
-    }
-  }, [message, currentTitle, charInfo1, charInfo2, setPreviousChats]); // Add setPreviousChats as a dependency
-
-  const handleSidebarClick = (uniqueTitle) => {
-    const selectedCharacter = previousChats.find(
-      (chat) => chat.title === uniqueTitle
-    );
-    if (selectedCharacter) {
+  const handleSidebarClick = (id) => {
+    if (previousChats.some((chat) => chat.id === id)) {
       setError(null);
-      setImageStatus({ state: "idle" });
-      setCurrentTitle(uniqueTitle);
-      setMessage(selectedCharacter);
-      setCharInfo1(selectedCharacter.first);
-      setCharInfo2(selectedCharacter.second);
-      setImages(selectedCharacter.images || null); // Ensure images are updated
+      setCurrentId(id);
       setFeedActive(true);
     }
   };
@@ -183,35 +126,30 @@ const CharacterCreatorPage = () => {
   // so a reload doesn't reopen it
   const location = useLocation();
   const navigate = useNavigate();
-  const openTitle = location.state?.openTitle;
+  const openId = location.state?.openId;
   useEffect(() => {
-    if (!openTitle) return;
-    handleSidebarClick(openTitle);
+    if (!openId) return;
+    handleSidebarClick(openId);
     navigate(location.pathname, { replace: true, state: null });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openTitle]);
+  }, [openId]);
 
-  const currentEncounter =
-    previousChats.find((chat) => chat.title === currentTitle) || {};
+  // Sidebar items, newest first
+  const historyItems = [...previousChats].reverse().map((chat) => ({
+    id: chat.id,
+    title: chat.title,
+    favorite: !!chat.favorite,
+  }));
 
-  // Sidebar items, newest first, one per title
-  const historyItems = [];
-  for (const chat of [...previousChats].reverse()) {
-    if (!historyItems.some((item) => item.title === chat.title)) {
-      historyItems.push({ title: chat.title, favorite: !!chat.favorite });
-    }
-  }
-
-  const toggleFavorite = (title) => {
-    setPreviousChats((prev) => {
-      const favorite = !prev.some((c) => c.title === title && c.favorite);
-      return prev.map((c) => (c.title === title ? { ...c, favorite } : c));
-    });
+  const toggleFavorite = (id) => {
+    setPreviousChats((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, favorite: !c.favorite } : c))
+    );
   };
 
-  const deleteCharacter = (title) => {
-    setPreviousChats((prev) => prev.filter((c) => c.title !== title));
-    if (title === currentTitle) createNew();
+  const deleteCharacter = (id) => {
+    setPreviousChats((prev) => prev.filter((c) => c.id !== id));
+    if (id === currentId) createNew();
   };
 
   return (
@@ -222,7 +160,7 @@ const CharacterCreatorPage = () => {
           handleClick={handleSidebarClick}
           button='+ New Character'
           items={historyItems}
-          activeTitle={feedActive ? currentTitle : null}
+          activeId={feedActive ? currentId : null}
           onToggleFavorite={toggleFavorite}
           onDelete={deleteCharacter}
         />
@@ -232,10 +170,12 @@ const CharacterCreatorPage = () => {
         <Loading text='Generating Character' />
       ) : feedActive ? (
         <CharacterSheet
-          characterData={currentEncounter}
+          characterData={currentCharacter}
           imageGenerator={imageGenerator}
-          imageStatus={imageStatus}
-          images={images}
+          imageStatus={
+            imageStatus.id === currentId ? imageStatus : { state: "idle" }
+          }
+          images={currentCharacter?.images}
         />
       ) : (
         <CharInput

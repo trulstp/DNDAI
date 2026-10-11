@@ -49,14 +49,7 @@ const monsterSummary = (monsters = []) => {
     .join(", ");
 };
 
-// Newest first, one entry per title (history lists can repeat a title)
-const latest = (history) => {
-  const seen = new Set();
-  return [...history]
-    .reverse()
-    .filter((entry) => !seen.has(entry.title) && seen.add(entry.title))
-    .slice(0, RECENT_COUNT);
-};
+const latest = (history) => [...history].reverse().slice(0, RECENT_COUNT);
 
 const RecentList = ({ title, icon, to, entries, describe }) => (
   <div className={classes["recent-group"]}>
@@ -66,10 +59,10 @@ const RecentList = ({ title, icon, to, entries, describe }) => (
     ) : (
       <ul className={classes["recent-list"]}>
         {entries.map((entry) => (
-          <li key={entry.title}>
+          <li key={entry.id}>
             <Link
               to={to}
-              state={{ openTitle: entry.title }}
+              state={{ openId: entry.id }}
               className={classes["recent-item"]}
             >
               <FontAwesomeIcon icon={icon} className={classes["recent-icon"]} />
