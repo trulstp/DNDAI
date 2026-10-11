@@ -1,5 +1,7 @@
 const monsterSchema = require("../models/DnDSchema");
 const Statblock = require("../models/statblockSchema");
+const mongoose = require("mongoose");
+const path = require("path");
 const axios = require("axios");
 const fetch = require("node-fetch");
 const sharp = require("sharp");
@@ -292,6 +294,35 @@ const getMonstersByLocation = async (req, res) => {
 
 const MAX_STATBLOCK_NAMES = 20;
 
+// Finds SRD stat blocks by monster name, returning { name: statblock or null }.
+// Pass fields to load only those (plus the name); otherwise whole stat blocks are returned.
+// An exact name match wins over one that ignores the parenthetical,
+// so "Giant Rat" isn't answered with "Giant Rat (Diseased)"
+async function findStatblocks(names, fields) {
+  const keys = names.map((name) => name.toLowerCase());
+  // MongoDB can't mix included and excluded fields, so pick one style
+  const projection = fields
+    ? Object.fromEntries([["_id", 0], ["name", 1], ["nameKeys", 1], ...fields.map((f) => [f, 1])])
+    : { _id: 0, __v: 0 };
+  const found = await Statblock.find({ nameKeys: { $in: keys } }, projection).lean();
+
+  const statblocks = {};
+  for (const name of names) {
+    const key = name.toLowerCase();
+    const matches = found.filter((statblock) => statblock.nameKeys.includes(key));
+    const match =
+      matches.find((statblock) => statblock.name.toLowerCase() === key) ||
+      matches[0];
+    if (match) {
+      const { nameKeys, ...statblock } = match;
+      statblocks[name] = statblock;
+    } else {
+      statblocks[name] = null;
+    }
+  }
+  return statblocks;
+}
+
 // gets SRD stat blocks for a comma-separated list of monster names, null for monsters without one
 const getStatblocks = async (req, res) => {
   try {
@@ -309,30 +340,7 @@ const getStatblocks = async (req, res) => {
       });
     }
 
-    const keys = names.map((name) => name.toLowerCase());
-    const found = await Statblock.find(
-      { nameKeys: { $in: keys } },
-      { _id: 0, __v: 0 }
-    ).lean();
-
-    const statblocks = {};
-    for (const name of names) {
-      const key = name.toLowerCase();
-      const matches = found.filter((statblock) => statblock.nameKeys.includes(key));
-      // An exact name match wins over one that ignores the parenthetical,
-      // so "Giant Rat" isn't answered with "Giant Rat (Diseased)"
-      const match =
-        matches.find((statblock) => statblock.name.toLowerCase() === key) ||
-        matches[0];
-      if (match) {
-        const { nameKeys, ...statblock } = match;
-        statblocks[name] = statblock;
-      } else {
-        statblocks[name] = null;
-      }
-    }
-
-    res.json(statblocks);
+    res.json(await findStatblocks(names));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -580,7 +588,51 @@ const FRACTIONAL_CR = { 0.125: "1/8", 0.25: "1/4", 0.5: "1/2" };
 const formatCR = (cr) => FRACTIONAL_CR[cr] || String(cr);
 
 // Groups the encounter into "3× Ghoul (CR 1, Undead)" lines, keeping the lead monster first
-function describeMonsters(monsters) {
+const ABILITY_GROUPS = [
+  ["traits", "special_abilities"],
+  ["actions", "actions"],
+  ["bonus actions", "bonus_actions"],
+  ["reactions", "reactions"],
+  ["legendary actions", "legendary_actions"],
+];
+
+// "traits: Incorporeal Movement; actions: Life Drain, Create Specter" from a stat block.
+// Names only, to keep the prompt (and its cost) small
+const summariseAbilities = (statblock) =>
+  ABILITY_GROUPS.filter(([, field]) => statblock[field]?.length)
+    .map(([label, field]) => `${label}: ${statblock[field].map((a) => a.name).join(", ")}`)
+    .join("; ");
+
+// Ability summaries for the encounter's monsters that have an SRD stat block.
+// The prompt still works without them, so a missing database or lookup error just skips this
+async function abilitiesFor(monsters) {
+  if (mongoose.connection.readyState !== 1) return {};
+  const names = [
+    ...new Set(
+      monsters
+        .map((m) => (typeof m === "string" ? m : m?.monsterName))
+        .filter((name) => typeof name === "string" && name)
+    ),
+  ].slice(0, MAX_STATBLOCK_NAMES);
+  if (names.length === 0) return {};
+  try {
+    const statblocks = await findStatblocks(
+      names,
+      ABILITY_GROUPS.map(([, field]) => field)
+    );
+    const abilities = {};
+    for (const [name, statblock] of Object.entries(statblocks)) {
+      const summary = statblock && summariseAbilities(statblock);
+      if (summary) abilities[name] = summary;
+    }
+    return abilities;
+  } catch (err) {
+    console.error("Ability lookup failed:", err.message);
+    return {};
+  }
+}
+
+function describeMonsters(monsters, abilities = {}) {
   const groups = new Map();
   for (const monster of monsters) {
     // Older clients send plain monster names
@@ -597,14 +649,18 @@ function describeMonsters(monsters) {
         challengeRating !== undefined && `CR ${formatCR(challengeRating)}`,
         groupTag,
       ].filter(Boolean);
+      const summary = abilities[monsterName];
       return `- ${count}× ${monsterName}${
         details.length ? ` (${details.join(", ")})` : ""
-      }`;
+      }${summary ? ` — ${summary}` : ""}`;
     })
     .join("\n");
 }
 
-function buildEncounterPrompt({ monsters = [], location, challengeRating }) {
+function buildEncounterPrompt(
+  { monsters = [], location, challengeRating },
+  abilities = {}
+) {
   const totalCR = monsters.reduce(
     (sum, m) => sum + (Number(m?.challengeRating) || 0),
     0
@@ -618,7 +674,9 @@ function buildEncounterPrompt({ monsters = [], location, challengeRating }) {
   return [
     `Create a detailed encounter in this type of location: ${location}.`,
     `It features exactly these monsters, in these numbers. The first one listed leads the group:`,
-    describeMonsters(monsters),
+    describeMonsters(monsters, abilities),
+    Object.keys(abilities).length > 0 &&
+      "Base the monsters' tactics on the abilities listed, and don't give them abilities they don't have.",
     difficulty,
     "Make the encounter interesting to read.",
   ]
@@ -628,6 +686,10 @@ function buildEncounterPrompt({ monsters = [], location, challengeRating }) {
 
 const encounter = async (req, res) => {
   const url = "https://api.openai.com/v1/chat/completions";
+  const monsters = Array.isArray(req.body.message?.monsters)
+    ? req.body.message.monsters
+    : [];
+  const abilities = await abilitiesFor(monsters);
 
   const body = {
     model: "gpt-5.4-mini",
@@ -639,7 +701,7 @@ const encounter = async (req, res) => {
       },
       {
         role: "user",
-        content: buildEncounterPrompt(req.body.message),
+        content: buildEncounterPrompt(req.body.message, abilities),
       },
     ],
     tools: [
@@ -709,24 +771,46 @@ const encounter = async (req, res) => {
 
 const { spawn } = require("child_process");
 
+// Choices the Python character generator supports
+const CHARACTER_CLASSES = ["Cleric", "Fighter", "Rogue", "Wizard"];
+const CHARACTER_RACES = ["Dragonborn", "Dwarf", "Elf", "Gnome", "Half-Elf", "Halfling", "Half-Orc", "Human", "Tiefling"];
+const CHARACTER_LEVELS = [1, 2, 3];
+const MAX_NAME_LENGTH = 40;
+// Resolved from this file, so it works whichever folder the server is started from
+const CHARACTER_SCRIPT = path.join(__dirname, "..", "scripts", "Class_creator.py");
+
+// Matches a choice ignoring case; empty or "random" means random, anything unsupported gives undefined
+const pickOption = (value, options) => {
+  if (value === undefined || value === null) return "random";
+  const text = String(value).trim().toLowerCase();
+  if (text === "" || text === "random") return "random";
+  return options.find((option) => String(option).toLowerCase() === text);
+};
+
 const getCharacter = (req, res) => {
-  // Validate or set default values before passing them to the Python script
-  const name = req.body.name || "random";
-  const charClass = req.body.classType || "random";
-  const race = req.body.race || "random";
-  const level = req.body.level;
+  const charClass = pickOption(req.body.classType, CHARACTER_CLASSES);
+  const race = pickOption(req.body.race, CHARACTER_RACES);
+  const level = pickOption(req.body.level, CHARACTER_LEVELS);
+  const name =
+    typeof req.body.name === "string"
+      ? req.body.name.replace(/[\u0000-\u001f]/g, "").trim()
+      : "";
 
-  const args = [
-    "scripts/Class_creator.py", // Ensure this is the correct path to your Python script
-    name,
-    charClass,
-    race,
-  ];
+  const problems = [
+    !charClass && `class must be one of ${CHARACTER_CLASSES.join(", ")}`,
+    !race && `race must be one of ${CHARACTER_RACES.join(", ")}`,
+    !level && `level must be one of ${CHARACTER_LEVELS.join(", ")}`,
+    name.length > MAX_NAME_LENGTH && `name must be at most ${MAX_NAME_LENGTH} characters`,
+  ].filter(Boolean);
+  if (problems.length > 0) {
+    return res.status(400).json({ error: problems.join("; ") });
+  }
+
+  const args = [CHARACTER_SCRIPT, name || "random", charClass, race];
   // Without a level argument the script rolls a random level
-  if (level) args.push(String(level));
+  if (level !== "random") args.push(String(level));
 
-  // Change "python" to "python3" or the correct path to your Python executable
-  const python = spawn("python3", args);
+  const python = spawn("python3", args, { cwd: path.dirname(CHARACTER_SCRIPT) });
 
   let dataToSend = "";
   let isClosed = false; // Flag to indicate if the response has been sent
@@ -766,6 +850,7 @@ const getCharacter = (req, res) => {
 };
 
 module.exports = {
+  abilitiesFor,
   buildEncounter,
   getStatblocks,
   buildEncounterPrompt,
