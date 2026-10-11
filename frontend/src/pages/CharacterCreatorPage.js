@@ -12,6 +12,14 @@ const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const EMPTY_SELECTIONS = { name: "", race: "", classType: "", level: "" };
 
+// "Brenna · Dwarf Cleric · random level" from the choices on the input screen
+const describeChoices = ({ name, race, classType, level }) =>
+  [
+    name?.trim() || "Random name",
+    `${race || "random race"} ${classType || "random class"}`,
+    level ? `Level ${level}` : "random level",
+  ].join(" · ");
+
 const CharacterCreatorPage = () => {
   const sidebarCtx = useContext(SidebarContext);
   const { previousChats, setPreviousChats } = sidebarCtx; // Use from context
@@ -20,6 +28,8 @@ const CharacterCreatorPage = () => {
   const [loading, setLoading] = useState(false);
   const [feedActive, setFeedActive] = useState(false);
   const [error, setError] = useState(null);
+  // The choices being created right now, shown on the loading screen
+  const [pending, setPending] = useState(null);
   // Tied to the character it was started for, so switching characters mid-generation can't mix them up
   const [imageStatus, setImageStatus] = useState({ state: "idle" });
 
@@ -59,22 +69,32 @@ const CharacterCreatorPage = () => {
       const imageUrl = await blobToDataUrl(await response.blob());
 
       setPreviousChats((prev) =>
-        prev.map((c) => (c.id === character.id ? { ...c, images: [imageUrl] } : c))
+        prev.map((c) =>
+          c.id === character.id ? { ...c, images: [imageUrl] } : c,
+        ),
       );
       setImageStatus({ state: "idle" });
     } catch (error) {
       console.error("Error in image generation:", error);
-      setImageStatus({ state: "error", message: error.message, id: character.id });
+      setImageStatus({
+        state: "error",
+        message: error.message,
+        id: character.id,
+      });
     }
   };
 
-  const getCharacter = async () => {
+  // Creates a character from the current choices, or the ones passed in (Reroll).
+  // Button clicks pass an event, so anything that isn't a set of choices falls back
+  const getCharacter = async (choices) => {
+    const request = choices && "classType" in choices ? choices : selections;
     setError(null);
+    setPending(request);
     setLoading(true);
     try {
       const firstResponse = await fetchOk(`${API}/app/create-character`, {
         method: "POST",
-        body: JSON.stringify(selections),
+        body: JSON.stringify(request),
         headers: { "Content-Type": "application/json" },
       });
       const first = await firstResponse.json();
@@ -102,6 +122,8 @@ const CharacterCreatorPage = () => {
         first,
         second,
         images: [],
+        // The choices it was made from (random stays random), reused by Reroll
+        request,
       };
       setPreviousChats((prev) => [...prev, character]);
       setCurrentId(character.id);
@@ -109,6 +131,8 @@ const CharacterCreatorPage = () => {
     } catch (error) {
       console.error("Error creating character:", error);
       setError(error.message);
+      // The error and Try again live on the input screen, so show it (this matters after a Reroll)
+      setFeedActive(false);
     } finally {
       setLoading(false);
     }
@@ -134,6 +158,15 @@ const CharacterCreatorPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openId]);
 
+  // The nav's Character Creator link always leads to a fresh input screen, even from this page
+  const resetRequest = location.state?.reset;
+  useEffect(() => {
+    if (!resetRequest) return;
+    createNew();
+    navigate(location.pathname, { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetRequest, location.key]);
+
   // Sidebar items, newest first
   const historyItems = [...previousChats].reverse().map((chat) => ({
     id: chat.id,
@@ -143,9 +176,17 @@ const CharacterCreatorPage = () => {
 
   const toggleFavorite = (id) => {
     setPreviousChats((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, favorite: !c.favorite } : c))
+      prev.map((c) => (c.id === id ? { ...c, favorite: !c.favorite } : c)),
     );
   };
+
+  // Same choices as the character on screen; older saved characters don't know theirs
+  const reroll = currentCharacter?.request
+    ? () => {
+        setSelections(currentCharacter.request);
+        getCharacter(currentCharacter.request);
+      }
+    : undefined;
 
   const deleteCharacter = (id) => {
     setPreviousChats((prev) => prev.filter((c) => c.id !== id));
@@ -168,11 +209,20 @@ const CharacterCreatorPage = () => {
       )}
 
       {loading ? (
-        <Loading text='Generating Character' />
+        <Loading
+          title='Creating your character…'
+          details={[pending && describeChoices(pending)]}
+        />
       ) : feedActive ? (
         <CharacterSheet
           characterData={currentCharacter}
           imageGenerator={imageGenerator}
+          onNew={createNew}
+          onReroll={reroll}
+          rerollHint={
+            currentCharacter?.request &&
+            `Create another: ${describeChoices(currentCharacter.request)}`
+          }
           imageStatus={
             imageStatus.id === currentId ? imageStatus : { state: "idle" }
           }

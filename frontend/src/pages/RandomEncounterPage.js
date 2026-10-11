@@ -19,6 +19,8 @@ const RandomEncounterPage = () => {
   const [encounter, setEncounter] = useState("");
   const [feedActive, setFeedActive] = useState(false);
   const [error, setError] = useState(null);
+  // The location and CR being rolled right now, shown on the loading screen
+  const [pending, setPending] = useState(null);
   // Tied to the encounter it was started for, so switching encounters mid-generation can't mix them up
   const [imageStatus, setImageStatus] = useState({ state: "idle" });
   const [isVisible, setIsVisible] = useState({
@@ -33,7 +35,9 @@ const RandomEncounterPage = () => {
     mood_atmosphere: true,
   });
 
-  const currentEntry = previousEncounter.find((entry) => entry.id === currentId);
+  const currentEntry = previousEncounter.find(
+    (entry) => entry.id === currentId,
+  );
 
   const createNew = () => {
     setError(null);
@@ -71,7 +75,7 @@ const RandomEncounterPage = () => {
       const imageUrl = await blobToDataUrl(await response.blob());
 
       setPreviousEncounter((prev) =>
-        prev.map((e) => (e.id === entry.id ? { ...e, images: [imageUrl] } : e))
+        prev.map((e) => (e.id === entry.id ? { ...e, images: [imageUrl] } : e)),
       );
       setImageStatus({ state: "idle" });
     } catch (error) {
@@ -80,19 +84,26 @@ const RandomEncounterPage = () => {
     }
   };
 
-  const getMessages = async () => {
+  // Rolls the chosen location and CR, or the ones passed in (Reroll). Button clicks pass
+  // an event, so anything without a location falls back to the current choices
+  const getMessages = async (request) => {
+    const { location, challengeRating } = request?.location
+      ? request
+      : { location: value1, challengeRating: value2 };
     setError(null);
+    setPending({ location, challengeRating });
+    setEncounter("");
     setLoading(true);
     try {
       const firstResponse = await fetchOk(
         `${API}/app/encounter?location=${encodeURIComponent(
-          value1
-        )}&challengeRating=${encodeURIComponent(value2)}`
+          location,
+        )}&challengeRating=${encodeURIComponent(challengeRating)}`,
       );
       const monsters = await firstResponse.json();
       if (monsters.length === 0) {
         throw new Error(
-          "No monsters live in that location at this challenge rating. Try another combination."
+          "No monsters live in that location at this challenge rating. Try another combination.",
         );
       }
       setEncounter(monsters);
@@ -100,7 +111,7 @@ const RandomEncounterPage = () => {
       const secondResponse = await fetchOk(`${API}/app/schematic`, {
         method: "POST",
         body: JSON.stringify({
-          message: { monsters, location: value1, challengeRating: value2 },
+          message: { monsters, location, challengeRating },
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -115,6 +126,9 @@ const RandomEncounterPage = () => {
         content,
         // Monsters rolled for this encounter, used for stat blocks
         monsterList: monsters,
+        // What was asked for, shown with the encounter and reused by Reroll
+        location,
+        challengeRating,
       };
       setPreviousEncounter((prev) => [...prev, entry]);
       setCurrentId(entry.id);
@@ -122,6 +136,8 @@ const RandomEncounterPage = () => {
     } catch (error) {
       console.error("Error generating encounter:", error);
       setError(error.message);
+      // The error and Try again live on the input screen, so show it (this matters after a Reroll)
+      setFeedActive(false);
     } finally {
       setLoading(false);
     }
@@ -136,9 +152,22 @@ const RandomEncounterPage = () => {
 
   const toggleFavorite = (id) => {
     setPreviousEncounter((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, favorite: !e.favorite } : e))
+      prev.map((e) => (e.id === id ? { ...e, favorite: !e.favorite } : e)),
     );
   };
+
+  // Same location and CR as the encounter on screen; older saved encounters don't know theirs
+  const reroll =
+    currentEntry?.location && currentEntry?.challengeRating
+      ? () => {
+          setValue1(currentEntry.location);
+          setValue2(String(currentEntry.challengeRating));
+          getMessages({
+            location: currentEntry.location,
+            challengeRating: currentEntry.challengeRating,
+          });
+        }
+      : undefined;
 
   const deleteEncounter = (id) => {
     setPreviousEncounter((prev) => prev.filter((e) => e.id !== id));
@@ -158,6 +187,15 @@ const RandomEncounterPage = () => {
     navigate(location.pathname, { replace: true, state: null });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openId]);
+
+  // The nav's Random Encounter link always leads to a fresh input screen, even from this page
+  const resetRequest = location.state?.reset;
+  useEffect(() => {
+    if (!resetRequest) return;
+    createNew();
+    navigate(location.pathname, { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetRequest, location.key]);
 
   const toggleVisibility = (section) => {
     setIsVisible((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -190,8 +228,11 @@ const RandomEncounterPage = () => {
           imageStatus.id === currentId ? imageStatus : { state: "idle" }
         }
         loading={loading}
+        pending={pending}
         feedActive={feedActive}
         encounter={encounter}
+        onNew={createNew}
+        onReroll={reroll}
         imageGenerator={imageGenerator}
         isVisible={isVisible}
         toggleVisibility={toggleVisibility}

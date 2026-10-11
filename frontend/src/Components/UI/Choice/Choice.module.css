@@ -309,6 +309,14 @@
   background-color: var(--hover-tint);
 }
 
+/* New / Reroll buttons shown with a finished encounter or character */
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
 /* Phones: leave room for the fixed bottom nav and make the action full width */
 @media only screen and (max-width: 600px) {
   .page {

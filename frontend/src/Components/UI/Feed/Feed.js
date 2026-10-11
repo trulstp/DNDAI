@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 import { GenerateImageButton } from "../Feedback/Feedback";
+import ResultActions from "../Choice/ResultActions";
+import { titleCase } from "../../../util/format";
 import MonsterList from "./MonsterList";
 import { CardText, CollapsibleCard } from "../Collapsible/Collapsible";
 import classes from "./Feed.module.css";
@@ -24,21 +26,55 @@ const Section = ({ title, text, isVisible, onToggle, children }) => (
   </CollapsibleCard>
 );
 
+// "Underdark · CR 12 · 5 monsters"; older saved encounters only know their monsters
+const encounterSummary = (entry) =>
+  [
+    entry.location && titleCase(entry.location),
+    entry.challengeRating && `CR ${entry.challengeRating}`,
+    entry.monsterList?.length &&
+      `${entry.monsterList.length} ${entry.monsterList.length === 1 ? "monster" : "monsters"}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
 const Feed = (props) => {
   const sectionProps = (field) => ({
     isVisible: props.isVisible[field],
     onToggle: () => props.toggleVisibility(field),
   });
 
+  // A different encounter starts at the top, not at the previous one's scroll position
+  const feedRef = useRef(null);
+  const entryId = props.currentEncounter?.[0]?.id;
+  useEffect(() => {
+    feedRef.current?.scrollIntoView({ block: "start" });
+  }, [entryId]);
+
   return (
-    <div className={classes.feed}>
+    <div className={classes.feed} ref={feedRef}>
       {props.currentEncounter?.map((chatMessage, index) => {
         const content = chatMessage.content;
         const images = chatMessage.images;
 
         return (
           <article key={index} className={classes.encounter}>
-            <h1 className={classes.title}>{content.title}</h1>
+            <header className={classes.header}>
+              <h1 className={classes.title}>{content.title}</h1>
+              {encounterSummary(chatMessage) && (
+                <p className={classes.summary}>
+                  {encounterSummary(chatMessage)}
+                </p>
+              )}
+              <ResultActions
+                newLabel='New encounter'
+                onNew={props.onNew}
+                onReroll={props.onReroll}
+                rerollHint={
+                  props.onReroll &&
+                  `Roll a new ${titleCase(chatMessage.location)} encounter at CR ${chatMessage.challengeRating}`
+                }
+              />
+            </header>
 
             <div className={classes.top}>
               <div className={classes.media}>
