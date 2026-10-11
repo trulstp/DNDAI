@@ -1,3 +1,7 @@
+# Build with the same Node version as .nvmrc in the repo root
+[build.environment]
+  NODE_VERSION = "24"
+
 [[redirects]]
   from = "/*"
   to = "/"

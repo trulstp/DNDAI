@@ -97,7 +97,7 @@ DNDAI/
 ## Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) 18 or newer
+- [Node.js](https://nodejs.org/) 24 (with nvm, run `nvm use` in the repo to pick it up from `.nvmrc`)
 - [Python 3](https://www.python.org/), available as `python3` on your PATH
 - A [MongoDB](https://www.mongodb.com/) database (local or Atlas)
 - An [OpenAI API key](https://platform.openai.com/api-keys)
