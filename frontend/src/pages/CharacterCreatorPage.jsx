@@ -64,6 +64,17 @@ const CharacterCreatorPage = () => {
       console.error("Portrait description not found");
       return;
     }
+    // The server only draws descriptions it signed; characters saved before that have no signature
+    const signature = character.second.portrait_signature;
+    if (!signature) {
+      setImageStatus({
+        state: "error",
+        message:
+          "This character was saved before an update, so a portrait can't be made for it. Create a new character to get a portrait.",
+        id: character.id,
+      });
+      return;
+    }
 
     try {
       setImageStatus({ state: "loading", id: character.id });
@@ -71,6 +82,7 @@ const CharacterCreatorPage = () => {
         method: "POST",
         body: JSON.stringify({
           message: description,
+          signature,
           race: character.first?.Race,
           characterClass: character.first?.Class,
           format: await preferredImageFormat(),

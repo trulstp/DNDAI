@@ -2,18 +2,18 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const {
-  register,
-  getAllMonsters,
   openaiImages,
   getMonstersByLocationAndCR,
-  getMonstersByLocation,
-  getLocations,
   encounter,
   getCharacter,
   creator,
   openaiImages2,
   getStatblocks,
+  validateEncounterRequest,
+  validateCharacterRequest,
+  validateImageRequest,
 } = require("../controller/dndController");
+const { aiLimits } = require("../middleware/limits");
 
 const router = express.Router();
 
@@ -25,30 +25,21 @@ const requireDb = (req, res, next) => {
   next();
 };
 
-// url Example: http://localhost:4000/user/register body: json format { "monsterName" : "Beholder", "challengeRating" : 13, "location" : "Underdark", "groupTag" : "Beholder" }
-router.post("/register", requireDb, register);
-
-router.post("/images", openaiImages);
-
 // url Example: http://localhost:4000/app/encounter?location=underdark&challengeRating=9
 router.get("/encounter", requireDb, getMonstersByLocationAndCR);
-
-// url Example: http://localhost:4000/app/all
-router.get("/all", requireDb, getAllMonsters);
-
-// url Example: http://localhost:4000/app/location?location=underdark
-router.get("/location", requireDb, getMonstersByLocation);
-
-router.get("/locations", requireDb, getLocations);
 
 // url Example: http://localhost:4000/app/statblocks?names=Wraith,Mummy
 router.get("/statblocks", requireDb, getStatblocks);
 
-router.post("/schematic", encounter);
-
 router.post("/create-character", getCharacter);
 
-router.post("/openaiCharacter", creator);
+// The routes below call OpenAI: requests are checked first, then counted against the limits
+router.post("/schematic", validateEncounterRequest, ...aiLimits, encounter);
 
-router.post("/images2", openaiImages2);
+router.post("/openaiCharacter", validateCharacterRequest, ...aiLimits, creator);
+
+router.post("/images", validateImageRequest("encounter"), ...aiLimits, openaiImages);
+
+router.post("/images2", validateImageRequest("portrait"), ...aiLimits, openaiImages2);
+
 module.exports = router;

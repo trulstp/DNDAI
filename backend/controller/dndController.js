@@ -2,58 +2,26 @@ const monsterSchema = require("../models/DnDSchema");
 const Statblock = require("../models/statblockSchema");
 const mongoose = require("mongoose");
 const path = require("path");
-const fetch = require("node-fetch");
 const sharp = require("sharp");
 const dotenv = require("dotenv");
 const OpenAI = require("openai");
 dotenv.config();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const { signPrompt, isSignedPrompt } = require("../util/promptSignature");
+const monsterSeed = require("../data/monsterSeed");
 
-// registers a monster based on schema, all needs to be included
-
-const register = async (req, res) => {
-  try {
-    // Check if the request contains an array of monsters
-    if (Array.isArray(req.body)) {
-      let registeredMonsters = [];
-
-      // Loop through each monster in the array
-      for (const monster of req.body) {
-        const newMonster = new monsterSchema({
-          monsterName: monster.monsterName,
-          challengeRating: monster.challengeRating,
-          setting: monster.setting,
-          location: monster.location,
-          groupTag: monster.groupTag,
-        });
-
-        // Save the monster
-        const data = await newMonster.save();
-        registeredMonsters.push(data);
-      }
-
-      // Return the array of registered monsters
-      return res.json(registeredMonsters);
-    } else {
-      // Handle single monster registration
-      let registeredMonster = new monsterSchema({
-        monsterName: req.body.monsterName,
-        challengeRating: req.body.challengeRating,
-        setting: req.body.setting,
-        location: req.body.location,
-        groupTag: req.body.groupTag,
-      });
-
-      const data = await registeredMonster.save();
-      res.json(data);
-    }
-  } catch (err) {
-    console.error("Register error:", err);
-    res.status(400).json({
-      error: err.message,
-    });
-  }
-};
+// Images often take 30-60 seconds; the limit only stops a stuck request from hanging forever
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  // Unset means OpenAI itself; the tests point it at a stand-in
+  baseURL: process.env.OPENAI_BASE_URL || undefined,
+  timeout: 2 * 60 * 1000,
+  maxRetries: 1,
+});
+// Encounter and character text
+const TEXT_TIMEOUT_MS = 90 * 1000;
+const CHAT_COMPLETIONS_URL = `${
+  process.env.OPENAI_BASE_URL || "https://api.openai.com/v1"
+}/chat/completions`;
 
 // My API key for OpenAI
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -239,30 +207,8 @@ const getMonstersByLocationAndCR = async (req, res) => {
       }))
     );
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const getMonstersByLocation = async (req, res) => {
-  try {
-    const { location } = req.query;
-    if (typeof location !== "string" || !location) {
-      return res.status(400).json({ error: "location is required" });
-    }
-
-    // Fetch all monsters of the given location
-    const monsters = await monsterSchema.find(locationQuery(location));
-
-    // Filter the results to only include monsterName, challengeRating, and groupTag
-    const filteredMonsters = monsters.map((monster) => ({
-      monsterName: monster.monsterName,
-      challengeRating: monster.challengeRating,
-      groupTag: monster.groupTag,
-    }));
-
-    res.json(filteredMonsters);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
   }
 };
 
@@ -318,53 +264,10 @@ const getStatblocks = async (req, res) => {
     res.set("Cache-Control", "public, max-age=86400");
     res.json(await findStatblocks(names));
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
   }
 };
-
-// gets all the monsters in the database
-
-const getAllMonsters = async (req, res) => {
-  try {
-    const monsters = await monsterSchema.find();
-    res.json(monsters);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const getLocations = async (req, res) => {
-  try {
-    const locations = await monsterSchema.find({}, "location");
-
-    // Use a Set to store unique locations after standardizing them
-    const uniqueLocationsSet = new Set();
-
-    // Iterate through the locations and standardize them before adding to the Set
-    locations.forEach((item) => {
-      // You can use a custom function to standardize the location as needed
-      const standardizedLocation = standardizeLocation(item.location);
-
-      // Add the standardized location to the Set
-      uniqueLocationsSet.add(standardizedLocation);
-    });
-
-    // Convert the Set back to an array
-    const uniqueLocations = Array.from(uniqueLocationsSet);
-
-    console.log("Distinct Locations:", uniqueLocations);
-    res.json(uniqueLocations);
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Custom function to standardize location
-function standardizeLocation(location) {
-  // You can implement your standardization logic here, e.g., removing spaces and making it lowercase
-  return location.toLowerCase().replace(/\s/g, "");
-}
 
 const characterSchema = {
   type: "object",
@@ -422,7 +325,7 @@ const characterSchema = {
 };
 
 const creator = async (req, res) => {
-  const url = "https://api.openai.com/v1/chat/completions";
+  const url = CHAT_COMPLETIONS_URL;
   const body = {
     model: "gpt-5.4-mini",
     messages: [
@@ -463,6 +366,7 @@ const creator = async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(TEXT_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -489,6 +393,9 @@ const creator = async (req, res) => {
     }
 
     const characterData = JSON.parse(argumentsString);
+    if (typeof characterData.character_portrait === "string") {
+      characterData.portrait_signature = signPrompt("portrait", characterData.character_portrait);
+    }
 
     res.json(characterData);
 
@@ -660,7 +567,7 @@ function buildEncounterPrompt(
 }
 
 const encounter = async (req, res) => {
-  const url = "https://api.openai.com/v1/chat/completions";
+  const url = CHAT_COMPLETIONS_URL;
   const monsters = Array.isArray(req.body.message?.monsters)
     ? req.body.message.monsters
     : [];
@@ -706,6 +613,7 @@ const encounter = async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(TEXT_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -733,6 +641,9 @@ const encounter = async (req, res) => {
     }
 
     const encounterData = JSON.parse(argumentsString);
+    if (typeof encounterData.poster_description === "string") {
+      encounterData.poster_signature = signPrompt("encounter", encounterData.poster_description);
+    }
 
     res.json(encounterData);
 
@@ -822,19 +733,122 @@ const getCharacter = (req, res) => {
   });
 };
 
+// Checks on what the browser sends to the OpenAI routes. They run before the rate limits,
+// so a rejected request doesn't count against anyone's limit, and they keep anything but
+// the expected values out of the prompts
+const MAX_IMAGE_PROMPT_LENGTH = 4000;
+const MAX_CR = 30;
+const SEED_LOCATIONS = Object.keys(monsterSeed).map((location) => location.toLowerCase());
+const ABILITY_NAMES = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"];
+// Letters, spaces and the punctuation monster and skill names use, e.g. "Giant Rat (Diseased)"
+const NAME_PATTERN = /^\p{L}[\p{L} ,()'’-]*$/u;
+
+const isName = (value, maxLength) =>
+  typeof value === "string" && value.length <= maxLength && NAME_PATTERN.test(value);
+// Also false for NaN
+const isNumberIn = (value, min, max) => typeof value === "number" && value >= min && value <= max;
+const isPlainObject = (value) =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const rejectRequest = (res, problems) => res.status(400).json({ error: problems.join("; ") });
+
+const isEncounterMonster = (monster) =>
+  // Older clients send plain monster names
+  typeof monster === "string"
+    ? isName(monster, 60)
+    : isPlainObject(monster) &&
+      isName(monster.monsterName, 60) &&
+      (monster.challengeRating === undefined || isNumberIn(monster.challengeRating, 0, MAX_CR)) &&
+      (monster.groupTag === undefined || isName(monster.groupTag, 40));
+
+const validateEncounterRequest = (req, res, next) => {
+  const message = req.body?.message;
+  if (!isPlainObject(message)) return rejectRequest(res, ["message is required"]);
+  const { monsters, location } = message;
+  // The page sends the challenge rating as text from the picker
+  const challengeRating =
+    message.challengeRating === undefined ? undefined : Number(message.challengeRating);
+
+  const problems = [
+    !(typeof location === "string" && SEED_LOCATIONS.includes(location.toLowerCase())) &&
+      "location must be one of the app's locations",
+    challengeRating !== undefined &&
+      !(challengeRating >= 1 && challengeRating <= MAX_CR) &&
+      `challengeRating must be between 1 and ${MAX_CR}`,
+    !(
+      Array.isArray(monsters) &&
+      monsters.length >= 1 &&
+      monsters.length <= MAX_ENCOUNTER_SIZE &&
+      monsters.every(isEncounterMonster)
+    ) && `monsters must list 1 to ${MAX_ENCOUNTER_SIZE} monsters`,
+  ].filter(Boolean);
+  if (problems.length > 0) return rejectRequest(res, problems);
+
+  if (challengeRating !== undefined) message.challengeRating = challengeRating;
+  next();
+};
+
+const validateCharacterRequest = (req, res, next) => {
+  const message = req.body?.message;
+  if (!isPlainObject(message)) return rejectRequest(res, ["message is required"]);
+  const { name, race, alignment, stats, skills } = message;
+  const level = Number(message.level);
+
+  const problems = [
+    !(typeof name === "string" && name.length <= MAX_NAME_LENGTH && !/[\u0000-\u001f]/.test(name)) &&
+      `name must be at most ${MAX_NAME_LENGTH} characters`,
+    !CHARACTER_RACES.includes(race) && `race must be one of ${CHARACTER_RACES.join(", ")}`,
+    !CHARACTER_CLASSES.includes(message.class) &&
+      `class must be one of ${CHARACTER_CLASSES.join(", ")}`,
+    !(Number.isInteger(level) && level >= 1 && level <= 20) && "level must be between 1 and 20",
+    !isName(alignment, 20) && "alignment must be an alignment such as Lawful Good",
+    !(
+      isPlainObject(stats) &&
+      Object.entries(stats).every(
+        ([ability, score]) => ABILITY_NAMES.includes(ability) && isNumberIn(score, 1, 30)
+      )
+    ) && "stats must map ability names to scores",
+    !(Array.isArray(skills) && skills.length <= 20 && skills.every((skill) => isName(skill, 30))) &&
+      "skills must be a list of skill names",
+  ].filter(Boolean);
+  if (problems.length > 0) return rejectRequest(res, problems);
+
+  message.level = level;
+  next();
+};
+
+// kind is "encounter" or "portrait", matching how the prompt was signed
+const validateImageRequest = (kind) => (req, res, next) => {
+  const { message, signature } = req.body || {};
+  if (typeof message !== "string" || !message || message.length > MAX_IMAGE_PROMPT_LENGTH) {
+    return rejectRequest(res, ["message must be the image description"]);
+  }
+  if (!isSignedPrompt(kind, message, signature)) {
+    return res.status(403).json({
+      error: "Artwork can only be made from descriptions this server wrote",
+      code: "UNSIGNED_IMAGE_PROMPT",
+    });
+  }
+  // Race and class are added to portrait prompts, so only the app's own choices are kept
+  if (kind === "portrait") {
+    if (!CHARACTER_RACES.includes(req.body.race)) delete req.body.race;
+    if (!CHARACTER_CLASSES.includes(req.body.characterClass)) delete req.body.characterClass;
+  }
+  next();
+};
+
 module.exports = {
+  validateEncounterRequest,
+  validateCharacterRequest,
+  validateImageRequest,
   abilitiesFor,
   encodeImage,
   buildEncounter,
   getStatblocks,
   buildEncounterPrompt,
   buildPortraitPrompt,
-  register,
   getMonstersByLocationAndCR,
-  getAllMonsters,
   openaiImages,
-  getMonstersByLocation,
-  getLocations,
   encounter,
   getCharacter,
   creator,

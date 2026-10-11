@@ -68,14 +68,20 @@ Support Roll helps you prep a session in seconds. Pick a location and a challeng
 DNDAI/
 ├── .nvmrc                     # Node version (24)
 ├── backend/
-│   ├── server.js              # Express app, CORS, MongoDB connection, HTTP/HTTPS
+│   ├── server.js              # MongoDB connection, HTTP/HTTPS
+│   ├── app.js                 # Express app: CORS, body limit, rate limits, routes
 │   ├── routes/
 │   │   └── dndRoutes.js       # /app/* endpoints
 │   ├── controller/
-│   │   └── dndController.js   # Encounter, character and image logic
+│   │   └── dndController.js   # Encounter, character and image logic, request checks
+│   ├── middleware/
+│   │   └── limits.js          # Rate limits and the daily cap on AI requests
+│   ├── util/
+│   │   └── promptSignature.js # Signs image prompts so only the app's own are drawn
 │   ├── models/
 │   │   ├── DnDSchema.js       # Monster schema
-│   │   └── statblockSchema.js # SRD stat blocks from Open5e
+│   │   ├── statblockSchema.js # SRD stat blocks from Open5e
+│   │   └── usageSchema.js     # AI requests per day, for the daily cap
 │   ├── services/
 │   │   └── open5eClient.js    # Open5e API client used by the sync script
 │   ├── scripts/
@@ -131,6 +137,16 @@ USE_HTTPS=false
 # SSL_CERT_PATH=/path/to/cert.pem
 ```
 
+Optional settings, mostly for a deployed server:
+
+| Variable | Default | What it does |
+|---|---|---|
+| `CORS_ORIGINS` | `http://localhost:3000,https://supportroll.netlify.app` | Sites allowed to call the API, comma separated |
+| `TRUST_PROXY` | `0` | Number of proxies in front of the server (set it on hosts like Render, so rate limits see each visitor's own IP) |
+| `AI_LIMIT_PER_HOUR` | `20` | AI requests per visitor per hour. An encounter or character with artwork is two |
+| `AI_LIMIT_PER_DAY` | `150` | AI requests per day for all visitors together, counted in MongoDB |
+| `PROMPT_SIGNING_SECRET` | derived from `OPENAI_API_KEY` | Key for signing image prompts |
+
 Start the server:
 ```bash
 npm start
@@ -160,15 +176,12 @@ npm start
 Open [http://localhost:3000](http://localhost:3000).
 
 ### 4. Add monsters to the database
-The encounter generator needs a monster catalogue. Add monsters by posting one object or an array of objects:
+The encounter generator needs a monster catalogue. Load it from `backend/data/monsterSeed.js` (safe to re-run), then copy the SRD stat blocks from Open5e:
 
 ```bash
-curl -X POST http://localhost:4000/app/register \
-  -H "Content-Type: application/json" \
-  -d '[
-    { "monsterName": "Goblin", "challengeRating": 1, "setting": "Forgotten Realms", "location": "forests, caves", "groupTag": "Goblinoid" },
-    { "monsterName": "Beholder", "challengeRating": 13, "setting": "Forgotten Realms", "location": "underdark", "groupTag": "Beholder" }
-  ]'
+cd ../backend
+node scripts/seedMonsters.js
+node scripts/syncOpen5e.js
 ```
 
 ---
@@ -179,16 +192,20 @@ All endpoints are under `/app`.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/register` | Add one monster or an array of monsters |
-| `GET` | `/all` | List every monster |
-| `GET` | `/location?location=underdark` | Monsters at a location |
-| `GET` | `/locations` | Distinct locations in the database |
 | `GET` | `/encounter?location=underdark&challengeRating=9` | Random monster group that fits the CR budget |
-| `POST` | `/schematic` | `{ message: { monsters, location } }` → structured encounter JSON |
+| `GET` | `/statblocks?names=Wraith,Mummy` | SRD stat blocks by monster name |
 | `POST` | `/create-character` | `{ name, race, classType, level }` → character mechanics JSON |
-| `POST` | `/openaiCharacter` | `{ message: { name, race, class, level, alignment, stats, skills } }` → personality and backstory JSON |
-| `POST` | `/images` | `{ message: prompt }` → landscape AVIF image (1536×1024) |
-| `POST` | `/images2` | `{ message: prompt }` → portrait AVIF image (1024×1536) |
+| `POST` | `/schematic` | `{ message: { monsters, location, challengeRating } }` → structured encounter JSON, with `poster_signature` |
+| `POST` | `/openaiCharacter` | `{ message: { name, race, class, level, alignment, stats, skills } }` → personality and backstory JSON, with `portrait_signature` |
+| `POST` | `/images` | `{ message: poster_description, signature: poster_signature }` → landscape AVIF image (1536×1024) |
+| `POST` | `/images2` | `{ message: character_portrait, signature: portrait_signature, race, characterClass }` → portrait AVIF image (1024×1536) |
+
+### Protecting the OpenAI routes
+The last four routes call OpenAI, so they're guarded:
+- **Request checks.** Locations, races, classes and the other fields must be values the app itself sends, so free text can't be slipped into the prompts. Bodies over 20 KB are refused.
+- **Signed image prompts.** The server signs each image description it writes (HMAC-SHA256), and the image routes only draw descriptions with a valid signature. They can't be used as a general-purpose image generator.
+- **Rate limits.** Each visitor gets `AI_LIMIT_PER_HOUR` AI requests an hour, and all visitors together `AI_LIMIT_PER_DAY` a day. Rejected requests don't count.
+- **Timeouts and errors.** OpenAI calls time out after 90 seconds (text) or 2 minutes (images), and errors never include internal details.
 
 ---
 
