@@ -7,6 +7,13 @@
   color: var(--text-body);
 }
 
+/* The heading element only adds meaning; the button inside it does the styling */
+.heading-wrap {
+  margin: 0;
+  font: inherit;
+  text-align: left;
+}
+
 .heading,
 .subheading {
   display: flex;

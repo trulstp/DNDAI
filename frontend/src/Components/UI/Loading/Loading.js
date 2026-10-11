@@ -8,7 +8,7 @@ import { faDragon } from "@fortawesome/free-solid-svg-icons";
 const Loading = ({ title, details, hint }) => (
   <div className={classes.loading} role='status' aria-live='polite'>
     <FontAwesomeIcon icon={faDragon} bounce className={classes.icon} />
-    <h2 className={classes.title}>{title}</h2>
+    <h1 className={classes.title}>{title}</h1>
     {details.filter(Boolean).map((detail) => (
       <p key={detail} className={classes.detail}>
         {detail}

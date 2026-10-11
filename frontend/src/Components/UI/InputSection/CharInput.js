@@ -48,7 +48,10 @@ const classChoices = [
 
 const levelChoices = [
   { value: RANDOM, label: "Random", icon: faDiceD20 },
-  ...levelOptions.map(({ value, label }) => ({ value, label: `Level ${label}` })),
+  ...levelOptions.map(({ value, label }) => ({
+    value,
+    label: `Level ${label}`,
+  })),
 ];
 
 const CharInput = ({ selections, handleChange, getCharacter, error }) => {
@@ -65,11 +68,14 @@ const CharInput = ({ selections, handleChange, getCharacter, error }) => {
         <h1 className={classes.title}>Create a Character</h1>
 
         <section className={classes.field}>
-          <h2 className={classes["field-label"]}>Name</h2>
+          {/* The visible heading is the field's label */}
+          <h2 className={classes["field-label"]}>
+            <label htmlFor='character-name'>Name</label>
+          </h2>
           <input
             className={classes.input}
             placeholder='Leave empty for a random name'
-            aria-label='Character name'
+            id='character-name'
             value={name}
             onChange={(e) => handleChange("name", e.target.value)}
           />

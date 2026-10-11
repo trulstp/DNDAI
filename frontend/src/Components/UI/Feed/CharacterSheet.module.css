@@ -41,7 +41,12 @@
   box-sizing: border-box;
 }
 
-/* The character name uses the app's display font instead of the stat block's small caps */
+/* The character name uses the app's display font instead of the stat block's small caps.
+   It receives focus when the sheet appears but isn't interactive, so no outline */
+.name:focus {
+  outline: none;
+}
+
 .name {
   font-family: var(--font-tertiary);
   font-variant: normal;

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faStar, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import classes from "./Sidebar.module.css";
@@ -113,8 +113,41 @@ const withLabels = (items) => {
 };
 
 // items: [{ id, title, favorite }], newest first
+const FOCUSABLE =
+  "button:not([disabled]), [href], input, [tabindex]:not([tabindex='-1'])";
+
 const Sidebar = (props) => {
   const { closeSidebar } = useContext(SidebarContext);
+  const panelRef = useRef(null);
+
+  // On phones the panel covers the page: move focus into it. Wherever it closes, give focus
+  // back to what opened it (the History button) rather than losing it
+  useEffect(() => {
+    const opener = document.activeElement;
+    if (isPhone()) panelRef.current?.querySelector(FOCUSABLE)?.focus();
+    return () => {
+      setTimeout(() => {
+        const lost =
+          !document.activeElement || document.activeElement === document.body;
+        if (lost && opener && document.contains(opener)) opener.focus();
+      });
+    };
+  }, []);
+
+  // ...and keep Tab inside it while it's open on a phone
+  const keepFocusInside = (event) => {
+    if (event.key !== "Tab" || !isPhone()) return;
+    const focusable = [...panelRef.current.querySelectorAll(FOCUSABLE)];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
   const closeOnPhone = () => {
     if (isPhone()) closeSidebar();
   };
@@ -141,8 +174,10 @@ const Sidebar = (props) => {
         aria-hidden='true'
       />
       <section
+        ref={panelRef}
         className={classes["side-bar"]}
         aria-label={`${props.title} history`}
+        onKeyDown={keepFocusInside}
       >
         <h2 className={classes.title}>
           <span>{props.title}</span>

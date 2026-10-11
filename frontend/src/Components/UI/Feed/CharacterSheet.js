@@ -69,10 +69,13 @@ const CharacterSheet = ({
     });
 
   // A different character starts at the top, not at the previous one's scroll position
+  // ...and focus moves to the character's name, so screen readers announce it
   const sheetRef = useRef(null);
+  const nameRef = useRef(null);
   const characterId = characterData?.id;
   useEffect(() => {
     sheetRef.current?.scrollIntoView({ block: "start" });
+    nameRef.current?.focus({ preventScroll: true });
   }, [characterId]);
 
   if (!characterData || !characterData.first || !characterData.second) {
@@ -119,7 +122,13 @@ const CharacterSheet = ({
           </div>
 
           <div className={`${card.statblock} ${styles.character}`}>
-            <h1 className={`${card.name} ${styles.name}`}>{first.Name}</h1>
+            <h1
+              className={`${card.name} ${styles.name}`}
+              ref={nameRef}
+              tabIndex={-1}
+            >
+              {first.Name}
+            </h1>
             <p className={card.type}>
               {first.Size} {first.Race.toLowerCase()}{" "}
               {first.Class.toLowerCase()}, level {first.Level},{" "}
@@ -189,6 +198,7 @@ const CharacterSheet = ({
               {classFeatures.length > 0 && (
                 <CollapsibleSubsection
                   title='Class Features'
+                  level={2}
                   isOpen={isOpen("features")}
                   onToggle={() => toggle("features")}
                 >
@@ -206,6 +216,7 @@ const CharacterSheet = ({
               {spells.length > 0 && (
                 <CollapsibleSubsection
                   title='Spells'
+                  level={2}
                   isOpen={isOpen("spells")}
                   onToggle={() => toggle("spells")}
                 >

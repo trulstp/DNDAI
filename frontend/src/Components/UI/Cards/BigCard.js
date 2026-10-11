@@ -10,7 +10,12 @@ const BigCard = (props) => {
   const className =
     sidebarOpen || navExpanded ? classes["with-sidebar"] : classes.collapsed;
 
-  return <div className={className}>{props.children}</div>;
+  // The page's main landmark, and the target of the "Skip to content" link
+  return (
+    <main id='main-content' tabIndex={-1} className={className}>
+      {props.children}
+    </main>
+  );
 };
 
 export default BigCard;

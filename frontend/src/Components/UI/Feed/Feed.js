@@ -43,11 +43,14 @@ const Feed = (props) => {
     onToggle: () => props.toggleVisibility(field),
   });
 
-  // A different encounter starts at the top, not at the previous one's scroll position
+  // A different encounter starts at the top, not at the previous one's scroll position,
+  // and focus moves to its title so screen readers announce it and keyboard users start there
   const feedRef = useRef(null);
+  const titleRef = useRef(null);
   const entryId = props.currentEncounter?.[0]?.id;
   useEffect(() => {
     feedRef.current?.scrollIntoView({ block: "start" });
+    titleRef.current?.focus({ preventScroll: true });
   }, [entryId]);
 
   return (
@@ -59,7 +62,9 @@ const Feed = (props) => {
         return (
           <article key={index} className={classes.encounter}>
             <header className={classes.header}>
-              <h1 className={classes.title}>{content.title}</h1>
+              <h1 className={classes.title} ref={titleRef} tabIndex={-1}>
+                {content.title}
+              </h1>
               {encounterSummary(chatMessage) && (
                 <p className={classes.summary}>
                   {encounterSummary(chatMessage)}
