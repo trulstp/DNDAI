@@ -1,54 +1,121 @@
-import classes from "./InputSection.module.css";
-import FormSelect from "../Select/FormSelect";
-import Button from "../Buttons/Button";
-import { locations, numbersArray } from "../../Arrays/options";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiceD20 } from "@fortawesome/free-solid-svg-icons";
+import ChoiceGroup from "../Choice/ChoiceGroup";
+import RangeSlider from "../Choice/RangeSlider";
+import classes from "../Choice/Choice.module.css";
+import {
+  locations,
+  locationGroups,
+  crTiers,
+  numbersArray,
+} from "../../Arrays/options";
 
-const InputSection = (props) => {
-  const options = locations.map((location) => ({
-    value: location,
-    label: location,
-  }));
+const DEFAULT_CR = 5;
+const MIN_CR = numbersArray[0];
+const MAX_CR = numbersArray[numbersArray.length - 1];
 
-  const SecondOptions = numbersArray.map((numbers) => ({
-    value: numbers,
-    label: numbers,
-  }));
+const titleCase = (text) => text.replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const handleChange = (selectedOption) => {
-    // Check if selectedOption is an array, and convert to an array if needed
-    const selectedValues = Array.isArray(selectedOption)
-      ? selectedOption.map((option) => option.value)
-      : [selectedOption.value];
-    props.setValue1(selectedValues.toString());
-  };
+const InputSection = ({ value1, value2, setValue1, setValue2, getMessages }) => {
+  const [query, setQuery] = useState("");
 
-  const handleChange2 = (selectedOption) => {
-    props.setValue2(selectedOption.value.toString());
+  // The page starts with no challenge rating, so give the slider a sensible default
+  useEffect(() => {
+    if (!value2) setValue2(String(DEFAULT_CR));
+  }, [value2, setValue2]);
+
+  const cr = Number(value2) || DEFAULT_CR;
+  const tier = crTiers.find((t) => cr <= t.max)?.label;
+
+  const search = query.trim().toLowerCase();
+  const groups = locationGroups
+    .map((group) => ({
+      ...group,
+      locations: group.locations.filter((l) => l.includes(search)),
+    }))
+    .filter((group) => group.locations.length > 0);
+
+  const pickRandomLocation = () => {
+    setQuery("");
+    setValue1(locations[Math.floor(Math.random() * locations.length)]);
   };
 
   return (
-    <div className={classes["bottom-section"]}>
-      <h1 className={classes.title}>Create a Random Encounter</h1>
-      <div className={classes["select-section"]}>
-        <FormSelect
-          width='200px'
-          options={options}
-          placeholder={"Locations"}
-          isMulti={false}
-          name={"Locations"}
-          onChange={handleChange}
-        />
-        <FormSelect
-          width='200px'
-          options={SecondOptions}
-          placeholder={"Challenge Rating"}
-          isMulti={false}
-          name={"CR"}
-          onChange={handleChange2}
-        />
-        <Button className={classes.submit} onClick={props.getMessages}>
-          Roll an Encounter
-        </Button>
+    <div className={classes.page}>
+      <div className={classes.panel}>
+        <h1 className={classes.title}>Create a Random Encounter</h1>
+
+        <section className={classes.field}>
+          <h2 className={classes["field-label"]}>Location</h2>
+          <div className={classes["input-row"]}>
+            <input
+              type='search'
+              className={classes.input}
+              placeholder='Search locations…'
+              aria-label='Search locations'
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button
+              type='button'
+              className={classes.secondary}
+              onClick={pickRandomLocation}
+            >
+              <FontAwesomeIcon icon={faDiceD20} className={classes.icon} /> Random
+            </button>
+          </div>
+
+          {groups.map((group) => (
+            <div key={group.label}>
+              <h3 className={classes["group-label"]}>{group.label}</h3>
+              <ChoiceGroup
+                label={group.label}
+                options={group.locations.map((l) => ({
+                  value: l,
+                  label: titleCase(l),
+                }))}
+                value={value1}
+                onChange={setValue1}
+              />
+            </div>
+          ))}
+          {groups.length === 0 && (
+            <p className={classes.empty}>No locations match “{query}”.</p>
+          )}
+        </section>
+
+        <section className={classes.field}>
+          <h2 className={classes["field-label"]}>Challenge Rating</h2>
+          <RangeSlider
+            label='Challenge rating'
+            min={MIN_CR}
+            max={MAX_CR}
+            value={cr}
+            caption={tier}
+            onChange={(value) => setValue2(String(value))}
+          />
+        </section>
+
+        <div className={classes.summary}>
+          <span
+            className={`${classes["summary-text"]} ${
+              value1 ? "" : classes.pending
+            }`}
+          >
+            {value1
+              ? `${titleCase(value1)} · CR ${cr}`
+              : "Choose a location to roll an encounter"}
+          </span>
+          <button
+            type='button'
+            className={classes.primary}
+            disabled={!value1}
+            onClick={getMessages}
+          >
+            Roll Encounter
+          </button>
+        </div>
       </div>
     </div>
   );
