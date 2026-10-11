@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const monsterRoutes = require("./routes/dndRoutes");
-const userRoutes = require("./routes/userRoutes");
 const cors = require("cors");
 
 dotenv.config();
@@ -18,7 +17,6 @@ app.use(
 app.use(express.json());
 
 app.use("/app", monsterRoutes);
-app.use("/user", userRoutes);
 
 (async () => {
   // Optional MongoDB

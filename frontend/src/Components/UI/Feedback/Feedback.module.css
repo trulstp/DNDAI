@@ -11,6 +11,27 @@
   text-align: left;
 }
 
+/* Floats above the page, clear of the nav (which sits along the bottom on phones) */
+.notice-region {
+  position: fixed;
+  right: 1.5rem;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 104;
+  max-width: min(30rem, calc(100vw - 3rem));
+}
+
+.notice {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+@media only screen and (max-width: 600px) {
+  .notice-region {
+    right: 1rem;
+    bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 2rem);
+  }
+}
+
 .banner-icon {
   width: 1.1rem;
   height: 1.1rem;

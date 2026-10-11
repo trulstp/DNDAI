@@ -4,6 +4,7 @@ import { faDiceD20 } from "@fortawesome/free-solid-svg-icons";
 import ChoiceGroup from "../Choice/ChoiceGroup";
 import RangeSlider from "../Choice/RangeSlider";
 import { ErrorBanner } from "../Feedback/Feedback";
+import { titleCase } from "../../../util/format";
 import classes from "../Choice/Choice.module.css";
 import {
   locations,
@@ -15,8 +16,6 @@ import {
 const DEFAULT_CR = 5;
 const MIN_CR = numbersArray[0];
 const MAX_CR = numbersArray[numbersArray.length - 1];
-
-const titleCase = (text) => text.replace(/\b\w/g, (c) => c.toUpperCase());
 
 const InputSection = ({
   value1,

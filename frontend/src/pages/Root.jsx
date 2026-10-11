@@ -3,6 +3,7 @@ import Nav from "../Components/Nav/Nav";
 import BigCard from "../Components/UI/Cards/BigCard";
 import { Outlet } from "react-router-dom";
 import { SidebarProvider } from "../store/sidebar-provider";
+import { StorageNotice } from "../Components/UI/Feedback/Feedback";
 
 const Root = () => {
   return (
@@ -23,6 +24,7 @@ const Root = () => {
         <BigCard>
           <Outlet />
         </BigCard>
+        <StorageNotice />
       </SidebarProvider>
     </React.Fragment>
   );

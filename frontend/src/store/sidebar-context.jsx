@@ -14,5 +14,7 @@ export const SidebarContext = createContext({
     setPreviousChats: () => {},
     previousEncounter: [],
     setPreviousEncounter: () => {},
+    storageNotice: null,
+    dismissStorageNotice: () => {},
 });
 
