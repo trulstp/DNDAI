@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiceD20 } from "@fortawesome/free-solid-svg-icons";
 import ChoiceGroup from "../Choice/ChoiceGroup";
 import RangeSlider from "../Choice/RangeSlider";
+import { ErrorBanner } from "../Feedback/Feedback";
 import classes from "../Choice/Choice.module.css";
 import {
   locations,
@@ -17,7 +18,14 @@ const MAX_CR = numbersArray[numbersArray.length - 1];
 
 const titleCase = (text) => text.replace(/\b\w/g, (c) => c.toUpperCase());
 
-const InputSection = ({ value1, value2, setValue1, setValue2, getMessages }) => {
+const InputSection = ({
+  value1,
+  value2,
+  setValue1,
+  setValue2,
+  getMessages,
+  error,
+}) => {
   const [query, setQuery] = useState("");
 
   // The page starts with no challenge rating, so give the slider a sensible default
@@ -96,6 +104,8 @@ const InputSection = ({ value1, value2, setValue1, setValue2, getMessages }) => 
             onChange={(value) => setValue2(String(value))}
           />
         </section>
+
+        {error && <ErrorBanner message={error} onRetry={getMessages} />}
 
         <div className={classes.summary}>
           <span

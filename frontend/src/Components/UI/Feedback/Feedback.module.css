@@ -1,0 +1,92 @@
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.75rem;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid var(--text-tertiary);
+  border-radius: 0 8px 8px 0;
+  background-color: var(--color-secondary);
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.banner-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.banner-text {
+  flex: 1;
+  min-width: 12rem;
+  line-height: 1.4;
+}
+
+.retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  background: none;
+  border: 1px solid var(--text-primary);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.retry:hover {
+  background-color: var(--hover-tint);
+}
+
+.retry:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.retry-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.generate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.generate-error {
+  max-width: 22rem;
+  margin: 0;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: 0.35em;
+  vertical-align: -0.1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}

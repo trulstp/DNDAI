@@ -6,6 +6,7 @@ import Loading from "../Components/UI/Loading/Loading";
 import CharInput from "../Components/UI/InputSection/CharInput";
 import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
+import { fetchOk } from "../util/fetchOk";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const CharacterCreatorPage = () => {
@@ -24,12 +25,16 @@ const CharacterCreatorPage = () => {
   const [feedActive, setFeedActive] = useState(false);
   const [images, setImages] = useState(null);
   const [charInfo2, setCharInfo2] = useState("");
+  const [error, setError] = useState(null);
+  const [imageStatus, setImageStatus] = useState({ state: "idle" });
 
   const handleChange = (field, value) => {
     setSelections((prev) => ({ ...prev, [field]: value }));
   };
 
   const createNew = () => {
+    setError(null);
+    setImageStatus({ state: "idle" });
     setFeedActive(false);
     setLoading(false);
     setMessage(null);
@@ -63,12 +68,8 @@ const CharacterCreatorPage = () => {
         },
       };
 
-      const response = await fetch(`${API}/app/images2`, options);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      setImageStatus({ state: "loading" });
+      const response = await fetchOk(`${API}/app/images2`, options);
       const imageUrl = await blobToDataUrl(await response.blob());
 
       // Update the state with the new image URL
@@ -78,12 +79,16 @@ const CharacterCreatorPage = () => {
           chat.title === currentTitle ? { ...chat, images: [imageUrl] } : chat
         )
       );
+      setImageStatus({ state: "idle" });
     } catch (error) {
       console.error("Error in image generation:", error);
+      setImageStatus({ state: "error", message: error.message });
     }
   };
 
   const getCharacter = async () => {
+    setError(null);
+    setLoading(true);
     try {
       const options1 = {
         method: "POST",
@@ -92,18 +97,11 @@ const CharacterCreatorPage = () => {
           "Content-Type": "application/json",
         },
       };
-      console.log("Selections sent:", options1.body); // Make sure this contains the correct data
-
-      const firstResponse = await fetch(
+      const firstResponse = await fetchOk(
         `${API}/app/create-character`,
         options1
       );
-
-      if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
-      console.log("First data received:", firstData);
-
-      setLoading(true);
       setCharInfo1(firstData);
 
       const options = {
@@ -123,18 +121,17 @@ const CharacterCreatorPage = () => {
           "Content-Type": "application/json",
         },
       };
-      console.log("Options sent:", options); // Make sure this contains the correct data
-
-      const secondResponse = await fetch(`${API}/app/openaiCharacter`, options);
-
-      if (!secondResponse.ok) throw new Error("Second fetch failed");
+      const secondResponse = await fetchOk(
+        `${API}/app/openaiCharacter`,
+        options
+      );
       const data = await secondResponse.json();
       setCharInfo2(data);
-      console.log("testing", data);
       setMessage(data);
       setFeedActive(true);
     } catch (error) {
-      console.error("Error here?", error);
+      console.error("Error creating character:", error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -171,6 +168,8 @@ const CharacterCreatorPage = () => {
       (chat) => chat.title === uniqueTitle
     );
     if (selectedCharacter) {
+      setError(null);
+      setImageStatus({ state: "idle" });
       setCurrentTitle(uniqueTitle);
       setMessage(selectedCharacter);
       setCharInfo1(selectedCharacter.first);
@@ -195,7 +194,20 @@ const CharacterCreatorPage = () => {
   const currentEncounter =
     previousChats.find((chat) => chat.title === currentTitle) || {};
 
-  console.log("currentEncounter", currentEncounter);
+  // Sidebar items, newest first, one per title
+  const historyItems = [];
+  for (const chat of [...previousChats].reverse()) {
+    if (!historyItems.some((item) => item.title === chat.title)) {
+      historyItems.push({ title: chat.title, favorite: !!chat.favorite });
+    }
+  }
+
+  const toggleFavorite = (title) => {
+    setPreviousChats((prev) => {
+      const favorite = !prev.some((c) => c.title === title && c.favorite);
+      return prev.map((c) => (c.title === title ? { ...c, favorite } : c));
+    });
+  };
 
   return (
     <>
@@ -204,9 +216,9 @@ const CharacterCreatorPage = () => {
           createNewEncounter={createNew}
           handleClick={handleSidebarClick}
           button='+ New Character'
-          uniqueTitles={Array.from(
-            new Set(previousChats.map((chat) => chat.title))
-          )}
+          items={historyItems}
+          activeTitle={feedActive ? currentTitle : null}
+          onToggleFavorite={toggleFavorite}
         />
       )}
 
@@ -216,6 +228,7 @@ const CharacterCreatorPage = () => {
         <CharacterSheet
           characterData={currentEncounter}
           imageGenerator={imageGenerator}
+          imageStatus={imageStatus}
           images={images}
         />
       ) : (
@@ -223,6 +236,7 @@ const CharacterCreatorPage = () => {
           getCharacter={getCharacter}
           handleChange={handleChange}
           selections={selections}
+          error={error}
         />
       )}
     </>

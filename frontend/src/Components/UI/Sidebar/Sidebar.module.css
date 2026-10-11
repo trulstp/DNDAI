@@ -1,53 +1,217 @@
 .side-bar {
-    background-color: var(--color-secondary);
-    transition: width var(--transition-speed), margin-left var(--transition-speed);
-    
+  background-color: var(--color-secondary);
+  transition: width var(--transition-speed), margin-left var(--transition-speed);
+  transform: translateX(-11rem);
+  /* Starts below the nav header, so it is shorter than the screen */
+  height: calc(100vh - 5rem);
+  margin-top: 5rem;
+  width: 11rem;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  z-index: 103;
+  box-sizing: border-box;
+}
 
-    transform: translateX(-11rem);
-    height: 100vh;
-    margin-top: 5rem;
-    width: 11rem;
+.sidebar-button {
+  display: flex;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+
+.group-label {
+  margin: 0.9rem 0.75rem 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  margin: 1rem 0.75rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-faint);
+}
+
+.item {
+  position: relative;
+  margin: 2px 6px;
+  border-radius: 6px;
+}
+
+.item:hover,
+.item:focus-within {
+  background-color: var(--hover-tint);
+}
+
+.active,
+.active:hover {
+  background-color: var(--color-tertiary);
+}
+
+.title {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.active .title {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.title:focus-visible,
+.icon:focus-visible,
+.danger:focus-visible,
+.cancel:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
+}
+
+/* On desktop the buttons appear on hover or keyboard focus, so long titles keep the full width */
+.actions {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 6px;
+  background-color: var(--color-secondary);
+  box-shadow: 0 1px 4px var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.item:hover .actions,
+.item:focus-within .actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.icon:hover {
+  color: var(--text-primary);
+  background-color: var(--hover-tint);
+}
+
+.starred,
+.starred:hover {
+  color: var(--text-primary);
+}
+
+/* Delete confirmation replaces the row */
+.confirm {
+  padding: 8px 10px;
+  background-color: var(--hover-tint);
+}
+
+.confirm-text {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.danger,
+.cancel {
+  flex: 1;
+  padding: 5px 6px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger {
+  background-color: var(--text-tertiary);
+  border: none;
+  color: var(--color-secondary);
+}
+
+.cancel {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+/* Touch screens have no hover, so the buttons sit beside the title and stay visible */
+@media (hover: none), only screen and (max-width: 600px) {
+  .item {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+  }
+
+  .actions {
+    position: static;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    background: none;
+    box-shadow: none;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .side-bar {
+    margin-left: 0;
+    height: calc(100vh - 5rem);
     position: absolute;
-    z-index: 103;
-    box-sizing: border-box;
-  
+    margin-top: 0rem;
+    z-index: 100;
+    width: 50%;
+    transition: width var(--transition-speed), margin-left var(--transition-speed);
+    transform: translateX(0rem);
   }
-
-  .sidebar-button {
-    display: flex;
-    margin-top: 1.5rem;
-    justify-content: center;
-  }
-
-  .history {
-    height: 100%;
-    
-    padding: 0;
-    text-align: center;
-  }
-
-
-  
-  .history li {
-    list-style-type: none;
-    padding: 5px;
-    margin-top: 10px;
-    cursor: pointer;
-    color: var(--text-primary);
-  }
-
-  @media only screen and (max-width: 600px) {
-    .side-bar {
-        margin-left: 0;
-        height: calc(100vh - 5rem);
-        position: absolute;
-        margin-top: 0rem;
-        z-index: 100;
-        width: 50%;
-        transition: width var(--transition-speed), margin-left var(--transition-speed);
-        transform: translateX(0rem);
-    }
-  }
+}
