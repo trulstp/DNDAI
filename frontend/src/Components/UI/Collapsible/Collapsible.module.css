@@ -1,0 +1,61 @@
+/* Collapsible cards shared by the encounter view and the character sheet */
+
+.card {
+  background-color: var(--color-secondary);
+  border-top: 4px solid var(--text-primary);
+  padding: 12px 16px;
+  color: var(--text-body);
+}
+
+.heading,
+.subheading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.heading {
+  padding: 0;
+  font-family: var(--font-tertiary);
+  font-size: 1.6rem;
+  color: var(--text-primary);
+}
+
+/* Matches the subheadings inside a stat block */
+.subheading {
+  margin-top: 14px;
+  padding: 0 0 2px;
+  border-bottom: 1px solid var(--text-primary);
+  font: inherit;
+  font-size: 20px;
+  font-variant: small-caps;
+  color: var(--text-tertiary);
+}
+
+.heading:focus-visible,
+.subheading:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 4px;
+}
+
+.caret {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.3rem;
+  font-variant: normal;
+  color: var(--text-muted);
+}
+
+.subheading .caret {
+  font-size: 1rem;
+}
+
+.text {
+  margin: 6px 0 0;
+  line-height: 1.55;
+}

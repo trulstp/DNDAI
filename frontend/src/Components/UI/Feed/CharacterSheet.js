@@ -1,5 +1,10 @@
 import Button from "../Buttons/Button";
-import React from "react";
+import React, { useState } from "react";
+import {
+  CardText,
+  CollapsibleCard,
+  CollapsibleSubsection,
+} from "../Collapsible/Collapsible";
 import { modifier } from "./StatBlock";
 import card from "./StatBlock.module.css";
 import styles from "./CharacterSheet.module.css";
@@ -45,6 +50,17 @@ const Property = ({ label, items }) =>
   ) : null;
 
 const CharacterSheet = ({ characterData, imageGenerator, images }) => {
+  // Collapsed sections stay collapsed when switching between characters
+  const [collapsed, setCollapsed] = useState(() => new Set());
+  const isOpen = (section) => !collapsed.has(section);
+  const toggle = (section) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(section)) next.delete(section);
+      else next.add(section);
+      return next;
+    });
+
   if (!characterData || !characterData.first || !characterData.second) {
     return <div>Loading character data...</div>;
   }
@@ -118,26 +134,37 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
         <div className={styles.traits}>
           {PERSONALITY.map(([label, field]) =>
             second[field] ? (
-              <div key={field} className={styles.card}>
-                <h2 className={styles.heading}>{label}</h2>
-                <p>{second[field]}</p>
-              </div>
+              <CollapsibleCard
+                key={field}
+                title={label}
+                isOpen={isOpen(field)}
+                onToggle={() => toggle(field)}
+              >
+                <CardText>{second[field]}</CardText>
+              </CollapsibleCard>
             ) : null
           )}
         </div>
 
         {second.backstory && (
-          <div className={`${styles.card} ${styles.backstory}`}>
-            <h2 className={styles.heading}>Backstory</h2>
-            <p>{second.backstory}</p>
-          </div>
+          <CollapsibleCard
+            title='Backstory'
+            isOpen={isOpen("backstory")}
+            onToggle={() => toggle("backstory")}
+            className={styles.backstory}
+          >
+            <CardText>{second.backstory}</CardText>
+          </CollapsibleCard>
         )}
 
         {(classFeatures.length > 0 || spells.length > 0) && (
           <div className={`${card.statblock} ${styles.features}`}>
             {classFeatures.length > 0 && (
-              <>
-                <h4 className={card.subheading}>Class Features</h4>
+              <CollapsibleSubsection
+                title='Class Features'
+                isOpen={isOpen("features")}
+                onToggle={() => toggle("features")}
+              >
                 {classFeatures.map(([level, features]) => (
                   <p key={level} className={card.entry}>
                     <strong>
@@ -146,12 +173,15 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
                     {features.join(", ")}
                   </p>
                 ))}
-              </>
+              </CollapsibleSubsection>
             )}
 
             {spells.length > 0 && (
-              <>
-                <h4 className={card.subheading}>Spells</h4>
+              <CollapsibleSubsection
+                title='Spells'
+                isOpen={isOpen("spells")}
+                onToggle={() => toggle("spells")}
+              >
                 {spells.map(([level, levelSpells]) => (
                   <p key={level} className={card.entry}>
                     <strong>
@@ -160,7 +190,7 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
                     {levelSpells.join(", ")}
                   </p>
                 ))}
-              </>
+              </CollapsibleSubsection>
             )}
           </div>
         )}

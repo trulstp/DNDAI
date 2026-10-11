@@ -2,6 +2,7 @@ import React from "react";
 
 import Button from "../Buttons/Button";
 import MonsterList from "./MonsterList";
+import { CardText, CollapsibleCard } from "../Collapsible/Collapsible";
 import classes from "./Feed.module.css";
 
 const TOP_SECTIONS = [
@@ -16,27 +17,11 @@ const BOTTOM_SECTIONS = [
   ["random_events_twists", "Random Twists"],
 ];
 
-// A card whose heading collapses its content
-const Section = ({ title, text, isVisible, onToggle, className, children }) => (
-  <section className={`${classes.card} ${className || ""}`}>
-    <button
-      type='button'
-      className={classes.heading}
-      onClick={onToggle}
-      aria-expanded={isVisible}
-    >
-      <span>{title}</span>
-      <span className={classes.caret} aria-hidden='true'>
-        {isVisible ? "−" : "+"}
-      </span>
-    </button>
-    {isVisible && (
-      <>
-        {text && <p className={classes.text}>{text}</p>}
-        {children}
-      </>
-    )}
-  </section>
+const Section = ({ title, text, isVisible, onToggle, children }) => (
+  <CollapsibleCard title={title} isOpen={isVisible} onToggle={onToggle}>
+    {text && <CardText>{text}</CardText>}
+    {children}
+  </CollapsibleCard>
 );
 
 const Feed = (props) => {

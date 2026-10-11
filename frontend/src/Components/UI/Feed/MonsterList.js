@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import StatBlock from "./StatBlock";
+import { CollapsibleSubsection } from "../Collapsible/Collapsible";
 import classes from "./MonsterList.module.css";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
@@ -56,19 +57,12 @@ const MonsterList = ({ monsters, isVisible, toggleVisibility }) => {
   };
 
   return (
-    <div className={classes["monster-list"]}>
-      <button
-        type='button'
-        className={classes.heading}
-        onClick={toggleVisibility}
-        aria-expanded={isVisible}
+    <div>
+      <CollapsibleSubsection
+        title='Stat Blocks'
+        isOpen={isVisible}
+        onToggle={toggleVisibility}
       >
-        <span>Stat Blocks</span>
-        <span className={classes.toggle} aria-hidden='true'>
-          {isVisible ? "−" : "+"}
-        </span>
-      </button>
-      {isVisible && (
         <>
           {status === "loading" && <p>Loading stat blocks...</p>}
           {status === "error" && (
@@ -129,7 +123,7 @@ const MonsterList = ({ monsters, isVisible, toggleVisibility }) => {
             licensed under CC-BY-4.0.
           </div>
         </>
-      )}
+      </CollapsibleSubsection>
     </div>
   );
 };
