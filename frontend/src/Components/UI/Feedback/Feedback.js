@@ -50,6 +50,10 @@ export const ImagePlaceholder = ({
   const loading = status.state === "loading";
   return (
     <div className={classes.placeholder}>
+      {/* Announces the start of generation; the button text alone isn't read out */}
+      <span className='visually-hidden' role='status'>
+        {loading ? `${text.action.replace("Generate", "Generating")}…` : ""}
+      </span>
       <p className={classes["placeholder-text"]}>{text.empty}</p>
       <button
         type='button'
