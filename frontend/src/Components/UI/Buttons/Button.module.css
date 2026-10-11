@@ -12,3 +12,9 @@
     background-color: var(--hover-tint);
     border: solid 1px var(--border-subtle);
   }
+  .button:disabled,
+  .button:disabled:hover {
+    cursor: progress;
+    opacity: 0.75;
+    background-color: transparent;
+  }

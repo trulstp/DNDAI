@@ -39,6 +39,7 @@ const RandomEncounter = (props) => {
               images={props.images}
               setImages={props.setImages}
               imageGenerator={props.imageGenerator}
+              imageStatus={props.imageStatus}
               isVisible={props.isVisible}
               setIsVisible={props.setIsVisible}
               toggleVisibility={props.toggleVisibility}
@@ -51,6 +52,7 @@ const RandomEncounter = (props) => {
               setValue1={props.setValue1}
               setValue2={props.setValue2}
               getMessages={props.getMessages}
+              error={props.error}
             />
           )}
         </>

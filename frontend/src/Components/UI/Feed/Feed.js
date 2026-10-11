@@ -1,6 +1,6 @@
 import React from "react";
 
-import Button from "../Buttons/Button";
+import { GenerateImageButton } from "../Feedback/Feedback";
 import MonsterList from "./MonsterList";
 import { CardText, CollapsibleCard } from "../Collapsible/Collapsible";
 import classes from "./Feed.module.css";
@@ -55,9 +55,10 @@ const Feed = (props) => {
                 ) : (
                   <div className={classes.placeholder}>
                     <p>No artwork for this encounter yet.</p>
-                    <Button onClick={() => props.imageGenerator()}>
-                      Generate Image?
-                    </Button>
+                    <GenerateImageButton
+                      status={props.imageStatus}
+                      onGenerate={props.imageGenerator}
+                    />
                   </div>
                 )}
               </div>

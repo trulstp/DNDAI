@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
+import { fetchOk } from "../util/fetchOk";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const RandomEncounterPage = () => {
@@ -18,6 +19,8 @@ const RandomEncounterPage = () => {
   const [encounter, setEncounter] = useState("");
   const [feedActive, setFeedActive] = useState(false);
   const [images, setImages] = useState(null);
+  const [error, setError] = useState(null);
+  const [imageStatus, setImageStatus] = useState({ state: "idle" });
   const [isVisible, setIsVisible] = useState({
     images: true,
     location: true,
@@ -31,6 +34,8 @@ const RandomEncounterPage = () => {
   });
 
   const createNew = () => {
+    setError(null);
+    setImageStatus({ state: "idle" });
     setFeedActive(false);
     setLoading(false);
     setMessage(null);
@@ -41,6 +46,8 @@ const RandomEncounterPage = () => {
   };
 
   const handleClick = (uniqueTitle) => {
+    setError(null);
+    setImageStatus({ state: "idle" });
     setFeedActive(true);
     setLoading(false);
     setCurrentTitle(uniqueTitle);
@@ -48,7 +55,6 @@ const RandomEncounterPage = () => {
     setValue1("");
     setValue2("");
     setImages(null);
-    console.log(feedActive);
   };
 
   const imageGenerator = async () => {
@@ -67,12 +73,8 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch(`${API}/app/images`, options);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch image");
-      }
-
+      setImageStatus({ state: "loading" });
+      const response = await fetchOk(`${API}/app/images`, options);
       const imageUrl = await blobToDataUrl(await response.blob());
 
       setImages([imageUrl]);
@@ -81,25 +83,29 @@ const RandomEncounterPage = () => {
           chat.title === currentTitle ? { ...chat, images: [imageUrl] } : chat
         )
       );
+      setImageStatus({ state: "idle" });
     } catch (error) {
       console.error("Error in imageGenerator:", error);
+      setImageStatus({ state: "error", message: error.message });
     }
   };
 
   const getMessages = async () => {
-    console.log(value1);
-
+    setError(null);
+    setLoading(true);
     try {
-      const firstResponse = await fetch(
+      const firstResponse = await fetchOk(
         `${API}/app/encounter?location=${encodeURIComponent(
           value1
         )}&challengeRating=${encodeURIComponent(value2)}`
       );
-      if (!firstResponse.ok) throw new Error("First fetch failed");
       const firstData = await firstResponse.json();
-      setLoading(true);
+      if (firstData.length === 0) {
+        throw new Error(
+          "No monsters live in that location at this challenge rating. Try another combination."
+        );
+      }
       setEncounter(firstData);
-      console.log(firstData);
 
       const options = {
         method: "POST",
@@ -114,22 +120,18 @@ const RandomEncounterPage = () => {
           "Content-Type": "application/json",
         },
       };
-      console.log("Options sent:", options); // Make sure this contains the correct data
-      const secondResponse = await fetch(`${API}/app/schematic`, options);
-
-      if (!secondResponse.ok) throw new Error("Second fetch failed");
+      const secondResponse = await fetchOk(`${API}/app/schematic`, options);
       const data = await secondResponse.json();
-
-      console.log("testing", data);
       // Check if the response has the expected structure
       if (data && typeof data === "object" && "title" in data) {
         setMessage(data);
         setFeedActive(true);
       } else {
-        throw new Error("Unexpected data structure from second fetch");
+        throw new Error("The AI returned an incomplete encounter. Try again.");
       }
     } catch (error) {
-      console.error("Error here?", error);
+      console.error("Error generating encounter:", error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -158,18 +160,29 @@ const RandomEncounterPage = () => {
     }
   }, [currentTitle, message, encounter, setPreviousEncounter]);
 
-  console.log(previousEncounter);
-
   const currentEncounter = previousEncounter.filter(
     (previousEncounter) => previousEncounter.title === currentTitle
   );
-  const uniqueTitles = Array.from(
-    new Set(
-      previousEncounter
-        .map((previousEncounter) => previousEncounter.title)
-        .reverse()
-    )
-  );
+
+  // Sidebar items, newest first, one per title
+  const historyItems = [];
+  for (const entry of [...previousEncounter].reverse()) {
+    if (!historyItems.some((item) => item.title === entry.title)) {
+      historyItems.push({ title: entry.title, favorite: !!entry.favorite });
+    }
+  }
+
+  const toggleFavorite = (title) => {
+    setPreviousEncounter((prev) => {
+      const favorite = !prev.some((e) => e.title === title && e.favorite);
+      return prev.map((e) => (e.title === title ? { ...e, favorite } : e));
+    });
+  };
+
+  const deleteEncounter = (title) => {
+    setPreviousEncounter((prev) => prev.filter((e) => e.title !== title));
+    if (title === currentTitle) createNew();
+  };
 
   // Opened from the home page's Recent list: show that encounter, then clear the request
   // so a reload doesn't reopen it
@@ -195,7 +208,10 @@ const RandomEncounterPage = () => {
         <Sidebar
           createNewEncounter={createNew}
           handleClick={handleClick}
-          uniqueTitles={uniqueTitles}
+          items={historyItems}
+          activeTitle={feedActive ? currentTitle : null}
+          onToggleFavorite={toggleFavorite}
+          onDelete={deleteEncounter}
           button={"+ New Encounter"}
         />
       )}
@@ -208,6 +224,8 @@ const RandomEncounterPage = () => {
         setValue1={setValue1}
         setValue2={setValue2}
         getMessages={getMessages}
+        error={error}
+        imageStatus={imageStatus}
         loading={loading}
         setLoading={setLoading}
         feedActive={feedActive}

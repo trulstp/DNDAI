@@ -1,4 +1,4 @@
-import Button from "../Buttons/Button";
+import { GenerateImageButton } from "../Feedback/Feedback";
 import React, { useState } from "react";
 import {
   CardText,
@@ -49,7 +49,12 @@ const Property = ({ label, items }) =>
     </p>
   ) : null;
 
-const CharacterSheet = ({ characterData, imageGenerator, images }) => {
+const CharacterSheet = ({
+  characterData,
+  imageGenerator,
+  imageStatus,
+  images,
+}) => {
   // Collapsed sections stay collapsed when switching between characters
   const [collapsed, setCollapsed] = useState(() => new Set());
   const isOpen = (section) => !collapsed.has(section);
@@ -87,7 +92,10 @@ const CharacterSheet = ({ characterData, imageGenerator, images }) => {
               />
             ))
           ) : (
-            <Button onClick={imageGenerator}>Generate Image?</Button>
+            <GenerateImageButton
+              status={imageStatus}
+              onGenerate={imageGenerator}
+            />
           )}
         </div>
 

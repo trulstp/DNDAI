@@ -14,6 +14,7 @@ import {
   classHints,
 } from "../../Arrays/options";
 import ChoiceGroup from "../Choice/ChoiceGroup";
+import { ErrorBanner } from "../Feedback/Feedback";
 import classes from "../Choice/Choice.module.css";
 
 // An empty value means random; the backend fills in anything left empty
@@ -50,7 +51,7 @@ const levelChoices = [
   ...levelOptions.map(({ value, label }) => ({ value, label: `Level ${label}` })),
 ];
 
-const CharInput = ({ selections, handleChange, getCharacter }) => {
+const CharInput = ({ selections, handleChange, getCharacter, error }) => {
   const { name, race, classType, level } = selections;
   const summary = [
     name.trim() || "Random name",
@@ -105,6 +106,8 @@ const CharInput = ({ selections, handleChange, getCharacter }) => {
             onChange={(value) => handleChange("level", value)}
           />
         </section>
+
+        {error && <ErrorBanner message={error} onRetry={getCharacter} />}
 
         <div className={classes.summary}>
           <span className={classes["summary-text"]}>{summary}</span>
