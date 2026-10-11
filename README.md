@@ -1,5 +1,7 @@
 # Support Roll
 
+[![CI](https://github.com/trulstp/DNDAI/actions/workflows/ci.yml/badge.svg)](https://github.com/trulstp/DNDAI/actions/workflows/ci.yml)
+
 **An AI-powered toolkit for Dungeons & Dragons Dungeon Masters.**
 
 Support Roll helps you prep a session in seconds. Pick a location and a challenge rating to roll a balanced combat encounter, or choose a race and class to generate a ready-to-play character. You get rules-based numbers, AI-written flavour text and AI-generated artwork.
@@ -157,7 +159,7 @@ npm start
 The API is now at `http://localhost:4000`.
 Use `npm run dev` instead to restart the server automatically when a file changes.
 
-Run the backend tests with `npm test`.
+Run the backend tests with `npm test`. GitHub Actions runs them on every pull request too, along with the frontend build and a check that the Docker image starts (`.github/workflows/ci.yml`).
 
 > MongoDB is optional at startup: the server still runs without it, but the encounter endpoints need it.
 
