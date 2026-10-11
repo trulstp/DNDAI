@@ -1,6 +1,6 @@
 /* min-height rather than height, so long content scrolls with the page (no inner scroller) */
 .main {
-    min-height: 100vh;
+    min-height: var(--app-height);
     width: 100%;
     display: flex;
     flex-direction: column;

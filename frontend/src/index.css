@@ -147,12 +147,25 @@ body::-webkit-scrollbar-thumb {
 
 
 
+/* The visible height. On phones 100vh is the height with the browser's toolbars hidden, but they
+   never hide here (the page scrolls inside <main>, not the window), so 100vh pages run behind them
+   and their bottom can't be reached. dvh follows the toolbars; older browsers keep 100vh */
+:root {
+  --app-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
 .App {
   background-color: var(--color-primary);
   transition: background-color 0.3s;
   display: flex;
   width: 100vw;
-  height: 100vh;
+  height: var(--app-height);
 }
 
 
