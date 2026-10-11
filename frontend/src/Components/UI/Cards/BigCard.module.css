@@ -3,36 +3,26 @@ main:focus {
     outline: none;
 }
 
-.with-sidebar {
+.with-sidebar,
+.collapsed {
     width: 100%;
-    height: 100vh;
-    margin-left: 16rem;
+    height: var(--app-height);
     flex-grow: 1;
-    transition: margin-left 0.3s ease-out;
- 
     overflow-y: auto; /* Allows vertical scrolling if content overflows */
+    transition: margin-left 0.3s ease-out;
+}
+
+.with-sidebar {
+    margin-left: 16rem;
 }
 
 .collapsed {
-    width: 100%;
-    height: 100vh;
     margin-left: 5rem;
-    flex-grow: 1;
-    overflow-y: auto; /* Allows vertical scrolling if content overflows */
-    transition: margin-left 0.3s ease-out;
 }
 
-
 @media only screen and (max-width: 600px) {
-    .with-sidebar {
-        width: 100%;
-        height: 100vh;
-        margin-left: 0rem;
-    }
-
+    .with-sidebar,
     .collapsed {
-        width: 100%;
-        height: 100vh;
-        margin-left: 0rem
+        margin-left: 0;
     }
 }
