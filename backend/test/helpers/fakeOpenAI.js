@@ -43,11 +43,26 @@ async function startFakeOpenAI() {
       .toBuffer()
   ).toString("base64");
   const requests = [];
+  // Set to true to answer like OpenAI does when the account has no credit left
+  const state = { outOfCredit: false };
 
   const server = http.createServer(async (req, res) => {
     const body = await readBody(req);
     requests.push({ path: req.url, body });
     res.setHeader("Content-Type", "application/json");
+
+    if (state.outOfCredit) {
+      res.statusCode = 429;
+      return res.end(
+        JSON.stringify({
+          error: {
+            message: "You exceeded your current quota, please check your plan and billing details.",
+            type: "insufficient_quota",
+            code: "insufficient_quota",
+          },
+        })
+      );
+    }
 
     if (req.url.endsWith("/chat/completions")) {
       const tool = body.tool_choice.function.name;
@@ -75,7 +90,7 @@ async function startFakeOpenAI() {
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   process.env.OPENAI_API_KEY = "test-key";
   process.env.OPENAI_BASE_URL = `http://127.0.0.1:${server.address().port}/v1`;
-  return { server, requests, FAKE_ENCOUNTER, FAKE_CHARACTER };
+  return { server, requests, state, FAKE_ENCOUNTER, FAKE_CHARACTER };
 }
 
 // Starts the app on a free port and returns fetches for its /app routes (getRoot for the others)

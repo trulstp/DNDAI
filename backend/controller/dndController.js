@@ -23,6 +23,34 @@ const CHAT_COMPLETIONS_URL = `${
   process.env.OPENAI_BASE_URL || "https://api.openai.com/v1"
 }/chat/completions`;
 
+// OpenAI's error codes for an account with no credit left
+const OUT_OF_CREDIT_CODES = ["insufficient_quota", "billing_hard_limit_reached"];
+
+// An Error for a failed chat completion, carrying OpenAI's error code like the OpenAI client's errors
+async function chatCompletionError(response) {
+  const errorData = await response.text();
+  const error = new Error(`HTTP error! Status: ${response.status} - ${errorData}`);
+  try {
+    error.code = JSON.parse(errorData).error?.code;
+  } catch {
+    // Not JSON; the message still has the details
+  }
+  return error;
+}
+
+// Logs a failed generation and answers with a reason the page can show. Running out of credit
+// gets its own code, so visitors see that the demo's AI budget is used up rather than a fault
+function sendGenerationError(res, label, error) {
+  console.error(`Error in ${label}:`, error.message);
+  if (OUT_OF_CREDIT_CODES.includes(error.code)) {
+    return res.status(503).json({
+      error: "The AI service is unavailable: its budget is used up",
+      code: "AI_UNAVAILABLE",
+    });
+  }
+  res.status(500).send("Internal Server Error");
+}
+
 // My API key for OpenAI
 const API_KEY = process.env.OPENAI_API_KEY;
 
@@ -70,8 +98,7 @@ const openaiImages = async (req, res) => {
     const { type, data } = await encodeImage(imageBuffer, req.body.format);
     res.type(type).send(data);
   } catch (error) {
-    console.error("Error in openaiImages:", error);
-    res.status(500).send("Internal Server Error");
+    sendGenerationError(res, "openaiImages", error);
   }
 };
 
@@ -132,8 +159,7 @@ const openaiImages2 = async (req, res) => {
     const { type, data } = await encodeImage(imageBuffer, req.body.format);
     res.type(type).send(data);
   } catch (error) {
-    console.error("Error in openaiImages2:", error);
-    res.status(500).send("Internal Server Error");
+    sendGenerationError(res, "openaiImages2", error);
   }
 };
 
@@ -375,8 +401,7 @@ const creator = async (req, res) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status} - ${errorData}`);
+      throw await chatCompletionError(response);
     }
 
     const responseData = await response.json();
@@ -405,8 +430,7 @@ const creator = async (req, res) => {
     res.json(characterData);
 
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    res.status(500).send("Internal Server Error");
+    sendGenerationError(res, "creator", error);
   }
 };
 
@@ -622,8 +646,7 @@ const encounter = async (req, res) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status} - ${errorData}`);
+      throw await chatCompletionError(response);
     }
 
     const responseData = await response.json();
@@ -653,8 +676,7 @@ const encounter = async (req, res) => {
     res.json(encounterData);
 
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    res.status(500).send("Internal Server Error");
+    sendGenerationError(res, "encounter", error);
   }
 };
 

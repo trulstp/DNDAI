@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Nav from "../Components/Nav/Nav";
 import BigCard from "../Components/UI/Cards/BigCard";
 import { Outlet } from "react-router-dom";
 import { SidebarProvider } from "../store/sidebar-provider";
 import { StorageNotice } from "../Components/UI/Feedback/Feedback";
+import { wakeServer } from "../util/api";
 
 const Root = () => {
+  // Start waking the backend while the visitor is still choosing what to make
+  useEffect(wakeServer, []);
+
   return (
     <React.Fragment>
       <SidebarProvider>

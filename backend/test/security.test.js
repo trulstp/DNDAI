@@ -195,3 +195,23 @@ test("the health check answers without the database", async () => {
 test("the client IP debug route is off unless turned on", async () => {
   assert.equal((await app.getRoot("/debug/client-ip")).status, 404);
 });
+
+test("when OpenAI is out of credit, every AI route says so instead of a generic error", async () => {
+  fakeOpenAI.state.outOfCredit = true;
+  try {
+    const encounterPrompt = fakeOpenAI.FAKE_ENCOUNTER.poster_description;
+    const portraitPrompt = fakeOpenAI.FAKE_CHARACTER.character_portrait;
+    for (const [path, body] of [
+      ["/schematic", ENCOUNTER_REQUEST],
+      ["/openaiCharacter", CHARACTER_REQUEST],
+      ["/images", { message: encounterPrompt, signature: signPrompt("encounter", encounterPrompt) }],
+      ["/images2", { message: portraitPrompt, signature: signPrompt("portrait", portraitPrompt) }],
+    ]) {
+      const response = await app.post(path, body);
+      assert.equal(response.status, 503, path);
+      assert.equal((await response.json()).code, "AI_UNAVAILABLE", path);
+    }
+  } finally {
+    fakeOpenAI.state.outOfCredit = false;
+  }
+});
