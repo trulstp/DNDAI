@@ -11,12 +11,12 @@ const HistoryItem = ({ item, active, onSelect, onToggleFavorite, onDelete }) => 
   if (confirming) {
     return (
       <li className={`${classes.item} ${classes.confirm}`}>
-        <span className={classes["confirm-text"]}>Delete “{item.title}”?</span>
+        <span className={classes["confirm-text"]}>Delete “{item.label}”?</span>
         <div className={classes["confirm-actions"]}>
           <button
             type='button'
             className={classes.danger}
-            onClick={() => onDelete(item.title)}
+            onClick={() => onDelete(item.id)}
           >
             Delete
           </button>
@@ -37,21 +37,21 @@ const HistoryItem = ({ item, active, onSelect, onToggleFavorite, onDelete }) => 
       <button
         type='button'
         className={classes.title}
-        onClick={() => onSelect(item.title)}
+        onClick={() => onSelect(item.id)}
         aria-current={active ? "true" : undefined}
       >
-        {item.title}
+        {item.label}
       </button>
       <div className={classes.actions}>
         <button
           type='button'
           className={`${classes.icon} ${item.favorite ? classes.starred : ""}`}
-          onClick={() => onToggleFavorite(item.title)}
+          onClick={() => onToggleFavorite(item.id)}
           aria-pressed={!!item.favorite}
           aria-label={
             item.favorite
-              ? `Remove ${item.title} from favourites`
-              : `Add ${item.title} to favourites`
+              ? `Remove ${item.label} from favourites`
+              : `Add ${item.label} to favourites`
           }
           title={item.favorite ? "Remove from favourites" : "Add to favourites"}
         >
@@ -62,7 +62,7 @@ const HistoryItem = ({ item, active, onSelect, onToggleFavorite, onDelete }) => 
             type='button'
             className={classes.icon}
             onClick={() => setConfirming(true)}
-            aria-label={`Delete ${item.title}`}
+            aria-label={`Delete ${item.label}`}
             title='Delete'
           >
             <FontAwesomeIcon icon={faTrashCan} />
@@ -80,9 +80,9 @@ const HistoryGroup = ({ label, items, ...itemProps }) =>
       <ul className={classes.history}>
         {items.map((item) => (
           <HistoryItem
-            key={item.title}
+            key={item.id}
             item={item}
-            active={item.title === itemProps.activeTitle}
+            active={item.id === itemProps.activeId}
             {...itemProps}
           />
         ))}
@@ -90,16 +90,29 @@ const HistoryGroup = ({ label, items, ...itemProps }) =>
     </section>
   );
 
-// items: [{ title, favorite }], newest first
+// Repeated titles get a number, counted from the oldest: "Title", "Title (2)", ...
+const withLabels = (items) => {
+  const seen = new Map();
+  const labels = new Map();
+  for (const item of [...items].reverse()) {
+    const count = (seen.get(item.title) || 0) + 1;
+    seen.set(item.title, count);
+    labels.set(item.id, count > 1 ? `${item.title} (${count})` : item.title);
+  }
+  return items.map((item) => ({ ...item, label: labels.get(item.id) }));
+};
+
+// items: [{ id, title, favorite }], newest first
 const Sidebar = (props) => {
+  const items = withLabels(props.items);
   const itemProps = {
-    activeTitle: props.activeTitle,
+    activeId: props.activeId,
     onSelect: props.handleClick,
     onToggleFavorite: props.onToggleFavorite,
     onDelete: props.onDelete,
   };
-  const favorites = props.items.filter((item) => item.favorite);
-  const others = props.items.filter((item) => !item.favorite);
+  const favorites = items.filter((item) => item.favorite);
+  const others = items.filter((item) => !item.favorite);
 
   return (
     <section className={classes["side-bar"]}>
@@ -109,7 +122,7 @@ const Sidebar = (props) => {
       <div className={classes.scroll}>
         <HistoryGroup label='Favourites' items={favorites} {...itemProps} />
         <HistoryGroup label='Recent' items={others} {...itemProps} />
-        {props.items.length === 0 && (
+        {items.length === 0 && (
           <p className={classes.empty}>Nothing saved yet.</p>
         )}
       </div>

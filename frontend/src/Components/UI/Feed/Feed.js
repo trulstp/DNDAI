@@ -34,7 +34,7 @@ const Feed = (props) => {
     <div className={classes.feed}>
       {props.currentEncounter?.map((chatMessage, index) => {
         const content = chatMessage.content;
-        const images = chatMessage.images || props.images;
+        const images = chatMessage.images;
 
         return (
           <article key={index} className={classes.encounter}>

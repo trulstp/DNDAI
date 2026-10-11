@@ -5,6 +5,7 @@ import RandomEncounter from "../Components/RandomEncounter/RandomEncounter";
 import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
+import { newId } from "../util/newId";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const RandomEncounterPage = () => {
@@ -12,14 +13,13 @@ const RandomEncounterPage = () => {
   const { previousEncounter, setPreviousEncounter } = sidebarCtx;
   const [value1, setValue1] = useState("");
   const [value2, setValue2] = useState("");
-  const [message, setMessage] = useState(null);
 
-  const [currentTitle, setCurrentTitle] = useState(null);
+  const [currentId, setCurrentId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [encounter, setEncounter] = useState("");
   const [feedActive, setFeedActive] = useState(false);
-  const [images, setImages] = useState(null);
   const [error, setError] = useState(null);
+  // Tied to the encounter it was started for, so switching encounters mid-generation can't mix them up
   const [imageStatus, setImageStatus] = useState({ state: "idle" });
   const [isVisible, setIsVisible] = useState({
     images: true,
@@ -33,60 +33,50 @@ const RandomEncounterPage = () => {
     mood_atmosphere: true,
   });
 
+  const currentEntry = previousEncounter.find((entry) => entry.id === currentId);
+
   const createNew = () => {
     setError(null);
-    setImageStatus({ state: "idle" });
     setFeedActive(false);
     setLoading(false);
-    setMessage(null);
     setValue1("");
     setValue2("");
-    setCurrentTitle(null);
-    setImages(null);
+    setCurrentId(null);
   };
 
-  const handleClick = (uniqueTitle) => {
+  const handleClick = (id) => {
     setError(null);
-    setImageStatus({ state: "idle" });
     setFeedActive(true);
     setLoading(false);
-    setCurrentTitle(uniqueTitle);
-    setMessage(null);
+    setCurrentId(id);
     setValue1("");
     setValue2("");
-    setImages(null);
   };
 
   const imageGenerator = async () => {
-    try {
-      const currentDescription =
-        currentEncounter[0]?.content?.poster_description;
-      if (!currentDescription) {
-        console.error("Poster description not found");
-        return;
-      }
+    const entry = currentEntry;
+    const description = entry?.content?.poster_description;
+    if (!description) {
+      console.error("Poster description not found");
+      return;
+    }
 
-      const options = {
+    try {
+      setImageStatus({ state: "loading", id: entry.id });
+      const response = await fetchOk(`${API}/app/images`, {
         method: "POST",
-        body: JSON.stringify({ message: currentDescription }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      setImageStatus({ state: "loading" });
-      const response = await fetchOk(`${API}/app/images`, options);
+        body: JSON.stringify({ message: description }),
+        headers: { "Content-Type": "application/json" },
+      });
       const imageUrl = await blobToDataUrl(await response.blob());
 
-      setImages([imageUrl]);
-      setPreviousEncounter((prevChats) =>
-        prevChats.map((chat) =>
-          chat.title === currentTitle ? { ...chat, images: [imageUrl] } : chat
-        )
+      setPreviousEncounter((prev) =>
+        prev.map((e) => (e.id === entry.id ? { ...e, images: [imageUrl] } : e))
       );
       setImageStatus({ state: "idle" });
     } catch (error) {
       console.error("Error in imageGenerator:", error);
-      setImageStatus({ state: "error", message: error.message });
+      setImageStatus({ state: "error", message: error.message, id: entry.id });
     }
   };
 
@@ -99,36 +89,36 @@ const RandomEncounterPage = () => {
           value1
         )}&challengeRating=${encodeURIComponent(value2)}`
       );
-      const firstData = await firstResponse.json();
-      if (firstData.length === 0) {
+      const monsters = await firstResponse.json();
+      if (monsters.length === 0) {
         throw new Error(
           "No monsters live in that location at this challenge rating. Try another combination."
         );
       }
-      setEncounter(firstData);
+      setEncounter(monsters);
 
-      const options = {
+      const secondResponse = await fetchOk(`${API}/app/schematic`, {
         method: "POST",
         body: JSON.stringify({
-          message: {
-            monsters: firstData,
-            location: value1,
-            challengeRating: value2,
-          },
+          message: { monsters, location: value1, challengeRating: value2 },
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const secondResponse = await fetchOk(`${API}/app/schematic`, options);
-      const data = await secondResponse.json();
-      // Check if the response has the expected structure
-      if (data && typeof data === "object" && "title" in data) {
-        setMessage(data);
-        setFeedActive(true);
-      } else {
+        headers: { "Content-Type": "application/json" },
+      });
+      const content = await secondResponse.json();
+      if (!content || typeof content !== "object" || !("title" in content)) {
         throw new Error("The AI returned an incomplete encounter. Try again.");
       }
+
+      const entry = {
+        id: newId(),
+        title: content.title,
+        content,
+        // Monsters rolled for this encounter, used for stat blocks
+        monsterList: monsters,
+      };
+      setPreviousEncounter((prev) => [...prev, entry]);
+      setCurrentId(entry.id);
+      setFeedActive(true);
     } catch (error) {
       console.error("Error generating encounter:", error);
       setError(error.message);
@@ -137,66 +127,37 @@ const RandomEncounterPage = () => {
     }
   };
 
-  // Use effect for setting the title based on message
-  useEffect(() => {
-    if (message && !currentTitle) {
-      setCurrentTitle(message.title);
-    }
-  }, [message, currentTitle]);
+  // Sidebar items, newest first
+  const historyItems = [...previousEncounter].reverse().map((entry) => ({
+    id: entry.id,
+    title: entry.title,
+    favorite: !!entry.favorite,
+  }));
 
-  // Use effect for updating the previousChats
-  useEffect(() => {
-    if (currentTitle && message) {
-      setPreviousEncounter((prevChats) => [
-        ...prevChats,
-        {
-          title: currentTitle,
-          role: message.role,
-          content: message,
-          // Monsters rolled for this encounter, used for stat blocks
-          monsterList: Array.isArray(encounter) ? encounter : [],
-        },
-      ]);
-    }
-  }, [currentTitle, message, encounter, setPreviousEncounter]);
-
-  const currentEncounter = previousEncounter.filter(
-    (previousEncounter) => previousEncounter.title === currentTitle
-  );
-
-  // Sidebar items, newest first, one per title
-  const historyItems = [];
-  for (const entry of [...previousEncounter].reverse()) {
-    if (!historyItems.some((item) => item.title === entry.title)) {
-      historyItems.push({ title: entry.title, favorite: !!entry.favorite });
-    }
-  }
-
-  const toggleFavorite = (title) => {
-    setPreviousEncounter((prev) => {
-      const favorite = !prev.some((e) => e.title === title && e.favorite);
-      return prev.map((e) => (e.title === title ? { ...e, favorite } : e));
-    });
+  const toggleFavorite = (id) => {
+    setPreviousEncounter((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, favorite: !e.favorite } : e))
+    );
   };
 
-  const deleteEncounter = (title) => {
-    setPreviousEncounter((prev) => prev.filter((e) => e.title !== title));
-    if (title === currentTitle) createNew();
+  const deleteEncounter = (id) => {
+    setPreviousEncounter((prev) => prev.filter((e) => e.id !== id));
+    if (id === currentId) createNew();
   };
 
   // Opened from the home page's Recent list: show that encounter, then clear the request
   // so a reload doesn't reopen it
   const location = useLocation();
   const navigate = useNavigate();
-  const openTitle = location.state?.openTitle;
+  const openId = location.state?.openId;
   useEffect(() => {
-    if (!openTitle) return;
-    if (previousEncounter.some((entry) => entry.title === openTitle)) {
-      handleClick(openTitle);
+    if (!openId) return;
+    if (previousEncounter.some((entry) => entry.id === openId)) {
+      handleClick(openId);
     }
     navigate(location.pathname, { replace: true, state: null });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openTitle]);
+  }, [openId]);
 
   const toggleVisibility = (section) => {
     setIsVisible((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -209,7 +170,7 @@ const RandomEncounterPage = () => {
           createNewEncounter={createNew}
           handleClick={handleClick}
           items={historyItems}
-          activeTitle={feedActive ? currentTitle : null}
+          activeId={feedActive ? currentId : null}
           onToggleFavorite={toggleFavorite}
           onDelete={deleteEncounter}
           button={"+ New Encounter"}
@@ -217,25 +178,21 @@ const RandomEncounterPage = () => {
       )}
 
       <RandomEncounter
-        currentEncounter={currentEncounter}
-        currentTitle={currentTitle}
+        currentEncounter={currentEntry ? [currentEntry] : []}
         value1={value1}
         value2={value2}
         setValue1={setValue1}
         setValue2={setValue2}
         getMessages={getMessages}
         error={error}
-        imageStatus={imageStatus}
+        imageStatus={
+          imageStatus.id === currentId ? imageStatus : { state: "idle" }
+        }
         loading={loading}
-        setLoading={setLoading}
         feedActive={feedActive}
-        setFeedActive={setFeedActive}
         encounter={encounter}
-        images={images}
         imageGenerator={imageGenerator}
-        setImages={setImages}
         isVisible={isVisible}
-        setIsVisible={setIsVisible}
         toggleVisibility={toggleVisibility}
       />
     </React.Fragment>
