@@ -27,7 +27,7 @@
   color-scheme: dark;
 
   /* Accent and red are lightened for dark backgrounds so text meets WCAG AA contrast (4.5:1) */
-  --text-primary: #CB9279; /* accent: headings, labels, borders */
+  --text-primary: #E38B5F; /* accent: headings, labels, borders */
   --text-secondary: #ffffff; /* strongest text */
   --text-tertiary: #EA5555; /* highlight red */
   --text-body: rgba(255, 255, 255, 0.85);
