@@ -68,8 +68,9 @@ Support Roll helps you prep a session in seconds. Pick a location and a challeng
 DNDAI/
 ├── .nvmrc                     # Node version (24)
 ├── backend/
-│   ├── server.js              # MongoDB connection, HTTP/HTTPS
-│   ├── app.js                 # Express app: CORS, body limit, rate limits, routes
+│   ├── server.js              # MongoDB connection, HTTP/HTTPS, clean shutdown
+│   ├── app.js                 # Express app: CORS, body limit, rate limits, routes, /health
+│   ├── Dockerfile             # Container with Node 24 and Python 3, for hosting
 │   ├── routes/
 │   │   └── dndRoutes.js       # /app/* endpoints
 │   ├── controller/
@@ -184,11 +185,22 @@ node scripts/seedMonsters.js
 node scripts/syncOpen5e.js
 ```
 
+### 5. Run the backend in Docker (optional)
+The backend ships with a `Dockerfile`, which is how it's hosted. It bundles Node 24 and Python 3, so nothing else needs to be installed:
+
+```bash
+cd backend
+docker build -t supportroll-backend .
+docker run --env-file .env -p 4000:4000 supportroll-backend
+```
+
+Docker's `--env-file` needs `KEY=value` lines without spaces around the `=`.
+
 ---
 
 ## API Reference
 
-All endpoints are under `/app`.
+All endpoints are under `/app`, except `GET /health`, which returns `{ "status": "ok", "database": "connected" }` for the host's health checks.
 
 | Method | Endpoint | Description |
 |---|---|---|

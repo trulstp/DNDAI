@@ -1,0 +1,10 @@
+# Built for the machine they were installed on; the image installs its own
+node_modules
+# Secrets are given to the container by the host, never copied into the image
+.env
+.env.*
+test
+Dockerfile
+.dockerignore
+*.log
+.DS_Store

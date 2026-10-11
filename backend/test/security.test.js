@@ -185,3 +185,9 @@ test("responses don't advertise Express", async () => {
   const response = await app.get("/locations");
   assert.equal(response.headers.get("x-powered-by"), null);
 });
+
+test("the health check answers without the database", async () => {
+  const response = await app.getRoot("/health");
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { status: "ok", database: "disconnected" });
+});

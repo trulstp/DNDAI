@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const cors = require("cors");
 const monsterRoutes = require("./routes/dndRoutes");
 const { generalLimit } = require("./middleware/limits");
@@ -23,6 +24,17 @@ app.set("trust proxy", trustProxy);
 app.use(cors({ origin: corsOrigins }));
 // The largest real request (a character's stats and skills) is about 1 KB
 app.use(express.json({ limit: "20kb" }));
+
+// For the host's health checks: 200 whenever the server is up. The database is reported but not
+// required, since the character creator works without it and a database blip shouldn't get the
+// server restarted
+app.get("/health", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({
+    status: "ok",
+    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+  });
+});
 
 app.use("/app", generalLimit, monsterRoutes);
 
