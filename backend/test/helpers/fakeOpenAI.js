@@ -78,13 +78,14 @@ async function startFakeOpenAI() {
   return { server, requests, FAKE_ENCOUNTER, FAKE_CHARACTER };
 }
 
-// Starts the app on a free port and returns a fetch for its /app routes
+// Starts the app on a free port and returns fetches for its /app routes (getRoot for the others)
 async function startApp() {
   const app = require("../../app");
   const server = await new Promise((resolve) => {
     const s = app.listen(0, "127.0.0.1", () => resolve(s));
   });
-  const base = `http://127.0.0.1:${server.address().port}/app`;
+  const root = `http://127.0.0.1:${server.address().port}`;
+  const base = `${root}/app`;
   const post = (path, body, headers = {}) =>
     fetch(`${base}${path}`, {
       method: "POST",
@@ -92,7 +93,8 @@ async function startApp() {
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
   const get = (path, headers = {}) => fetch(`${base}${path}`, { headers });
-  return { server, post, get };
+  const getRoot = (path) => fetch(`${root}${path}`);
+  return { server, post, get, getRoot };
 }
 
 module.exports = { startFakeOpenAI, startApp };
