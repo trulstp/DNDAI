@@ -25,7 +25,7 @@ const CharacterCreatorPage = () => {
   const [charInfo2, setCharInfo2] = useState("");
 
   const handleChange = (field, value) => {
-    setSelections({ ...selections, [field]: value });
+    setSelections((prev) => ({ ...prev, [field]: value }));
   };
 
   const createNew = () => {

@@ -1,0 +1,335 @@
+/* Shared layout and controls for the encounter and character selection screens */
+
+.page {
+  width: 100%;
+  padding: 2rem 1.5rem 3rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+/* margin: auto centres the panel but still lets it scroll from the top when taller than the screen */
+.panel {
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.title {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-tertiary);
+  color: var(--text-primary);
+  font-size: 2.4rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field-label {
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--text-primary);
+  font-family: var(--font-tertiary);
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  text-align: left;
+}
+
+.group-label {
+  margin: 0.5rem 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Search and text inputs */
+.input-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS zooming in on focus */
+  color: var(--text-secondary);
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-tertiary);
+  border-radius: 8px;
+}
+
+.input::placeholder {
+  color: var(--text-faint);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--text-primary);
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Chips: compact options that wrap */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip,
+.tile {
+  font: inherit;
+  color: var(--text-body);
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-tertiary);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+}
+
+/* Tiles: larger options with an optional icon and hint */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border-top: 3px solid var(--color-tertiary);
+  text-align: left;
+}
+
+.chip:hover,
+.tile:hover {
+  border-color: var(--text-primary);
+}
+
+.chip:focus-visible,
+.tile:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible,
+.range:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.selected {
+  border-color: var(--text-primary);
+  background-color: var(--hover-tint);
+  color: var(--text-secondary);
+}
+
+.chip.selected {
+  background-color: var(--text-primary);
+  color: var(--color-secondary);
+}
+
+.tile.selected {
+  border-top-color: var(--text-primary);
+}
+
+/* Sized explicitly: Home.module.css has a global svg rule (full width, bottom margin) that would otherwise apply */
+.icon {
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.chip.selected .icon {
+  color: var(--color-secondary);
+}
+
+.tile .icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.15rem;
+}
+
+.optionLabel {
+  font-weight: 600;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Slider */
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.slider-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.slider-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-secondary);
+  min-width: 2ch;
+}
+
+.slider-caption {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  margin: 0.6rem 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--text-primary) var(--fill),
+    var(--color-tertiary) var(--fill)
+  );
+  cursor: pointer;
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 3px solid var(--color-secondary);
+  box-shadow: 0 1px 4px var(--shadow);
+}
+
+.range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 3px solid var(--color-secondary);
+  box-shadow: 0 1px 4px var(--shadow);
+}
+
+.slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+
+/* Summary bar with the main action */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
+  background-color: var(--color-secondary);
+  border-top: 4px solid var(--text-primary);
+  border-radius: 0 0 10px 10px;
+}
+
+.summary-text {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.summary-text.pending {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.primary,
+.secondary {
+  font: inherit;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.primary {
+  padding: 0.75rem 1.5rem;
+  color: var(--color-secondary);
+  background-color: var(--text-primary);
+  border: none;
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem;
+  color: var(--text-primary);
+  background: none;
+  border: 1px solid var(--text-primary);
+}
+
+.secondary:hover {
+  background-color: var(--hover-tint);
+}
+
+/* Phones: leave room for the fixed bottom nav and make the action full width */
+@media only screen and (max-width: 600px) {
+  .page {
+    padding: 1.25rem 1rem 7rem;
+  }
+
+  .title {
+    font-size: 1.9rem;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .primary {
+    width: 100%;
+  }
+}

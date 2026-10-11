@@ -1,146 +1,125 @@
-import React, { useRef } from "react";
+import React from "react";
 
 import Button from "../Buttons/Button";
 import MonsterList from "./MonsterList";
 import classes from "./Feed.module.css";
 
+const TOP_SECTIONS = [
+  ["location", "Location"],
+  ["mood_atmosphere", "Mood and Atmosphere"],
+];
+
+const BOTTOM_SECTIONS = [
+  ["obstacles", "Obstacles"],
+  ["allies_npcs", "Allied NPCs"],
+  ["treasure_rewards", "Treasure"],
+  ["random_events_twists", "Random Twists"],
+];
+
+// A card whose heading collapses its content
+const Section = ({ title, text, isVisible, onToggle, className, children }) => (
+  <section className={`${classes.card} ${className || ""}`}>
+    <button
+      type='button'
+      className={classes.heading}
+      onClick={onToggle}
+      aria-expanded={isVisible}
+    >
+      <span>{title}</span>
+      <span className={classes.caret} aria-hidden='true'>
+        {isVisible ? "−" : "+"}
+      </span>
+    </button>
+    {isVisible && (
+      <>
+        {text && <p className={classes.text}>{text}</p>}
+        {children}
+      </>
+    )}
+  </section>
+);
+
 const Feed = (props) => {
-  const feedContainerRef = useRef(null);
+  const sectionProps = (field) => ({
+    isVisible: props.isVisible[field],
+    onToggle: () => props.toggleVisibility(field),
+  });
 
   return (
-    <div className={`${classes.feed}`} ref={feedContainerRef}>
-      {props.currentEncounter?.map((chatMessage, index) => (
-        <div key={index}>
-          <h1 onClick={() => props.toggleVisibility("images")}>
-            {chatMessage.content.title}
-          </h1>
-          <div className={classes["section-container"]}>
-            {props.isVisible.images &&
-              (chatMessage.images || props.images) &&
-              (chatMessage.images || props.images).map((image, imageIndex) => (
-                <section
-                  key={imageIndex}
-                  className={classes.section}
-                  onClick={() => props.toggleVisibility("images")}
-                >
-                  <img
-                    className={classes.image}
-                    loading='lazy'
-                    key={index}
-                    src={image} // Directly using the AVIF image URL
-                    alt={chatMessage.content.title}
+    <div className={classes.feed}>
+      {props.currentEncounter?.map((chatMessage, index) => {
+        const content = chatMessage.content;
+        const images = chatMessage.images || props.images;
+
+        return (
+          <article key={index} className={classes.encounter}>
+            <h1 className={classes.title}>{content.title}</h1>
+
+            <div className={classes.top}>
+              <div className={classes.media}>
+                {images?.length ? (
+                  images.map((image, imageIndex) => (
+                    <img
+                      key={imageIndex}
+                      className={classes.image}
+                      loading='lazy'
+                      src={image}
+                      alt={content.title}
+                    />
+                  ))
+                ) : (
+                  <div className={classes.placeholder}>
+                    <p>No artwork for this encounter yet.</p>
+                    <Button onClick={() => props.imageGenerator()}>
+                      Generate Image?
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className={classes.stack}>
+                {TOP_SECTIONS.map(([field, title]) => (
+                  <Section
+                    key={field}
+                    title={title}
+                    text={content[field]}
+                    {...sectionProps(field)}
                   />
-                </section>
+                ))}
+              </div>
+            </div>
+
+            <Section
+              title='Monsters'
+              text={content.monsters}
+              {...sectionProps("monsters")}
+            >
+              {/* Older saved encounters have no monster list */}
+              {chatMessage.monsterList?.length > 0 && (
+                <MonsterList
+                  key={chatMessage.monsterList
+                    .map((monster) => monster.monsterName)
+                    .join(",")}
+                  monsters={chatMessage.monsterList}
+                  isVisible={props.isVisible.stat_blocks}
+                  toggleVisibility={() => props.toggleVisibility("stat_blocks")}
+                />
+              )}
+            </Section>
+
+            <div className={classes.grid}>
+              {BOTTOM_SECTIONS.map(([field, title]) => (
+                <Section
+                  key={field}
+                  title={title}
+                  text={content[field]}
+                  {...sectionProps(field)}
+                />
               ))}
-            {!chatMessage.images && !props.images && (
-              <section className={classes.section}>
-                <h2>Image</h2>
-                <div className={classes["image-button"]}>
-                  <Button onClick={() => props.imageGenerator()}>
-                    Generate Image?
-                  </Button>
-                </div>
-              </section>
-            )}
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("location")}
-            >
-              <h2 className={classes.heading}>Location</h2>
-              {props.isVisible.location && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.location}
-                </p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("mood_atmosphere")}
-            >
-              <h2 className={classes.heading}>Mood and Atmosphere</h2>
-              {props.isVisible.mood_atmosphere && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.mood_atmosphere}
-                </p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("monsters")}
-            >
-              <h2 className={classes.heading}>Monsters</h2>
-              {props.isVisible.monsters && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.monsters}
-                </p>
-              )}
-            </section>
-
-            {/* Older saved encounters have no monster list */}
-            {chatMessage.monsterList?.length > 0 && (
-              <MonsterList
-                key={chatMessage.monsterList
-                  .map((monster) => monster.monsterName)
-                  .join(",")}
-                monsters={chatMessage.monsterList}
-                isVisible={props.isVisible.stat_blocks}
-                toggleVisibility={() => props.toggleVisibility("stat_blocks")}
-              />
-            )}
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("obstacles")}
-            >
-              <h2 className={classes.heading}>Obstacles</h2>
-              {props.isVisible.obstacles && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.obstacles}
-                </p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("allies_npcs")}
-            >
-              <h2 className={classes.heading}>Allied NPCs</h2>
-              {props.isVisible.allies_npcs && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.allies_npcs}
-                </p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("treasure_rewards")}
-            >
-              <h2 className={classes.heading}>Treasure</h2>
-              {props.isVisible.treasure_rewards && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.treasure_rewards}
-                </p>
-              )}
-            </section>
-
-            <section
-              className={classes.section}
-              onClick={() => props.toggleVisibility("random_events_twists")}
-            >
-              <h2 className={classes.heading}>Random Twists</h2>
-              {props.isVisible.random_events_twists && (
-                <p className={classes.paragraph}>
-                  {chatMessage.content.random_events_twists}
-                </p>
-              )}
-            </section>
-          </div>
-        </div>
-      ))}
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 };

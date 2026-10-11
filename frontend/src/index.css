@@ -73,6 +73,12 @@ body {
   
 }
 
+/* Page titles use the display font across the app */
+h1 {
+  font-family: var(--font-tertiary);
+  color: var(--text-primary);
+}
+
 body::-webkit-scrollbar {
   width: 0.25rem;
 }

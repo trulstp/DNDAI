@@ -714,15 +714,16 @@ const getCharacter = (req, res) => {
   const name = req.body.name || "random";
   const charClass = req.body.classType || "random";
   const race = req.body.race || "random";
-  const level = req.body.level || 1; // Default level if not provided
+  const level = req.body.level;
 
   const args = [
     "scripts/Class_creator.py", // Ensure this is the correct path to your Python script
     name,
     charClass,
     race,
-    String(level), // Convert level to a string to ensure all args are strings
   ];
+  // Without a level argument the script rolls a random level
+  if (level) args.push(String(level));
 
   // Change "python" to "python3" or the correct path to your Python executable
   const python = spawn("python3", args);

@@ -57,7 +57,17 @@ const MonsterList = ({ monsters, isVisible, toggleVisibility }) => {
 
   return (
     <div className={classes["monster-list"]}>
-      <h2 onClick={toggleVisibility}>Stat Blocks</h2>
+      <button
+        type='button'
+        className={classes.heading}
+        onClick={toggleVisibility}
+        aria-expanded={isVisible}
+      >
+        <span>Stat Blocks</span>
+        <span className={classes.toggle} aria-hidden='true'>
+          {isVisible ? "−" : "+"}
+        </span>
+      </button>
       {isVisible && (
         <>
           {status === "loading" && <p>Loading stat blocks...</p>}
