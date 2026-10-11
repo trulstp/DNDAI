@@ -31,7 +31,7 @@ Support Roll helps you prep a session in seconds. Pick a location and a challeng
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18 (Create React App), React Router 6, react-select, CSS Modules, Font Awesome |
+| Frontend | React 18 (Vite), React Router 6, CSS Modules, Font Awesome |
 | Backend | Node.js, Express 4, Mongoose 7 |
 | Database | MongoDB (monster catalogue) |
 | AI | OpenAI Chat Completions with function/tool calling for structured JSON, OpenAI Images (`gpt-image-1-mini`) |
@@ -141,7 +141,7 @@ npm install
 
 Create `frontend/.env` (optional; defaults to `http://localhost:4000`):
 ```env
-REACT_APP_API_BASE_URL=http://localhost:4000
+VITE_API_BASE_URL=http://localhost:4000
 ```
 
 Start the dev server:
