@@ -8,6 +8,7 @@ import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
 import { newId } from "../util/newId";
+import { useDocumentTitle } from "../util/useDocumentTitle";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const EMPTY_SELECTIONS = { name: "", race: "", classType: "", level: "" };
@@ -34,6 +35,14 @@ const CharacterCreatorPage = () => {
   const [imageStatus, setImageStatus] = useState({ state: "idle" });
 
   const currentCharacter = previousChats.find((chat) => chat.id === currentId);
+
+  useDocumentTitle(
+    loading
+      ? "Creating character…"
+      : feedActive && currentCharacter
+        ? currentCharacter.title
+        : "Character Creator",
+  );
 
   const handleChange = (field, value) => {
     setSelections((prev) => ({ ...prev, [field]: value }));
@@ -200,7 +209,7 @@ const CharacterCreatorPage = () => {
           createNewEncounter={createNew}
           handleClick={handleSidebarClick}
           title='Character'
-          button='+ New Character'
+          button='New character'
           items={historyItems}
           activeId={feedActive ? currentId : null}
           onToggleFavorite={toggleFavorite}

@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faStar, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import classes from "./Sidebar.module.css";
-import Button from "../Buttons/Button";
+import choice from "../Choice/Choice.module.css";
 import { SidebarContext } from "../../../store/sidebar-context";
 
 // On phones the sidebar covers the page, so it closes once a choice is made
@@ -149,14 +149,19 @@ const Sidebar = (props) => {
           <span>History</span>
         </h2>
         <div className={classes["sidebar-button"]}>
-          <Button
+          <button
+            type='button'
+            className={`${choice.secondary} ${classes["new-button"]}`}
             onClick={() => {
               props.createNewEncounter();
               closeOnPhone();
             }}
           >
+            <FontAwesomeIcon icon={faPlus} className={choice.icon} />
             {props.button}
-          </Button>
+          </button>
+          {/* History lives in localStorage, so say so before someone clears their browser */}
+          <p className={classes.note}>Saved in this browser only</p>
         </div>
         <div className={classes.scroll}>
           <HistoryGroup label='Favourites' items={favorites} {...itemProps} />

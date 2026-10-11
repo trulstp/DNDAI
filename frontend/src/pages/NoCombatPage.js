@@ -1,4 +1,8 @@
+import { useDocumentTitle } from "../util/useDocumentTitle";
+
 const NoCombatPage = () => {
+  useDocumentTitle("Non-Combat Encounters");
+
   return (
     <div>
       <h1>Non-Combat Encounter</h1>

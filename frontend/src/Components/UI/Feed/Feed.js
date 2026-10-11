@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import { GenerateImageButton } from "../Feedback/Feedback";
+import { ImagePlaceholder } from "../Feedback/Feedback";
 import ResultActions from "../Choice/ResultActions";
 import { titleCase } from "../../../util/format";
 import MonsterList from "./MonsterList";
@@ -89,13 +89,11 @@ const Feed = (props) => {
                     />
                   ))
                 ) : (
-                  <div className={classes.placeholder}>
-                    <p>No artwork for this encounter yet.</p>
-                    <GenerateImageButton
-                      status={props.imageStatus}
-                      onGenerate={props.imageGenerator}
-                    />
-                  </div>
+                  <ImagePlaceholder
+                    kind='artwork'
+                    status={props.imageStatus}
+                    onGenerate={props.imageGenerator}
+                  />
                 )}
               </div>
 

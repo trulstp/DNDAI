@@ -51,8 +51,23 @@
 
 .sidebar-button {
   display: flex;
-  margin-top: 1.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+  padding: 0 0.75rem;
+}
+
+.new-button {
   justify-content: center;
+  padding: 0.55rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.72rem;
+  text-align: center;
+  color: var(--text-faint);
 }
 
 .scroll {

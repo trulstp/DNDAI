@@ -1,4 +1,4 @@
-import { GenerateImageButton } from "../Feedback/Feedback";
+import { ImagePlaceholder } from "../Feedback/Feedback";
 import React, { useEffect, useRef, useState } from "react";
 import ResultActions from "../Choice/ResultActions";
 import {
@@ -110,7 +110,8 @@ const CharacterSheet = ({
                 />
               ))
             ) : (
-              <GenerateImageButton
+              <ImagePlaceholder
+                kind='portrait'
                 status={imageStatus}
                 onGenerate={imageGenerator}
               />
