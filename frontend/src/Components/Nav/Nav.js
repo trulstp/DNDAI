@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./Nav.module.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { SidebarContext } from "../../store/sidebar-context";
 import { useContext } from "react";
 import logo from "../../Images/logo.svg";
@@ -13,14 +13,17 @@ import {
   faSun,
 } from "@fortawesome/free-solid-svg-icons";
 
+// The current page's icon is shown in colour; NavLink also sets aria-current
+const navLinkClass = ({ isActive }) =>
+  `${classes["nav-link"]} ${isActive ? classes.active : ""}`;
+
 const Nav = () => {
   const {
     handleSidebar,
     handleLightMode,
     lightMode,
     sidebarOpen,
-    handleHover,
-    handleHoverOff,
+    historyAvailable,
   } = useContext(SidebarContext);
 
   const location = useLocation();
@@ -29,14 +32,9 @@ const Nav = () => {
     ? "Character"
     : "Encounter";
 
-  const history = sidebarOpen ? "history" : "";
-  const historyNav = sidebarOpen ? "historyNav" : "navbar";
-
   return (
     <nav
-      className={`${classes[historyNav]}`}
-      onMouseEnter={() => handleHover()}
-      onMouseLeave={() => handleHoverOff()}
+      className={`${classes.navbar} ${sidebarOpen ? classes.historyNav : ""}`}
     >
       <ul className={classes["navbar-nav"]}>
         <li className={classes["logo"]}>
@@ -66,41 +64,61 @@ const Nav = () => {
             <img src={logo} alt='' className={classes["logo-mark"]} />
           </Link>
         </li>
+        {/* Only the encounter and character pages have a history sidebar */}
+        {historyAvailable && (
+          <li className={classes["nav-item"]}>
+            <button
+              type='button'
+              onClick={handleSidebar}
+              className={`${classes["nav-link"]} ${classes["nav-button"]} ${
+                sidebarOpen ? classes.history : ""
+              }`}
+              aria-expanded={sidebarOpen}
+              aria-label={`${historyTitle} history`}
+            >
+              <FontAwesomeIcon
+                icon={faScroll}
+                className={classes["icon-wide"]}
+              />
+              <span className={classes["link-text"]}>History</span>
+            </button>
+          </li>
+        )}
         <li className={classes["nav-item"]}>
-          <button
-            type='button'
-            onClick={handleSidebar}
-            className={`${classes["nav-link"]} ${classes["nav-button"]} ${classes[history]}`}
-            aria-expanded={sidebarOpen}
+          <NavLink
+            to='/encounter'
+            className={navLinkClass}
+            aria-label='Random Encounter'
           >
-            <FontAwesomeIcon icon={faScroll} className={classes["icon-wide"]} />
-            <span className={classes["link-text"]}>History</span>
-          </button>
-        </li>
-        <li className={classes["nav-item"]}>
-          <Link to='/encounter' className={classes["nav-link"]}>
             <FontAwesomeIcon icon={faDragon} />
             <span className={classes["link-text"]}>Random Encounter</span>
-          </Link>
+          </NavLink>
         </li>
         <li className={classes["nav-item"]}>
-          <Link to='/creator' className={classes["nav-link"]}>
+          <NavLink
+            to='/creator'
+            className={navLinkClass}
+            aria-label='Character Creator'
+          >
             <FontAwesomeIcon icon={faHatWizard} />
             <span className={classes["link-text"]}>Character Creator</span>
-          </Link>
+          </NavLink>
         </li>
         {/* Hidden until login works:
         <li className={classes["nav-item"]}>
-          <Link to='/login' className={classes["nav-link"]}>
+          <NavLink to='/login' className={navLinkClass} aria-label='Login'>
             <FontAwesomeIcon icon={faRightToBracket} />
             <span className={classes["link-text"]}>Login</span>
-          </Link>
+          </NavLink>
         </li> */}
-        <li className={classes["nav-item"]}>
+        <li className={`${classes["nav-item"]} ${classes["nav-bottom"]}`}>
           <button
             type='button'
             onClick={handleLightMode}
             className={`${classes["nav-link"]} ${classes["nav-button"]}`}
+            aria-label={
+              lightMode ? "Switch to dark mode" : "Switch to light mode"
+            }
           >
             <FontAwesomeIcon icon={lightMode ? faMoon : faSun} />
             <span className={classes["link-text"]}>

@@ -203,15 +203,31 @@
   }
 }
 
+.backdrop {
+  display: none;
+}
+
+/* Phones: a drawer over a dimmed page, above the bottom nav's top edge */
 @media only screen and (max-width: 600px) {
+  .backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 5rem;
+    z-index: 102;
+    background-color: rgba(0, 0, 0, 0.45);
+  }
+
   .side-bar {
-    margin-left: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    width: min(80vw, 20rem);
     height: calc(100vh - 5rem);
-    position: absolute;
-    margin-top: 0rem;
-    z-index: 100;
-    width: 50%;
-    transition: width var(--transition-speed), margin-left var(--transition-speed);
-    transform: translateX(0rem);
+    transform: none;
+    box-shadow: 4px 0 16px var(--shadow);
   }
 }
