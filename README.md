@@ -130,6 +130,9 @@ Start the server:
 npm start
 ```
 The API is now at `http://localhost:4000`.
+Use `npm run dev` instead to restart the server automatically when a file changes.
+
+Run the backend tests with `npm test`.
 
 > MongoDB is optional at startup: the server still runs without it, but the encounter endpoints need it.
 
@@ -180,7 +183,6 @@ All endpoints are under `/app`.
 | `POST` | `/openaiCharacter` | `{ message: { name, race, class, level, alignment, stats, skills } }` → personality and backstory JSON |
 | `POST` | `/images` | `{ message: prompt }` → landscape AVIF image (1536×1024) |
 | `POST` | `/images2` | `{ message: prompt }` → portrait AVIF image (1024×1536) |
-| `POST` | `/completions` | `{ message }` → plain chat completion |
 
 ---
 

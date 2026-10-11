@@ -2,7 +2,6 @@ const monsterSchema = require("../models/DnDSchema");
 const Statblock = require("../models/statblockSchema");
 const mongoose = require("mongoose");
 const path = require("path");
-const axios = require("axios");
 const fetch = require("node-fetch");
 const sharp = require("sharp");
 const dotenv = require("dotenv");
@@ -58,36 +57,6 @@ const register = async (req, res) => {
 
 // My API key for OpenAI
 const API_KEY = process.env.OPENAI_API_KEY;
-
-// gets a response from openai based on a message
-const openaimessage = async (req, res) => {
-  const options = {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    data: {
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "user",
-          content: req.body.message,
-        },
-      ],
-      max_tokens: 600,
-    },
-    url: "https://api.openai.com/v1/chat/completions",
-  };
-
-  try {
-    const response = await axios(options);
-    res.send(response.data);
-  } catch (error) {
-    console.error("Error in openaimessage:", error.message);
-    res.status(500).send("Internal Server Error");
-  }
-};
 
 // Browsers that can't show AVIF (older Safari and iOS) ask for WebP instead.
 // AVIF is the default: about half the size of WebP for these images
@@ -863,7 +832,6 @@ module.exports = {
   register,
   getMonstersByLocationAndCR,
   getAllMonsters,
-  openaimessage,
   openaiImages,
   getMonstersByLocation,
   getLocations,
