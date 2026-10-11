@@ -143,7 +143,9 @@ Optional settings, mostly for a deployed server:
 | Variable | Default | What it does |
 |---|---|---|
 | `CORS_ORIGINS` | `http://localhost:3000,https://supportroll.netlify.app` | Sites allowed to call the API, comma separated |
-| `TRUST_PROXY` | `0` | Number of proxies in front of the server (set it on hosts like Render, so rate limits see each visitor's own IP) |
+| `TRUST_PROXY` | `0` | Number of proxies in front of the server, so rate limits see each visitor's own IP |
+| `CLIENT_IP_HEADER` | not set | A header with the visitor's IP set by the proxy in front, e.g. `CF-Connecting-IP` behind Cloudflare (Render). Used instead of `TRUST_PROXY` when set |
+| `DEBUG_CLIENT_IP` | `false` | `true` adds `GET /debug/client-ip`, showing which IP the rate limits see. For setting up a host only |
 | `AI_LIMIT_PER_HOUR` | `20` | AI requests per visitor per hour. An encounter or character with artwork is two |
 | `AI_LIMIT_PER_DAY` | `150` | AI requests per day for all visitors together, counted in MongoDB |
 | `PROMPT_SIGNING_SECRET` | derived from `OPENAI_API_KEY` | Key for signing image prompts |
