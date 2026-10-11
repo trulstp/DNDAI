@@ -83,10 +83,11 @@
    margin: 0 1.5rem; 
 }
 
-.nav-link-logo svg {
-    width: 2rem;
-   min-width: 2rem;
-   margin: 0 1.5rem; 
+.logo-mark {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    margin: 0 1.125rem;
 }
 
 .fa-primary {
@@ -128,22 +129,7 @@
   position: absolute;
   left: -999px;
   transition: var(--transition-speed);
-  text-align: end;
-}
-
-
-
-.logo svg {
-    transform: rotate(0deg);
-    transition: var(--transition-speed);
-}
-
-.navbar:hover .logo svg {
-    transform: rotate(-180deg);
-}
-
-.historyNav .logo svg {
-    transform: rotate(-180deg);
+  text-align: start;
 }
 
 @media only screen and (max-width: 600px) {
@@ -202,12 +188,9 @@
       
      }
 
-     .historyNav .logo svg {
-        margin-left: 11rem;
-     }
-
+    /* The name appears to the right of the logo when the nav expands */
     .historyNav .logo-text {
-    left: 0px;
+    left: 5rem;
     }
 
       .navbar:hover {
@@ -219,13 +202,8 @@
     }
 
     
-      .navbar:hover .logo svg
-      {
-        margin-left: 11rem;
-      }
-    
       .navbar:hover .logo-text
       {
-        left: 0px;
+        left: 5rem;
       }
 }
