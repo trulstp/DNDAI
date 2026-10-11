@@ -14,12 +14,15 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/"
+    "test": "node --test test/*.test.js"
   },
   "name": "backend",
   "version": "1.0.0",
   "description": "backend for the dnd database",
   "main": "server.js",
   "author": "Truls Teige Pettersen",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=24"
+  }
 }
