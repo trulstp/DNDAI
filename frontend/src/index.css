@@ -1,4 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+/* Open Sans, hosted with the app instead of loaded from Google: one variable font trimmed to the
+   weights used (400-700) and Latin characters, 18 KB instead of 44.5 KB, with no third-party request.
+   Licensed under the SIL Open Font License (fonts/OpenSans-OFL.txt) */
+@font-face {
+  font-family: "Open Sans";
+  src: url("../src/fonts/open-sans-400-700.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: "draconis";
