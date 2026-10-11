@@ -26,12 +26,13 @@
   font-size: 16px;
   color-scheme: dark;
 
-  --text-primary: #B46746; /* accent: headings, labels, borders */
+  /* Accent and red are lightened for dark backgrounds so text meets WCAG AA contrast (4.5:1) */
+  --text-primary: #CB9279; /* accent: headings, labels, borders */
   --text-secondary: #ffffff; /* strongest text */
-  --text-tertiary: #E84545; /* highlight red */
+  --text-tertiary: #EA5555; /* highlight red */
   --text-body: rgba(255, 255, 255, 0.85);
   --text-muted: rgba(255, 255, 255, 0.65);
-  --text-faint: rgba(255, 255, 255, 0.45);
+  --text-faint: rgba(255, 255, 255, 0.55);
 
   --color-primary: #343541; /* page background */
   --color-secondary: #202123; /* nav, sidebar and cards */
@@ -58,8 +59,8 @@
   --text-secondary: #2B2420;
   --text-tertiary: #C23A2B;
   --text-body: rgba(43, 36, 32, 0.88);
-  --text-muted: rgba(43, 36, 32, 0.65);
-  --text-faint: rgba(43, 36, 32, 0.5);
+  --text-muted: rgba(43, 36, 32, 0.75);
+  --text-faint: rgba(43, 36, 32, 0.7);
 
   --color-primary: #F4EDE1;
   --color-secondary: #FFFAF1;
