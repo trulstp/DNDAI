@@ -1,4 +1,8 @@
+import { useDocumentTitle } from "../util/useDocumentTitle";
+
 const MapsPage = () => {
+  useDocumentTitle("Maps");
+
   return (
     <div style={{ textAlign: "center" }}>
       <h1>Maps Page</h1>

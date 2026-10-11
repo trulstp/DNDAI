@@ -6,6 +6,7 @@ import { SidebarContext } from "../store/sidebar-context";
 import { blobToDataUrl } from "../util/blobToDataUrl";
 import { fetchOk } from "../util/fetchOk";
 import { newId } from "../util/newId";
+import { useDocumentTitle } from "../util/useDocumentTitle";
 const API = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
 
 const RandomEncounterPage = () => {
@@ -37,6 +38,14 @@ const RandomEncounterPage = () => {
 
   const currentEntry = previousEncounter.find(
     (entry) => entry.id === currentId,
+  );
+
+  useDocumentTitle(
+    loading
+      ? "Rolling encounter…"
+      : feedActive && currentEntry
+        ? currentEntry.title
+        : "Random Encounter",
   );
 
   const createNew = () => {
@@ -212,7 +221,7 @@ const RandomEncounterPage = () => {
           onToggleFavorite={toggleFavorite}
           onDelete={deleteEncounter}
           title='Encounter'
-          button={"+ New Encounter"}
+          button='New encounter'
         />
       )}
 

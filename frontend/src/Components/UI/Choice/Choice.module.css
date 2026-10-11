@@ -166,6 +166,11 @@
   color: var(--color-secondary);
 }
 
+/* On a filled button the icon takes the button's text colour, or it would vanish into the fill */
+.primary .icon {
+  color: inherit;
+}
+
 .tile .icon {
   font-size: 1.3rem;
   margin-bottom: 0.15rem;

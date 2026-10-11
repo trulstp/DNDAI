@@ -23,10 +23,27 @@
   filter: drop-shadow(0 6px 14px var(--shadow));
 }
 
+/* The wordmark, matching the nav: breathefire, uppercase, orange then red.
+   The font's own space is very narrow, so the words get a gap of their own */
 .title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.45em;
   margin: 0.75rem 0 0;
+  font-family: var(--font-secondary);
   font-size: 3.4rem;
   line-height: 1.1;
+  letter-spacing: 0.1ch;
+  text-transform: uppercase;
+}
+
+.title-first {
+  color: var(--text-primary);
+}
+
+.title-second {
+  color: var(--text-tertiary);
 }
 
 .tagline {

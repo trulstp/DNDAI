@@ -90,7 +90,11 @@ const Home = () => {
     <div className={classes.home}>
       <header className={classes.hero}>
         <img src={logo} alt='' className={classes.logo} />
-        <h1 className={classes.title}>Support Roll</h1>
+        {/* Same two-tone wordmark as the nav */}
+        <h1 className={classes.title}>
+          <span className={classes["title-first"]}>Support</span>{" "}
+          <span className={classes["title-second"]}>Roll</span>
+        </h1>
         <p className={classes.tagline}>
           Encounters and characters for your next session, rolled in seconds.
         </p>
