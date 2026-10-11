@@ -27,12 +27,17 @@ const CHAT_COMPLETIONS_URL = `${
 const API_KEY = process.env.OPENAI_API_KEY;
 
 // Browsers that can't show AVIF (older Safari and iOS) ask for WebP instead.
-// AVIF is the default: about half the size of WebP for these images
+// AVIF is the default: smaller than WebP for these images
 const IMAGE_FORMATS = ["avif", "webp"];
+
+// Effort is how hard the encoder works to shrink the file, not image quality. The default (4)
+// took over two minutes per image on the hosting's free-plan CPU; 0 takes seconds and the
+// file is about 64 KB instead of 46 KB
+const FORMAT_OPTIONS = { avif: { effort: 0 }, webp: {} };
 
 async function encodeImage(imageBuffer, requestedFormat) {
   const format = IMAGE_FORMATS.includes(requestedFormat) ? requestedFormat : "avif";
-  const data = await sharp(imageBuffer).toFormat(format).toBuffer();
+  const data = await sharp(imageBuffer).toFormat(format, FORMAT_OPTIONS[format]).toBuffer();
   return { type: `image/${format}`, data };
 }
 
