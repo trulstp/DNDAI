@@ -81,13 +81,14 @@ Pick a location and a challenge rating to roll a balanced combat encounter, or c
 │              │ ────────────────────▶ │              │ ─────────▶ │   MongoDB   │
 │    React     │ ◀──── monster list ── │   Express    │ ◀───────── │  monsters,  │
 │   frontend   │                       │   backend    │            │ stat blocks │
-│              │   2. monsters +       │              │  tool      └─────────────┘
-│              │      location ──────▶ │              │  calling ─▶ ┌──────────┐
-│              │ ◀── encounter JSON ── │              │ ◀────────── │  OpenAI  │
-│              │   3. signed image     │              │             │          │
-│              │      prompt ────────▶ │              │ ──────────▶ │  Images  │
-│              │ ◀── AVIF/WebP image ─ │   (sharp)    │ ◀────────── │          │
-└──────────────┘                       └──────┬───────┘             └──────────┘
+│              │   2. monsters +       │              │    tool    └─────────────┘
+│              │      location ──────▶ │              │  calling   ┌─────────────┐
+│              │ ◀── encounter JSON ── │              │ ─────────▶ │   OpenAI    │
+│              │   3. signed image     │              │ ◀───────── │    chat     │
+│              │      prompt ────────▶ │              │            ├─────────────┤
+│              │                       │              │ ─────────▶ │   OpenAI    │
+│              │ ◀── AVIF/WebP image ─ │   (sharp)    │ ◀───────── │   images    │
+└──────────────┘                       └──────┬───────┘            └─────────────┘
                                               │ spawn
                                        ┌──────▼───────┐
                                        │    Python    │  character mechanics
