@@ -34,4 +34,41 @@ const SPELLS_ALSO_ON_CLASS_LIST = {
   "Meld into Stone": ["druid"],
 };
 
-module.exports = { ABILITIES, SKILLS, SPELLS_ALSO_ON_CLASS_LIST };
+// --- Rules for the character engine (services/characterEngine.js) ---
+
+// Which abilities get the highest rolls, best first, by class slug. From the Python script.
+// TODO: the other eight classes (barbarian, bard, druid, monk, paladin, ranger, sorcerer, warlock)
+const STAT_PRIORITY = {
+  cleric: ["Wisdom", "Charisma", "Constitution", "Strength", "Intelligence", "Dexterity"],
+  fighter: ["Strength", "Constitution", "Dexterity", "Wisdom", "Intelligence", "Charisma"],
+  rogue: ["Dexterity", "Intelligence", "Constitution", "Strength", "Charisma", "Wisdom"],
+  wizard: ["Intelligence", "Wisdom", "Dexterity", "Constitution", "Charisma", "Strength"],
+};
+
+// Backgrounds give two skills and a feature
+const BACKGROUNDS = {
+  Acolyte: { skills: ["Insight", "Religion"], feature: "Shelter of the Faithful" },
+  Criminal: { skills: ["Deception", "Stealth"], feature: "Criminal Contact" },
+  "Folk Hero": { skills: ["Animal Handling", "Survival"], feature: "Rustic Hospitality" },
+  Noble: { skills: ["History", "Persuasion"], feature: "Position of Privilege" },
+  Sage: { skills: ["Arcana", "History"], feature: "Researcher" },
+  Soldier: { skills: ["Athletics", "Intimidation"], feature: "Military Rank" },
+};
+
+// How likely each background is per class, as weights (the Python script's repeated list entries).
+// TODO: the other eight classes
+const BACKGROUND_WEIGHTS = {
+  cleric: { Sage: 3, Soldier: 1, Noble: 2, "Folk Hero": 2, Criminal: 1, Acolyte: 4 },
+  fighter: { Sage: 1, Soldier: 5, Noble: 2, "Folk Hero": 2, Criminal: 2, Acolyte: 1 },
+  rogue: { Sage: 1, Soldier: 2, Noble: 1, "Folk Hero": 4, Criminal: 4, Acolyte: 1 },
+  wizard: { Sage: 5, Soldier: 1, Noble: 3, "Folk Hero": 1, Criminal: 1, Acolyte: 1 },
+};
+
+module.exports = {
+  ABILITIES,
+  SKILLS,
+  SPELLS_ALSO_ON_CLASS_LIST,
+  STAT_PRIORITY,
+  BACKGROUNDS,
+  BACKGROUND_WEIGHTS,
+};
