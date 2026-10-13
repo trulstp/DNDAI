@@ -65,7 +65,7 @@ Pick a location and a challenge rating to roll a balanced combat encounter, or c
 |---|---|
 | Frontend | React 18, Vite, React Router 6, CSS Modules, Font Awesome |
 | Backend | Node.js 24, Express 4, Mongoose 7 |
-| Database | MongoDB (monster catalogue, SRD stat blocks, daily usage) |
+| Database | MongoDB (monster catalogue, SRD stat blocks and character data, daily usage) |
 | AI | OpenAI Chat Completions with tool calling for structured JSON; OpenAI Images (`gpt-image-1-mini`) |
 | Image processing | `sharp`: AVIF, with WebP for browsers without AVIF support |
 | Character rules engine | Python 3 |
@@ -127,10 +127,11 @@ OPENAI_API_KEY=sk-...
 PORT=4000
 ```
 
-Load the monster catalogue (safe to re-run), copy the SRD stat blocks from Open5e, and start the server:
+Load the monster catalogue, copy the SRD stat blocks and the character data (classes, races and spells) from Open5e, and start the server. The scripts are safe to re-run:
 ```bash
 node scripts/seedMonsters.js
 node scripts/syncOpen5e.js
+node scripts/syncCharacterData.js
 npm start            # or: npm run dev, which restarts on changes
 ```
 The API is now at `http://localhost:4000`. Run the tests with `npm test`.
@@ -197,8 +198,8 @@ DNDAI/
 │   ├── routes/ · controller/  # Endpoints and their logic
 │   ├── middleware/limits.js   # Rate limits and the daily AI budget
 │   ├── util/promptSignature.js
-│   ├── models/                # Monsters, stat blocks, usage
-│   ├── scripts/               # Python rules engine, seed and Open5e sync
+│   ├── models/                # Monsters, stat blocks, classes, races, spells, usage
+│   ├── scripts/               # Python rules engine, seed and Open5e syncs
 │   ├── data/monsterSeed.js    # Monsters per location
 │   ├── test/                  # npm test
 │   └── Dockerfile
